@@ -1,0 +1,43 @@
+﻿@* Bestätigung.cshtml: Diese View zeigt eine Anmeldebestätigung für den regulären Nutzer.*@
+@* Diese View verwendet eine Liste des Models "Schulung.cs"*@
+
+@using Schulungsportal_2.Models
+
+@model IEnumerable<Schulungsportal_2.Models.Schulungen.Schulung>
+
+@{
+    ViewBag.Title = "Bestätigung";
+}
+
+
+@if (Model.Count() == 0)
+{
+    <h3>Achtung</h3>
+    <hr />
+
+    <p>Du hast keine Schulung ausgewählt.</p>
+    <a href="javascript:history.back()">zur&uuml;ck</a>
+
+}
+else
+{
+    <h3>Bestätigung</h3>
+    <hr />
+
+    <p>Du bist nun zu folgenden Schulungen angemeldet:</p>
+
+    foreach (var schulung in Model)
+    {
+        if (schulung.Check)
+        {
+            <p style="color:red">Diese E-Mail Adresse wurde bereits für eine Anmeldung zur Schulung <b>@Html.DisplayFor(modelItem => schulung.Titel)</b> am @schulung.Termine.Min(x => x.Start).ToString("dd.MM.yyyy HH:mm") Uhr verwendet.</p>
+        }
+        else
+        {
+            <p><b>@Html.DisplayFor(modelItem => schulung.Titel)</b> am @schulung.Termine.Min(x => x.Start).ToString("dd.MM.yyyy HH:mm") Uhr</p>
+        }
+    }
+
+    <p>Die Informationen und Termine zu den Schulungen erhältst du außerdem per E-Mail. Solltest du innerhalb von 24h keine automatische E-Mail erhalten, wende dich bitte an <a href="mailto:@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter">@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter</a></p>
+    @Html.ActionLink("Zurück zur Übersicht", "Anmeldung")
+}

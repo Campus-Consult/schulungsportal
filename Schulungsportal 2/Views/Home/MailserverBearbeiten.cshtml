@@ -1,0 +1,90 @@
+﻿@* MailserverBearbeiten.cshtml: Diese View wird verwendet, um die Mailserver Einstellungen anzupassen. Sie besteht aus Textareas, die bereits mit den alten Einstellungen gefüllt sind.*@
+@* Diese View verwendet das Model "MailProperties.cs"*@
+@model Schulungsportal_2.Models.MailProperties
+
+@{
+    ViewData["Title"] = "Mailserver Bearbeiten";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="MailserverBearbeiten" asp-controller="Home">
+    @Html.HiddenFor(model => model.id) @* Die ID wird nicht angezeigt, aber beim Speichern versteckt mitgegeben.*@
+    <div class="form-horizontal">
+        @* Label und Eingabefeld für mailserver*@
+        <div class="form-group">
+            <label asp-for="mailserver" class="col-md-2 control-label"></label>
+            <div class="col-md-3">
+                <input asp-for="mailserver" class="form-control" />
+                <span asp-validation-for="mailserver" class="text-danger" />
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        @* Label und Eingabefeld für port*@
+        <div class="form-group">
+            <label asp-for="port" class="col-md-2 control-label"></label>
+            <div class="col-md-3">
+                <input asp-for="port" class="form-control" />
+                <span asp-validation-for="port" class="text-danger" />
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        @* Label und Eingabefeld für useSsl*@
+        <div class="form-group">
+            <label asp-for="useSsl" class="col-md-2 control-label"></label>
+            <div class="col-md-3">
+                <input asp-for="useSsl" class="form-control" />
+                <span asp-validation-for="useSsl" class="text-danger" />
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        @* Label und Eingabefeld für Absender*@
+        <div class="form-group">
+            <label asp-for="absender" class="col-md-2 control-label"></label>
+            <div class="col-md-3">
+                <input asp-for="absender" class="form-control" />
+                <span asp-validation-for="absender" class="text-danger" />
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        @* Label und Eingabefeld für Passwort*@
+        <div class="form-group">
+            <label asp-for="passwort" class="col-md-2 control-label"></label>
+            <div class="col-md-3">
+                <input asp-for="passwort" class="form-control" />
+                <span asp-validation-for="passwort" class="text-danger" />
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        @* Label und Eingabefeld für Adresse des Schulungsbeauftragten*@
+        <div class="form-group">
+            <label asp-for="adresseSchulungsbeauftragter" class="col-md-2 control-label"></label>
+            <div class="col-md-3">
+                <input asp-for="adresseSchulungsbeauftragter" class="form-control" />
+                <span asp-validation-for="adresseSchulungsbeauftragter" class="text-danger" />
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+    </div>
+
+    @* "Speichern"- Button*@
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-1">
+            <input type="submit" value="Speichern" class="btn btn-default" />
+        </div>
+    </div>
+</form>
+
+<form action="/Manage/Index">
+    @* "Abbrechen"- Button*@
+    <div class="form-group">
+        <div class="col-md-9">
+            <input type="submit" value="Abbrechen" class="btn btn-default">
+        </div>
+    </div>
+</form>

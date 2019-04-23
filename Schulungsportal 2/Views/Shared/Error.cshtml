@@ -1,0 +1,15 @@
+﻿@model Exception
+
+@using Schulungsportal_2.Models
+
+@{
+        ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">Uuuuups...</h1>
+<h3 class="text-danger">Ein Fehler ist aufgetreten. Bitte versuchen sie es später erneut. Sollte das Problem weiterhin bestehen kontaktieren sie uns bitte unter <a href="mailto:@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter">@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter</a>.</h3>
+
+
+<p>@Model.Message</p>
+@if (Model.InnerException != null)
+{<p>@Model.InnerException.Message</p>}

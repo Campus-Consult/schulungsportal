@@ -1,0 +1,171 @@
+﻿ @*Anlegen.cshtml: Diese View stellt die Eingabemaske für das Anlegen einer Schulung dar.*@ 
+
+@* Diese View verwendet das ViewModel: "SchulungCreateViewModel.cs"*@ 
+@model Schulungsportal_2.ViewModels.SchulungCreateViewModel
+
+@{
+    ViewData["Title"] = "Anlegen";
+}
+
+<h2>Anlegen</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <hr/>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @if (ViewBag.errorMessage != null) {
+            <p style="color: red">@ViewBag.errorMessage</p>
+        }
+
+        @* Label und Eingabefeld für Titel*@ 
+        <div class="form-group">
+            @Html.LabelFor(model => model.Titel, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.Titel, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Titel, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        @* Label und Eingabefeld für Name des Organisation*@
+        <div class="form-group">
+            @Html.LabelFor(model => model.OrganisatorInstitution, htmlAttributes: new { @class = "control-label col-md-2"})
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.OrganisatorInstitution, new { htmlAttributes = new { @class = "form-control orga", @list = "organizors" } })
+                <datalist id="organizors">
+                    @foreach (var org in ViewBag.OrganisatorenDatalist)
+                    {
+                    <option value="@org" />
+                    }
+                </datalist>
+                @Html.ValidationMessageFor(model => model.OrganisatorInstitution, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        @* Label und Eingabefeld für Name des Dozenten*@ 
+        <div class="form-group">
+            @Html.LabelFor(model => model.NameDozent, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.NameDozent, new { htmlAttributes = new { @class = "form-control orga" } })
+                @Html.ValidationMessageFor(model => model.NameDozent, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        @* Label und Eingabefeld für Nummer des Dozenten*@ 
+        <div class="form-group">
+            @Html.LabelFor(model => model.NummerDozent, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.NummerDozent, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.NummerDozent, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        @* Label und Eingabefeld für E-Mail des Dozenten*@ 
+        <div class="form-group">
+            @Html.LabelFor(model => model.EmailDozent, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.EmailDozent, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.EmailDozent, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+
+        <div>
+            <div class="form-group"><label class="col-md-2 control-label">Termine</label></div>
+            <div id="termine-container">
+                @{int i = 0; }
+                @foreach (var termin in Model.TermineVM)
+                {
+                    <div class="termin form-group">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-2">
+                            <input class="form-control text-box single-line start-date" data-val="true" data-val-date="Das Feld &quot;Start-Termin&quot; muss eine Datumsangabe sein." data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." id="TermineVM_@(i)_StartDate" name="TermineVM[@(i)].StartDate" placeholder="dd.mm.yyyy" type="date" value="@termin.StartDate.ToString("yyyy-MM-dd")">
+                            <span class="field-validation-valid text-danger" data-valmsg-for="termin.StartDate" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <input class="form-control text-box single-line start-time" data-val="true" data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." id="TermineVM_@(i)_StartTime" name="TermineVM[@(i)].StartTime" placeholder="hh:mm" type="time" value="@termin.StartTime.ToString("hh\\:mm")">
+                            <span class="field-validation-valid text-danger" data-valmsg-for="termin.StartTime" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-md-1">bis</div>
+                        <div class="col-md-2">
+                            <input class="form-control text-box single-line end-date" data-val="true" data-val-date="Das Feld &quot;End-Termin&quot; muss eine Datumsangabe sein." data-val-required="Das Feld &quot;End-Termin&quot; ist erforderlich." id="TermineVM_@(i)_EndDate" name="TermineVM[@(i)].EndDate" placeholder="dd.mm.yyyy" type="date" value="@termin.EndDate.ToString("yyyy-MM-dd")">
+                            <span class="field-validation-valid text-danger" data-valmsg-for="termin.EndDate" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-md-2">
+                            <input class="form-control text-box single-line end-time" data-val="true" data-val-required="Das Feld &quot;End-Uhrzeit&quot; ist erforderlich." id="TermineVM_@(i)_EndTime" name="TermineVM[@(i)].EndTime" placeholder="hh:mm" type="time" value="@termin.EndTime.ToString("hh\\:mm")">
+                            <span class="field-validation-valid text-danger" data-valmsg-for="termin.EndTime" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-md-1">
+                            <button class="btn btn-danger termin-remove" title="entfernen" type="button">-</button>
+                        </div>
+                    </div>
+                    i++;
+                }
+            </div>
+            <div class="form-group">
+                <div class="col-md-11"></div>
+                <div class="col-md-1">
+                    <button id="termin-add" class="btn btn-success" type="button">+</button>
+                </div>
+            </div>
+        </div>
+
+        @* Label und Eingabefelder für die Anmeldefrist*@
+        <div class="form-group">
+            @Html.LabelFor(model => model.AnmeldefristDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.AnmeldefristDate, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd.mm.yyyy" } })
+                @Html.ValidationMessageFor(model => model.AnmeldefristDate, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+                @Html.EditorFor(model => model.AnmeldefristTime, new { htmlAttributes = new { @class = "form-control", @placeholder = "hh:mm" } })
+                @Html.ValidationMessageFor(model => model.AnmeldefristTime, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-5"></div>
+        </div>
+
+        @* Label und Eingabefeld für Beschreibung*@ 
+        <div class="form-group">
+            @Html.LabelFor(model => model.Beschreibung, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-5">
+                @Html.TextAreaFor(model => model.Beschreibung, htmlAttributes: new { @class = "text-box multi-line", @style = "width: 456px; height: 128px" })
+                @*<textarea class="text-box multi-line" data-val="true" data-val-required="Das Feld &quot;Beschreibung&quot; ist erforderlich." id="Beschreibung" name="Beschreibung" style="width: 456px; height: 128px"></textarea>*@
+                @Html.ValidationMessageFor(model => model.Beschreibung, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-5"></div>
+        </div>      
+      
+        @* Label und Eingabefeld für Ort*@ 
+        <div class="form-group">
+            @Html.LabelFor(model => model.Ort, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.Ort, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Ort, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-7"></div>
+        </div>
+       
+        @* "Anlegen"- Button*@ 
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Anlegen" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+@* Link zurück zur Schulungs-Übersicht*@
+<div>
+    <a asp-action="Uebersicht">Zurück zur Schulungsübersicht</a>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/schulung-edit-create.js"></script>
+}

@@ -1,0 +1,72 @@
+﻿@model Schulungsportal_2.ViewModels.SearchResultViewModel
+
+@{
+    ViewBag.Title = "Teilnehmerhistorie";
+}
+
+@if (Model.schulung == null || Model.schulung.Count() == 0)
+{
+    <h2>Keine besuchten Schulungen vorhanden</h2>
+    <p>Entweder sind alle Schulungen dieser Person abgesagt, oder die Anwesenheit wurde noch nicht bestätigt</p>
+}
+else
+{
+    <h2>Suchergebnisse für @Model.titel</h2>
+    <table class="table">
+
+        @* Einrichtung der Tabellen-Überschriften*@
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().Titel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().Termine.FirstOrDefault().Start)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().Termine.FirstOrDefault().End)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().OrganisatorInstitution)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().Ort)
+            </th>
+            <th class="hidden-print">
+            </th>
+        </tr>
+
+        @* Tabellen-Content aus allen übergebenen SchulungModel-Objekten in die Tabelle einbetten*@
+        @foreach (var item in Model.schulung)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Titel)
+                </td>
+                <td>
+                    @foreach (var termin in item.Termine.OrderBy(x => x.Start))
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.Start)</div>
+                    }
+                </td>
+                <td>
+                    @foreach (var termin in item.Termine.OrderBy(x => x.Start))
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.End)</div>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrganisatorInstitution)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ort)
+                </td>
+                <td class="hidden-print">
+                    <a target="_blank" href="/Schulung/Details/@item.SchulungGUID">Details</a> |
+                    <a target="_blank" href="/Schulung/Teilnehmerliste/@item.SchulungGUID">Teilnehmer</a>
+                </td>
+            </tr>
+        }
+    </table>
+    <input class="hidden-print btn btn-default" type="button" value="Drucken" onClick="javascript:window.print()">
+}
+<p><a class="hidden-print" href="javascript:window.history.back()">Zurück</a></p>

@@ -1,0 +1,35 @@
+﻿@* Impressum.cshtml: Diese View stellt die Impressums-Seite dar.*@
+
+@* Diese View verwendet das Model: "Impressum.cs"*@
+@model Schulungsportal_2.Models.Impressum
+
+@{
+    ViewBag.Title = "Impressum";
+}
+
+<hgroup class="title">
+    <h1>@ViewBag.Title</h1>
+</hgroup>
+
+@if(User.Identity.IsAuthenticated) {
+<p>
+    @Html.ActionLink("Impressum bearbeiten", "Impressumbearbeiten", "Home")
+</p>
+}
+<p>Angaben gemäß § 5 TMG</p>
+<p><strong>Verantwortungsbereich:</strong><br /> @Model.Verantwortungsbereich<a href="@Html.Raw(Context.Request.Host)">@Html.Raw(Context.Request.Host)</a></p>
+<p>&nbsp;</p>
+<p><strong>Diensteanbieter:</strong><br /> @Model.Dienstanbieter</p>
+<p>&nbsp;</p>
+<p><strong>Vertretungsberechtigtervorstand:</strong><br /> @Model.Vorstand</p>
+<p>&nbsp;</p>
+<p><strong>Anschrift:</strong><br /> @Model.Anschrift</p>
+<p>&nbsp;</p>
+<p><strong>elektronische Postadresse:</strong><br /> <a title="Kontakt" href="javascript:linkTo_UnCryptMailto('nbjmup;lpoubluAdbnqvt.dpotvmu/psh');" class="mail-link"> kontakt[at]campus-consult[dot]org</a></p>
+<p>&nbsp;</p>
+<p><strong>Schnelle elektronische und unmittelbare Kommunikation:</strong><br /> @Model.Kommunikation</p>
+<p>&nbsp;</p>
+<p><strong>Journalistisch-redaktionelle Verantwortung:</strong><br /> @Model.JournalistischeVerantwortung</p>
+<p>&nbsp;</p>
+<p>Eingetragen im Vereinsregister<br />Registergericht: Amstsgericht Paderborn<br />Reisternummer: VR 1615<p>&nbsp;</p>Steuernummer:339/5778/1742</p>
+<p>&nbsp;</p>

@@ -1,0 +1,121 @@
+﻿ @*Details.cshtml: Diese View stellt die Übersicht zu einer Schulung für den Schulungsbeauftragten dar. 
+ Diese View verwendet das Model "Schulung.cs" zu*@ 
+
+@model Schulungsportal_2.Models.Schulungen.Schulung
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details: @Html.DisplayFor(m => m.Titel)</h2>
+@if (Model.IsAbgesagt)
+{
+    <p style="color:red">Diese Schulung wurde abgesagt.</p>
+
+}
+else if (DateTime.Now > Model.Termine.Max(x => x.End))
+{
+    if (!Model.IsGeprüft)
+    {
+        <p style="color:red">Die Anwesenheit der Teilnehmer wurde noch nicht überprüft.</p>
+    }
+    else
+    {
+        <p style="color:green">Die Anwesenheit der Teilnehmer wurde überprüft.</p>
+    }
+}
+
+<div>
+    <hr/>
+    <table class="table table-striped well">
+        <tr>
+            <th>
+                Titel:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Titel)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(m => m.OrganisatorInstitution):
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.OrganisatorInstitution)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Dozent:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.NameDozent)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Handynummer:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.NummerDozent)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                E-Mail:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.EmailDozent)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Termin:
+            </th>
+            <td>
+                @foreach (var termin in Model.Termine.OrderBy(x => x.Start))
+                {
+                    if (termin.Start.Date.Equals(termin.End.Date))
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @termin.End.ToString("HH:mm") Uhr</div>
+
+                    }
+                    else
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @Html.DisplayFor(modelItem => termin.End) Uhr</div>
+
+                    }
+                }
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Anmeldefrist:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Anmeldefrist) Uhr
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Ort:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Ort)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Beschreibung:
+            </th>
+            <td class="multi-line">@Html.DisplayFor(m => m.Beschreibung)</td>
+        </tr>
+    </table>
+    <p>
+    <a href="/Schulung/Teilnehmerliste/@Model.SchulungGUID">Teilnehmerliste</a> |
+    <a href="/Schulung/Bearbeiten/@Model.SchulungGUID">Bearbeiten</a>
+    @if (!Model.IsAbgesagt && !Model.IsGeprüft) {<span> | </span><a href="/Schulung/Absagen/@Model.SchulungGUID">Absagen</a>}
+    @if (Model.IsAbgesagt){<span> | </span><a href="/Schulung/Loeschen/@Model.SchulungGUID">Löschen</a>}
+    </p>
+    <p>@Html.ActionLink("Zurück zur Schulungsübersicht", "Uebersicht") | @Html.ActionLink("Zum Archiv", "Archiv")</p>
+</div>

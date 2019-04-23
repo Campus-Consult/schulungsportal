@@ -1,0 +1,79 @@
+﻿@* Index.cshtml: Diese View stellt die Übersicht aller Schulungen für den Schulungsbeauftragten in einer Tabelle dar.*@ 
+@* Diese View verwendet das Model "SchulungModel.cs".*@
+@model IEnumerable<Schulungsportal_2.Models.Schulungen.Schulung>
+
+@{
+    ViewData["Title"] = "Uebersicht";
+}
+
+<h2>Schulungen</h2>
+
+<p>
+    @Html.ActionLink("Neue Schulung anlegen", "Anlegen", "Schulung")
+</p>
+<table class="table">
+
+    @* Einrichtung der Tabellen-Überschriften*@ 
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Titel)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Termine.FirstOrDefault().Start)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Termine.FirstOrDefault().End)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrganisatorInstitution)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.NameDozent)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Ort)
+        </th>
+        <th>
+        </th>
+    </tr>
+
+    @* Tabellen-Content aus allen übergebenen SchulungModel-Objekten in die Tabelle einbetten*@ 
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Titel) 
+                @if (!item.IsGeprüft && DateTime.Now > item.Termine.Max(x => x.End))
+                {
+                    <p style="color: red">[ANWESENHEITEN UNGEPRÜFT]</p>
+                }
+            </td>
+            <td>
+                @foreach (var termin in item.Termine.OrderBy(x => x.Start))
+                {
+                    <div>@Html.DisplayFor(modelItem => termin.Start)</div>
+                }
+            </td>
+            <td>
+                @foreach (var termin in item.Termine.OrderBy(x => x.Start))
+                {
+                    <div>@Html.DisplayFor(modelItem => termin.End)</div>
+                }
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.OrganisatorInstitution)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NameDozent)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ort)
+            </td>
+            <td>
+                <a href="/Schulung/Details/@item.SchulungGUID">Details</a> | 
+                <a href="/Schulung/Teilnehmerliste/@item.SchulungGUID">Teilnehmer</a>
+            </td>
+        </tr>
+    }
+</table>

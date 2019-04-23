@@ -1,0 +1,107 @@
+﻿ @*Absagen.cshtml: Diese View stellt die Absagen-Abfrage zu einer Schulung für den Schulungsbeauftragten in einer Tabelle dar.*@ 
+ @*Diese View verwendet das Model "Schulung.cs" zu*@ 
+@model Schulungsportal_2.Models.Schulungen.Schulung
+
+@{
+    ViewData["Title"] = "Absagen";
+}
+
+<h2>Absagen: @Html.DisplayFor(m => m.Titel)</h2>
+
+<h3>Sind Sie sicher, das Sie diese Schulung absagen möchten?</h3>
+<div>
+    <hr />
+    <table class="table table-striped well">
+        <tr>
+            <th>
+                Titel:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Titel)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(m => m.OrganisatorInstitution):
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.OrganisatorInstitution)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Dozent:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.NameDozent)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Handynummer:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.NummerDozent)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                E-Mail:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.EmailDozent)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Termin:
+            </th>
+            <td>
+                @foreach (var termin in Model.Termine.OrderBy(x => x.Start))
+                {
+                    if (termin.Start.Date.Equals(termin.End.Date))
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @termin.End.ToString("HH:mm") Uhr</div>
+
+                    }
+                    else
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @Html.DisplayFor(modelItem => termin.End) Uhr</div>
+
+                    }
+                }
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Ort:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Ort)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Beschreibung:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Beschreibung)
+            </td>
+        </tr>
+    </table>
+
+    <p> Diese Aktion kann nicht Rückgängig gemacht werden!</p>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            @Html.HiddenFor(m => m.SchulungGUID)
+        </div>
+        <div class="form-actions no-color">
+            <input type="submit" value="Absagen" class="btn btn-default" /> |
+            @Html.ActionLink("Zurück zur Schulungsübersicht", "Uebersicht")
+        </div>
+    }
+</div>
+

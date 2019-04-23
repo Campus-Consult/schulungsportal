@@ -1,0 +1,76 @@
+﻿@* Index.cshtml: Diese View stellt die Übersicht aller vergangenen Schulungen für den Schulungsbeauftragten in einer Tabelle dar.*@ 
+@* Diese View verwendet das ViewModel "ArchivViewModel.cs".*@
+@model Schulungsportal_2.ViewModels.ArchivViewModel
+
+@{
+    ViewData["Title"] = "Archiv";
+}
+
+<h2>Archiv</h2>
+<p>
+    @Html.ActionLink("Archiv durchsuchen", "Suche", "Suche")
+</p>
+
+<table class="table">
+
+    @* Einrichtung der Tabellen-Überschriften*@ 
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().Titel)             
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().Termine.FirstOrDefault().Start)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().Termine.FirstOrDefault().End)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().OrganisatorInstitution)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().NameDozent)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.schulung.FirstOrDefault().Ort)
+        </th>
+        <th>
+        </th>
+    </tr>
+
+    @* Tabellen-Content aus allen übergebenen SchulungModel-Objekten in die Tabelle einbetten*@ 
+    @foreach (var item in Model.schulung)
+    {
+
+            <tr @if (item.IsAbgesagt) { <text> style="color:lightgray" </text> } >
+                <td>
+                    @Html.DisplayFor(modelItem => item.Titel)
+                    @if (item.IsAbgesagt){ <text> [ABGESAGT] </text> }
+                </td>
+                <td>
+                    @foreach (var termin in item.Termine.OrderBy(x => x.Start))
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.Start)</div>
+                    }
+                </td>
+                <td>
+                    @foreach (var termin in item.Termine.OrderBy(x => x.Start))
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.End)</div>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrganisatorInstitution)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NameDozent)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ort)
+                </td>
+                <td>
+                    <a href="/Schulung/Details/@item.SchulungGUID">Details</a> |
+                    <a href="/Schulung/Teilnehmerliste/@item.SchulungGUID">Teilnehmer</a>
+                </td>
+            </tr>
+    }
+</table>

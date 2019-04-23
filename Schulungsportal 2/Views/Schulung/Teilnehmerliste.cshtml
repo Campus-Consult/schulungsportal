@@ -1,0 +1,181 @@
+﻿ @*Teilnehmerliste.cshtml: Diese View stellt die Übersicht aller Anmeldungen zu einer Schulung für den Schulungsbeauftragten oder den Dozenten in einer Tabelle dar. 
+ Diese View verwendet das ViewModel "TeilnehmerlisteViewModel.cs" zu*@ 
+
+@model Schulungsportal_2.ViewModels.TeilnehmerlisteViewModel
+
+@{
+    ViewData["Title"] = "Teilnehmerliste";
+}
+
+<div class="hidden-print">
+    <h2>Teilnehmerliste</h2>
+
+    <h4>@Html.DisplayFor(model => model.Schulung.Titel) (<a href="/Schulung/Details/@Model.Schulung.SchulungGUID">Details</a>)</h4>
+
+    @if ((Model.Schulung.IsGeprüft || Model.Schulung.IsAbgesagt) && !Context.User.Identity.IsAuthenticated)
+    {
+        <p style="Color:red;">  Diese Schulung ist bereits vorbei. </p>
+    }
+    else if (Model.Schulung == null)
+    {
+        <p style="Color:red;"> Die Schulung wurde nicht gefunden. </p>
+    }
+    else if (Model.Anmeldungen.Count() == 0)
+    {
+        <a href="/Anmeldung/Nachtragen/@Model.Schulung.SchulungGUID">Teilnehmer hinzufügen</a>
+        <p style="Color:red;"> Für diese Schulung gibt es noch keine Anmeldungen. </p>
+    }
+    else
+    {
+        if (Model.Anmeldungen.Count() == 1)
+        {
+            <p>Zu dieser Schulung gibt es 1 Anmeldung</p>
+        }
+        else
+        {
+            <p>Zu dieser Schulung gibt es @Model.Anmeldungen.Count() Anmeldungen</p>
+        }
+
+    <p><a href="/Anmeldung/Nachtragen/@Model.Schulung.SchulungGUID">Teilnehmer hinzufügen</a> | <a title="Rundmail" href=@Html.DisplayFor(m => Model.RundmailLink) class="mail-link">Rundmail</a> | <a href="" onclick="printDiv('printableArea')"> Anwesenheitsliste drucken </a></p>
+    <table class="table table-striped well">
+
+        @* Einrichtung der Tabellen-Überschriften*@ 
+        <tr>
+            <th>
+                Vorname
+            </th>
+            <th>
+                Nachname
+            </th>
+            <th>
+                E-Mail-Adresse
+            </th>
+            <th>
+                Handynummer
+            </th>
+            <th>
+                Status bei CC
+            </th>
+            <th>
+            </th>
+        </tr>
+
+        @* Tabellen-Content aus allen übergebenen SchulungModel-Objekten in die Tabelle einbetten*@ 
+        @foreach (var item in Model.Anmeldungen)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Vorname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nachname)
+                </td>
+                <td>
+                    @*Anonymisierte Mails haben kein @ und sollen damit auch nicht wie mails gerendert werden*@
+                    @if (item.Email.Contains("@"))
+                    {
+                        @Html.DisplayFor(modelItem => item.Email)
+                    } else
+                    {
+                        @item.Email
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nummer)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    <a href="/Anmeldung/Loeschen/@item.anmeldungId">Löschen</a>
+                </td>
+            </tr>
+        }
+    </table>
+    }
+
+    @* Link zurück zur Schulungs-Übersicht*@
+    <div>
+        <p>@Html.ActionLink("Zurück zur Schulungsübersicht", "Uebersicht") | @Html.ActionLink("Zum Archiv", "Archiv")</p>
+    </div>
+
+
+    @if (Context.User.Identity.IsAuthenticated && !Model.Schulung.IsGeprüft && DateTime.Now > Model.Schulung.Termine.Max(x => x.End))
+    {
+        <hr/>
+        <a href="/Schulung/Geprueft/@Model.Schulung.SchulungGUID">Anwesenheit geprüft</a>
+    }
+
+</div>
+<div id="printableArea" class="hidden">
+
+    <img src="~/images/cc-logo.png" style="width: 30%; margin:10px; background-color: white" />
+
+    @{var Dates = Model.Schulung.Termine.Select(x => x.Start.Date.ToString("dd.MM.yyyy"));
+        var Last = Dates.Last();
+        int i = 1;}
+    @foreach (var date in Dates)
+    {
+        if (Dates.Count() > 1)
+        {
+            <h3>Anwesenheitsliste @Html.DisplayFor(model => model.Schulung.Titel) (Teil @i/@Dates.Count())</h3>
+        }
+        else
+        {
+            <h3>Anwesenheitsliste @Html.DisplayFor(model => model.Schulung.Titel)</h3>
+        }
+        <p>Gehalten von @Html.DisplayFor(model => model.Schulung.NameDozent) am @date @*@String.Join(", ", Model.Schulung.Termine.Select(x => x.Start.Date.ToString("dd.MM.yyyy")))*@ </p>
+
+        if (DateTime.Now > Model.Schulung.Termine.Max(x => x.End).AddDays(3) && !Context.User.Identity.IsAuthenticated)
+        {
+            <p style="Color:red;">  Diese Schulung ist bereits vorbei. </p>
+        }
+        else if (Model.Schulung == null)
+        {
+            <p style="Color:red;"> Error 404: Schulung not found </p>
+        }
+        else if (Model.Anmeldungen.Count() == 0)
+        {
+            <p style="Color:red;"> Für diese Schulung gibt es noch keine Anmeldungen </p>
+        }
+        else
+        {
+            <table class="table table-bordered">
+
+                @* Einrichtung der Tabellen-Überschriften*@
+                <tr>
+                    <th>
+                        Nachname
+                    </th>
+                    <th>
+                        Vorname
+                    </th>
+                    <th>
+                        Unterschrift
+                    </th>
+                </tr>
+
+                @* Tabellen-Content aus allen übergebenen SchulungModel-Objekten in die Tabelle einbetten*@
+                @foreach (var item in Model.Anmeldungen)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Nachname)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Vorname)
+                        </td>
+                        <td></td>
+                    </tr>
+                }
+            </table>
+            if (!date.Equals(Last))
+            {
+                <p style="page-break-after: always;">&nbsp;</p>
+                <p style="page-break-before: always;">&nbsp;</p>
+            }
+        }
+        i++;
+    }
+</div>
+

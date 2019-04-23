@@ -1,0 +1,182 @@
+﻿@* Anmeldung.cshtml: Diese View stellt die Übersicht aller Schulungen und das Anmelde Formular für den regulären Nutzer dar.*@
+@* Diese View verwendet das ViewModel "AnmeldungViewModel.cs"*@
+
+@using Schulungsportal_2.Models
+
+@model Schulungsportal_2.ViewModels.AnmeldungViewModel
+
+@{
+    ViewBag.Title = "Anmeldung";
+}
+
+@if (Model.Schulungen.Count != 0)
+{
+    <div class="col-md-5">
+
+        <p>Die Anmeldung zu einer Schulung ist bis zur angegebenen Anmeldefrist möglich. In  Ausnahmefällen kann eine Anmeldung auch nach dieser Frist über <a href="mailto:@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter">@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter</a> erfolgen.</p>
+
+        <h3>Schulungen</h3>
+        <hr />
+
+        @foreach (var item in Model.Schulungen)
+        {
+            <h4>@Html.DisplayFor(modelItem => item.Titel)</h4>
+
+            <table class="table table-striped well">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(modelItem => item.OrganisatorInstitution):
+                    </th>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrganisatorInstitution)
+
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Termin:
+                    </th>
+                    <td>
+                        @foreach (var termin in item.Termine.OrderBy(x => x.Start))
+                        {
+                            if (termin.Start.Date.Equals(termin.End.Date))
+                            {
+                                <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @termin.End.ToString("HH:mm") Uhr</div>
+
+                            }
+                            else
+                            {
+                                <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @Html.DisplayFor(modelItem => termin.End) Uhr</div>
+
+                            }
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Anmeldefrist:
+                    </th>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Anmeldefrist) Uhr
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Ort:
+                    </th>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Ort)
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Beschreibung:
+                    </th>
+                    <td class="multi-line">@Html.DisplayFor(m => item.Beschreibung)</td>
+                </tr>
+            </table>
+            <hr />
+        }
+    </div>
+    <div class="col-md-7">
+        <h3>Anmeldung</h3>
+        <hr />
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+
+                @* Label und Eingabefeld für Vorname des Teilnehmers*@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Vorname, htmlAttributes: new { @class = "col-md-3 control-label" })
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.Vorname, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Vorname, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @* Label und Eingabefeld für Nachname des Teilnehmers*@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Nachname, htmlAttributes: new { @class = "col-md-3 control-label" })
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.Nachname, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Nachname, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @* Label und Eingabefeld für E-Mail des Teilnehmers*@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "col-md-3 control-label" })
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @* Label und Eingabefeld für Nummer des Teilnehmers*@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Nummer, htmlAttributes: new { @class = "col-md-3 control-label" })
+                    <div class="col-md-4">
+                        @Html.EditorFor(model => model.Nummer, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Nummer, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @* Label und Eingabefeld für Status des Teilnehmers*@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "col-md-3 control-label" })
+                    <div class="col-md-4">
+                        @Html.DropDownListFor(m => m.Status,
+
+                                Model.Stati,
+
+
+                                "- Bitte Status wählen -",
+
+
+                                new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+                @*Label und Checkboxen für Schulungen*@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Schulungen, htmlAttributes: new { @class = "col-md-3 control-label" })
+                    @for (int i = 0; i < Model.Schulungen.Count; i++)
+                    {
+                        <div class="col-md-3"></div>
+                        <div class="col-md-9">
+                            @Html.CheckBoxFor(m => m.SchulungsCheckboxen[i].Checked)
+                            @Html.HiddenFor(m => m.SchulungsCheckboxen[i].Titel)
+                            @Html.HiddenFor(m => m.SchulungsCheckboxen[i].Guid)
+                            @Html.DisplayFor(m => m.SchulungsCheckboxen[i].Titel)
+                        </div>
+                    }
+                </div>
+                <div class="col-md-offset-3 col-md-9">
+                    <p>Mit dem Klick auf "Anmelden" bestätige ich, dass die personenbezogenen Daten zu dieser Anmeldung dauerhaft in einer Datenbank gespeichert werden. Die Informationen unter <a target="_blank" href="/Home/Datenschutz">Datenschutz</a> habe ich gelesen und bin mit ihnen einverstanden. </p>
+                </div>
+
+                @* "Anmelde"- Button*@
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-md-9">
+                        <input type="submit" value="Anmelden" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <hr />
+    <p> Sollten Sie Fragen oder Probleme mit der Anmeldung haben, kontaktieren Sie <a href="mailto:@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter">@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter</a>.</p>
+}
+else
+{
+    <h4>Es werden derzeit leider keine Schulungen angeboten. Sobald wir wieder eine Schulung anbieten, kannst du dich anmelden.</h4>
+
+}
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,69 @@
+﻿@model Schulungsportal_2.ViewModels.SucheViewModel
+
+@{
+    ViewData["Title"] = "Suche";
+}
+
+<h2>Suche</h2>
+
+<hr/>
+
+<h3>Suche nach Titel:</h3>
+@using (Html.BeginForm("SucheTitel", "Suche", FormMethod.Get))
+{
+    <div class="form-horizontal">
+
+        @* Label und Eingabefeld für Titel*@ 
+        <div class="form-group">
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.Titel, new { htmlAttributes = new { @class = "form-control", @placeholder = "Vorname" } })
+                @Html.ValidationMessageFor(model => model.Titel, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-7">
+                <input type="submit" value="Suchen" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<hr/>
+
+<h3>Suche nach Dozent:</h3>
+@using (Html.BeginForm("SucheDozent","Suche", FormMethod.Get))
+{
+    <div class="form-horizontal">
+
+        @* Label und Eingabefeld für Titel*@ 
+        <div class="form-group">
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.VornameDozent, new { htmlAttributes = new { @class = "form-control", @placeholder = "Vorname"} })
+            </div>
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.NachnameDozent, new { htmlAttributes = new { @class = "form-control", @placeholder = "Nachname" } })
+            </div>
+            <div class="col-md-4">
+                <input type="submit" value="Suchen" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<hr />
+
+<h3>Suche nach Jahr:</h3>
+@using (Html.BeginForm("SucheJahr", "Suche", FormMethod.Get))
+{
+    <div class="form-horizontal">
+
+        @* Label und Eingabefeld für Titel*@ 
+        <div class="form-group">
+            <div class="col-md-3">
+                @Html.EditorFor(model => model.Jahr, new { htmlAttributes = new { @class = "form-control", @placeholder = "Jahr" } })
+                @Html.ValidationMessageFor(model => model.Jahr, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-7">
+                <input type="submit" value="Suchen" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}

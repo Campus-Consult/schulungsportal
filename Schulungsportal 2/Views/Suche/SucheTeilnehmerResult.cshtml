@@ -1,0 +1,67 @@
+﻿@model List<Schulungsportal_2.ViewModels.TeilnehmerSucheResultViewModel>
+
+@{
+    ViewBag.Title = "SucheTeilnehmerResult";
+}
+
+<h2>Suche Teilnehmer Result</h2>
+
+@using (Html.BeginForm("TeilnehmerSelected","Suche"))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>Match Count</th>
+                <th>Gefundene</th>
+                <th>Vorname</th>
+                <th>Nachname</th>
+                <th>Email</th>
+                <th>Telefonnummer</th>
+            </tr>
+
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                <tr>
+                    <td>
+                        @Html.HiddenFor(modelItem => modelItem[i].AnmeldungIDs)
+                        @Html.CheckBoxFor(modelItem => modelItem[i].Checked)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].matchCount)
+                        @Html.HiddenFor(modelItem => modelItem[i].matchCount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].number)
+                        @Html.HiddenFor(modelItem => modelItem[i].number)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].VornameTeilnehmer)
+                        @Html.HiddenFor(modelItem => modelItem[i].VornameTeilnehmer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].NachnameTeilnehmer)
+                        @Html.HiddenFor(modelItem => modelItem[i].NachnameTeilnehmer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].EmailTeilnehmer)
+                        @Html.HiddenFor(modelItem => modelItem[i].EmailTeilnehmer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].TelefonTeilnehmer)
+                        @Html.HiddenFor(modelItem => modelItem[i].TelefonTeilnehmer)
+                    </td>
+                </tr>
+            }
+
+        </table>
+        @* "Löschen"- Button*@
+        <div class="form-group">
+            <div class="col-md-12">
+                <input type="submit" value="Anonymisieren" name="DeleteButton" class="btn btn-default" />
+                <input type="submit" value="Historie Ausgeben" name="RecordButton" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}

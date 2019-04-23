@@ -1,0 +1,74 @@
+﻿@* Loeschen2.cshtml: Diese View stellt die Löschen-Abfrage zu einer Anmeldung für den Schulungsbeauftragten in einer Tabelle dar.*@ 
+@* Diese View verwendet das Model "Schulung.cs" zu*@ 
+@model Schulungsportal_2.Models.Anmeldungen.Anmeldung
+
+@{
+    ViewData["Title"] = "Loeschen";
+}
+
+<h2>Löschen: @Html.DisplayFor(m => m.Vorname) @Html.DisplayFor(m => m.Nachname)</h2>
+
+<h3>Sind Sie sicher, das Sie diese Anmeldung löschen möchten?</h3>
+<div>
+    <hr />
+    <table class="table table-striped well">
+        <tr>
+            <th>
+                Vorname:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Vorname)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Nachname
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Nachname)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Handynummer:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Nummer)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                E-Mail:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Email)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Status bei CC:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Status)
+            </td>
+        </tr>
+    </table>
+
+    <p> Diese Aktion kann nicht Rückgängig gemacht werden!</p>
+
+    @using (Html.BeginForm())
+    {
+        <div class="form-group">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.anmeldungId)
+        </div>
+        <div class="form-actions no-color">
+            <input type="submit" value="Löschen" class="btn btn-default" />
+        </div>
+    }
+
+    <div>
+        <a href="/Schulung/Teilnehmerliste/@Model.SchulungGuid">zurück zur Teilnehmerliste</a>
+    </div>
+</div>
+

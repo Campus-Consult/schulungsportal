@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Schulungsportal</title>
+    <link rel="stylesheet" href="~/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/design.css" />
+    <script src="~/js/modernizr-2.6.2.js"></script>
+    <script src="~/js/modernizr-2.8.3.js"></script>
+
+</head>
+<body class="multi-bgs">
+    <img src="~/img/cc-logo.png" style="width: 18%; margin:10px; background-color: white" />
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Schulungsportal", "Anmeldung", "Anmeldung", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <partial name="_VerwaltungPartial" />
+                    <li>@Html.ActionLink("Impressum", "Impressum", "Home")</li>
+                    <li>@Html.ActionLink("Datenschutz", "Datenschutz", "Home")</li>
+                </ul>
+                <partial name="_LoginPartial" />
+            </div>
+        </div>
+    </div>
+    <div class="container body-content" style="background-color: #fff;">
+        @RenderBody()
+        <hr />
+        <footer>
+            <div class="col-md-12">
+                <p>&copy; @DateTime.Now.Year.ToString() - Campus Consult e.V.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/js/jquery-3.3.1.js"></script>
+    <script src="~/js/bootstrap.js"></script>
+    <script src="~/js/respond.js"></script>
+    <script src="~/js/functions.js"></script>
+    <script src="~/js/site.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,54 @@
+﻿@font-face {
+    font-family: 'Titillium Web';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/titilliumweb.woff') format('woff');
+}
+
+* {
+    font-family: 'Titillium Web', sans-serif;
+}
+
+/* Nav-bar Farbe auf CC-Blau */
+.navbar {
+    background-color: rgb(24,62,116);
+    border-bottom-width: 0;
+}
+
+/* Input Felder und Textareas lassen sich auf 512px strecken*/
+input, textarea {
+    max-width: 512px;
+}
+
+/* Multiline textbox gleicht sich vom design einem bootstrap Input Feld an*/
+.text-box.multi-line {
+    border-radius: 4px;
+    border-color: #C8C8D0;
+}
+
+/*Hintergrundbilder (Dreiecke)*/
+.multi-bgs {
+ background:url(../img/Dreiecke_header.png) no-repeat fixed right top,
+ url(../img/CC_Dreiecke_300l_untenlinks.png) no-repeat fixed left bottom;
+ }
+
+.text-dark {
+    color: #999999;
+}
+
+/** Style logout button like other links*/
+button.logout {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    line-height: 20px;
+}
+
+button.logout:hover {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+/*Zeige multiline Text als solchen*/
+.multi-line {
+    white-space: pre-line;
+}

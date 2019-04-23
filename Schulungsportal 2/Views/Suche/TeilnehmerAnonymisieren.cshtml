@@ -1,0 +1,65 @@
+﻿@model List<Schulungsportal_2.ViewModels.TeilnehmerSucheResultViewModel>
+
+@{
+    ViewBag.Title = "Teilnehmer Anonymisieren";
+}
+
+@if(Model.Count == 0)
+{
+    <h2>Keine Datensätze ausgewählt!</h2>
+    <a href="javascript:window.history.back()">Zurück</a>
+}else
+{
+
+<h2>Sicher, dass folgenede Datensätze anonymisiert werden sollen?</h2>
+
+using (Html.BeginForm("TeilnehmerAnonymisieren","Suche"))
+{
+    @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            <table class="table">
+                <tr>
+                    <th>Match Count</th>
+                    <th>Gefundene</th>
+                    <th>Vorname</th>
+                    <th>Nachname</th>
+                    <th>Email</th>
+                    <th>Telefonnummer</th>
+                </tr>
+
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+                    <tr>
+                        @Html.HiddenFor(modelItem => modelItem[i].AnmeldungIDs)
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].matchCount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].number)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].VornameTeilnehmer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].NachnameTeilnehmer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].EmailTeilnehmer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => modelItem[i].TelefonTeilnehmer)
+                    </td>
+                </tr>
+                }
+
+            </table>
+            @* "Löschen"- Button*@
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="submit" value="Anonymisieren" class="btn btn-default" />
+                </div>
+            </div>
+            <p><a href="javascript:window.history.back()">Zurück</a></p>
+        </div>
+    }
+}

@@ -1,0 +1,75 @@
+﻿ @*Geprueft.cshtml: Diese View stellt die Geprueft-Abfrage zu einer Schulung für den Schulungsbeauftragten dar. 
+ Diese View verwendet das Model "Schulung.cs" zu*@ 
+@model Schulungsportal_2.Models.Schulungen.Schulung
+
+@{
+    ViewData["Title"] = "Geprueft";
+}
+
+<h2>Anwesenheit geprüft: @Html.DisplayFor(m => m.Titel)</h2>
+
+<h3>Sind Sie sicher, dass die Anwesenheit der Teilnehmer an dieser Schulung vollständig überprüft wurde und Sie diese Schulung als "Geprüft" setzen möchten?</h3>
+<div>
+    <hr />
+    <table class="table table-striped well">
+        <tr>
+            <th>
+                Titel:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Titel)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Dozent:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.NameDozent)
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Termin:
+            </th>
+            <td>
+                @foreach (var termin in Model.Termine.OrderBy(x => x.Start))
+                {
+                    if (termin.Start.Date.Equals(termin.End.Date))
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @termin.End.ToString("HH:mm") Uhr</div>
+
+                    }
+                    else
+                    {
+                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @Html.DisplayFor(modelItem => termin.End) Uhr</div>
+
+                    }
+                }
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Ort:
+            </th>
+            <td>
+                @Html.DisplayFor(m => m.Ort)
+            </td>
+        </tr>
+    </table>
+
+    <p>Die Schulung wird automatisch ins Archiv verschoben. Diese Aktion kann nicht Rückgängig gemacht werden!</p>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            @Html.HiddenFor(m => m.SchulungGUID)
+        </div>
+        <div class="form-actions no-color">
+            <input type="submit" value="Bestätigen" class="btn btn-default" /> |
+            @Html.ActionLink("Zurück zur Schulungsübersicht", "Uebersicht")
+        </div>
+    }
+</div>
+
