@@ -9,7 +9,7 @@ Damit es einfacher ist, das Schulungsportal einzurichten kann man in der release
 Um das Projekt auf einem Produktivsystem laufen zu lassen muss ein anderer Datenbankstring verwendet werden, der unter der Sektion `ConnectionString` und dann `DefaultConnection` eingetragen wird
 
 ### Email
-Um zu vermeiden, dass Passw�rter eingeschickt werden m�ssen, wird die Konfiguration des Email-Kontos ebenfalls in der Konfiguration vollbracht, der Aufbau sieht wie folgt aus:
+Um zu vermeiden, dass Passwörter eingeschickt werden müssen, wird die Konfiguration des Email-Kontos ebenfalls in der Konfiguration vollbracht, der Aufbau sieht wie folgt aus:
 ```
   "EMailOptions": {
     "Mailserver": "smtp.office365.com",
@@ -18,6 +18,6 @@ Um zu vermeiden, dass Passw�rter eingeschickt werden m�ssen, wird die Konfig
     "Passwort": "p4ssw0rd"
   }
 ```
-  Diese Konfiguration kann man anlegen wenn man unter Schulungsportal 2 Rechtsklickt um dann `Geheime Benutzerschl�ssel verwalten` ausw�hlt
+  Diese Konfiguration kann man anlegen wenn man unter Schulungsportal 2 Rechtsklickt um dann `Geheime Benutzerschlüssel verwalten` auswählt
 
-  Leider scheint es damit nicht m�glich zu sein, sich selber Termine zu schicken, da office365 sich querstellt
+  Leider scheint es damit nicht möglich zu sein, sich selber Termine zu schicken, da office365 sich querstellt
