@@ -6,7 +6,7 @@ stages:
 
 restore:
   tags:
-    -shared
+    - shared
   stage: restore
   cache:
     key: nuget-cache
@@ -17,7 +17,7 @@ restore:
 
 test:
   tags:
-    -shared
+    - shared
   stage: test
   cache:
     key: nuget-cache
