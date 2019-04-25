@@ -14,6 +14,7 @@ using Schulungsportal_2.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
+using Npgsql.EntityFrameworkCore;
 using Schulungsportal_2.Services;
 
 namespace Schulungsportal_2
@@ -39,9 +40,17 @@ namespace Schulungsportal_2
 
             services.Configure<EMailOptions>(Configuration.GetSection("EMailOptions"));
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            var dbtype = Configuration.GetSection("ConnectionStrings")["type"];
+            var connectionString = Configuration.GetSection("ConnectionStrings")["DefaultConnection"];
+            if (dbtype == "mssql") {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(connectionString));
+            } else if (dbtype == "postgresql") {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseNpgsql(connectionString));
+            } else {
+                throw new Exception("Dbtype has to be 'mssql' or 'postgresql', got"+dbtype);
+            }
             services.AddDefaultIdentity<IdentityUser>()
                 .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
