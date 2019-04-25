@@ -1,0 +1,24 @@
+image: mcr.microsoft.com/dotnet/core/sdk:2.2
+
+stages:
+  - restore
+  - test
+
+restore:
+  stage: restore
+  cache:
+    key: nuget-cache
+    paths:
+      - .nuget/
+  script:
+    - "dotnet restore --packages ./.nuget"
+
+test:
+  stage: test
+  cache:
+    key: nuget-cache
+    paths:
+      - .nuget/
+    policy: pull
+  script:
+    - "dotnet test --no-restore"
