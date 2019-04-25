@@ -5,6 +5,8 @@ stages:
   - test
 
 restore:
+  tags:
+    -shared
   stage: restore
   cache:
     key: nuget-cache
@@ -14,6 +16,8 @@ restore:
     - "dotnet restore --packages ./.nuget"
 
 test:
+  tags:
+    -shared
   stage: test
   cache:
     key: nuget-cache
