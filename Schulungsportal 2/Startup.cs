@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 using Npgsql.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Schulungsportal_2.Services;
 
 namespace Schulungsportal_2
@@ -48,7 +49,10 @@ namespace Schulungsportal_2
             } else if (dbtype == "postgresql") {
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseNpgsql(connectionString));
-            } else {
+            } else if (dbtype == "mysql") {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseMySql(connectionString));
+            } else{
                 throw new Exception("Dbtype has to be 'mssql' or 'postgresql', got"+dbtype);
             }
             services.AddDefaultIdentity<IdentityUser>()
