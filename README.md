@@ -1,5 +1,8 @@
 # Schulungsportal
 
+## Neue Verwalter/Admins aufnehmen
+Man kann sich nur noch per invite registrieren, dafür muss ein Verwalter/Admin unter `/Manage/AddManager` die E-Mail Adresse des Neulings submitten, damit dieser eine Invite-Mail bekommt.
+
 ## Konfiguration
 
 ### Admin
