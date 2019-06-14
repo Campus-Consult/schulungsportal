@@ -53,8 +53,18 @@ namespace Schulungsportal_2
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseMySql(connectionString));
             } else{
-                throw new Exception("Dbtype has to be 'mssql' or 'postgresql', got"+dbtype);
+                throw new Exception("Dbtype has to be 'mssql', 'postgresql' or 'mysql', got "+dbtype);
             }
+            services.Configure<IdentityOptions>(o =>
+                {
+                    // disable some requirements for password, cause I haven't found a way to easily check that on client side
+                    o.Password.RequireDigit = false;
+                    o.Password.RequireLowercase = false;
+                    o.Password.RequireNonAlphanumeric = false;
+                    o.Password.RequireUppercase = false;
+                    o.Password.RequiredLength = 8;
+                    o.Password.RequiredUniqueChars = 1;
+                });
             services.AddDefaultIdentity<IdentityUser>()
                 .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)

@@ -1,0 +1,52 @@
+﻿@model Schulungsportal_2.Controllers.ManageController.RegisterModel;
+
+@{
+    ViewData["Title"] = "Registrieren";
+}
+
+<h2>Für das Schulungsportal registrieren</h2>
+
+@if (ViewBag.invalidInvite) {
+    <p style="color: red">Die Einladung ist invalid, falls dies ein Fehler ist wenden Sie sich bitte an den Admin</p>
+} else {
+    <p>Bitte registrieren sie sich mit einem sicheren Password für das Schulungsportal, @ViewBag.loginName</p>
+    using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            <hr/>
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @if (ViewBag.errorMessage != null) {
+                <p style="color: red">@ViewBag.errorMessage</p>
+            }
+            @* Label und Eingabefeld für Password*@ 
+            <div class="form-group">
+                <label asp-for="Password" class="control-label col-md-2"></label>
+                <div class="col-md-3">
+                    <input asp-for="Password" class="form-control">
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="col-md-7"></div>
+            </div>
+            <div class="form-group">
+                <label asp-for="PasswordRepeat" class="control-label col-md-2"></label>
+                <div class="col-md-3">
+                    <input asp-for="PasswordRepeat" class="form-control">
+                    <span asp-validation-for="PasswordRepeat" class="text-danger"></span>
+                </div>
+                <div class="col-md-7"></div>
+            </div>
+
+            @* "Submit"- Button*@ 
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="submit" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

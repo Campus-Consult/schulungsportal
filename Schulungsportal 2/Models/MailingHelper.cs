@@ -247,6 +247,38 @@ namespace Schulungsportal_2.Models
             }
         }
 
+        public static Task GenerateAndSendInviteMail(Invite invite, string rootUrl, string vorstand, IEmailSender emailSender) {
+            MimeMessage message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
+            message.To.Add(new MailboxAddress(invite.EMailAdress)); // Empfaenger
+            message.Subject = "Invite Schulungsportal"; //Betreff
+
+            InviteMailViewModel imwm = new InviteMailViewModel {
+                Vorstand = vorstand,
+                InviteURL = rootUrl + "/Manage/Register/" + invite.InviteGUID,
+                CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
+                FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
+                InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
+            };
+
+            var body = new TextPart("html") //Inhalt
+            {
+                Text = RunCompile("InviteMail", imwm),
+                ContentTransferEncoding = ContentEncoding.Base64,
+            };
+
+            var multipart = new MultipartRelated();
+            multipart.Add(body);
+            // Bilder für Corporate Design
+            multipart.Add(LoadInlinePicture("CCLogo.png", imwm.CCLogoFile));
+            multipart.Add(LoadInlinePicture("FBLogo.png", imwm.FacebookLogoFile));
+            multipart.Add(LoadInlinePicture("InstaLogo.png", imwm.InstaLogoFile));
+            
+            message.Body = multipart;
+
+            return emailSender.SendEmailAsync(message);
+        }
+
         /// <summary>
         /// Generiert den Termin als Anhang (.ics-Datei)
         /// </summary>
@@ -336,7 +368,7 @@ namespace Schulungsportal_2.Models
             return parts;
         }
 
-        private static string RunCompile(string filename, MailViewModel mvm)
+        private static string RunCompile<T>(string filename, T mvm)
         {
             var cacheResult = engine.TemplateCache.RetrieveTemplate(filename);
             if (cacheResult.Success)
@@ -369,6 +401,14 @@ namespace Schulungsportal_2.Models
         public string Vorstand { get; set; }
         public Schulung Schulung { get; set; }
         public List<Schulung> Schulungen { get; set; }
+        public string CCLogoFile { get; set; }
+        public string FacebookLogoFile { get; set; }
+        public string InstaLogoFile { get; set; }
+    }
+
+    public class InviteMailViewModel {
+        public string InviteURL { get; set; }
+        public string Vorstand { get; set; }
         public string CCLogoFile { get; set; }
         public string FacebookLogoFile { get; set; }
         public string InstaLogoFile { get; set; }

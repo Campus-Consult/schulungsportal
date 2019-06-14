@@ -41,6 +41,7 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="MailTemplates\AnlegeMail.cshtml" />
+    <EmbeddedResource Include="MailTemplates\InviteMail.cshtml" />
     <EmbeddedResource Include="MailTemplates\BestaetigungsMail.cshtml" />
     <EmbeddedResource Include="MailTemplates\FBLogo.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>

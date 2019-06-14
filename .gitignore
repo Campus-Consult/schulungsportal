@@ -339,5 +339,8 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
+# vscode
+.vscode
+
 # Private release settings
 appsettings.Release.json

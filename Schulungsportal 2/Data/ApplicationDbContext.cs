@@ -47,6 +47,7 @@ namespace Schulungsportal_2.Data
         public DbSet<Anmeldung> Anmeldung { get; set; }
         public DbSet<Impressum> Impressum { get; set; }
         public DbSet<MailProperties> MailProperties { get; set; }
+        public DbSet<Invite> Invites { get; set; }
 
 
         public static ApplicationDbContext Create()
