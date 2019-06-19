@@ -69,6 +69,7 @@ namespace Schulungsportal_2.Controllers
                 .Where(s => s.Anmeldefrist > DateTime.Now)
                 .Include(s => s.Anmeldungen)
                 .Include(s => s.Termine)
+                .OrderBy(s => s.Anmeldefrist)
                 .Skip(offset)
                 .Take(max)
                 .Select(toSchulungDTO)
