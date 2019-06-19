@@ -13,7 +13,8 @@ namespace Schulungsportal_2.Data.Migrations
                 columns: table => new
                 {
                     id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Verantwortungsbereich = table.Column<string>(nullable: false),
                     Dienstanbieter = table.Column<string>(nullable: false),
                     Vorstand = table.Column<string>(nullable: false),
@@ -31,7 +32,8 @@ namespace Schulungsportal_2.Data.Migrations
                 columns: table => new
                 {
                     id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     mailserver = table.Column<string>(nullable: false),
                     port = table.Column<int>(nullable: false),
                     useSsl = table.Column<bool>(nullable: false),
@@ -71,7 +73,8 @@ namespace Schulungsportal_2.Data.Migrations
                 columns: table => new
                 {
                     anmeldungId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Vorname = table.Column<string>(nullable: false),
                     Nachname = table.Column<string>(nullable: false),
                     Email = table.Column<string>(nullable: false),
