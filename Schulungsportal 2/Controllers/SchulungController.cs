@@ -99,7 +99,7 @@ namespace Schulungsportal_2.Controllers
                     // stellt für alle Termine sicher, dass die Reihenfolge Anmeldefrist<Start<Ende eingehalten ist
                     if (schulung.Termine.Count > 0 && schulung.Termine.All(x => x.Start > schulung.Anmeldefrist && x.End > x.Start))
                     {
-                        var rootUrl = string.Format("{0}://{1}",Request.Scheme, Request.Host);
+                        var rootUrl = string.Format("https://{0}", Request.Host);
                         MailingHelper.GenerateAndSendAnlegeMail(schulung, rootUrl, getVorstand(), emailSender);
                         return RedirectToAction("Uebersicht");
                     }

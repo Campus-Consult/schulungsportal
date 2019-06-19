@@ -1,0 +1,1 @@
+scp -r bin/Release/netcoreapp2.2/publish/ cc@51.75.72.48:/var/www/schulungsportal2

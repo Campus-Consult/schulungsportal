@@ -47,7 +47,7 @@ namespace Schulungsportal_2.Controllers
                 ViewBag.errorMessage = "User is already registered!";
                 return View();
             }
-            var rootUrl = string.Format("{0}://{1}",Request.Scheme, Request.Host);
+            var rootUrl = string.Format("https://{0}",Request.Host);
             // create invite
             Invite invite = await InviteRepository.CreateForMail(manAdd.EMailAdress, DateTime.Now.AddDays(2));
             // send invite

@@ -343,4 +343,4 @@ healthchecksdb
 .vscode
 
 # Private release settings
-appsettings.Release.json
+appsettings.Production.json
