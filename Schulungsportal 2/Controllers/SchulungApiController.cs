@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Schulungsportal_2.Data;
 using Schulungsportal_2.Models;
 using Schulungsportal_2.Models.Anmeldungen;
@@ -42,8 +43,78 @@ namespace Schulungsportal_2.Controllers
             this.emailSender = emailSender;
         }
 
-        public ActionResult<IEnumerable<Schulung>> GetAll() {
-            return Json(_context.Schulung.AsEnumerable());
+        [Route("")]
+        public ActionResult<IEnumerable<Schulung>> GetAll(int offset = 0, int max = 100) {
+            // don't allow negative offsets and limit max to 200
+            if (offset < 0 || max < 0 || max > 200) {
+                return StatusCode(400);
+            }
+            return Json(_context.Schulung
+                .Include(s => s.Anmeldungen)
+                .Include(s => s.Termine)
+                .OrderBy(s => s.Anmeldefrist)
+                .Skip(offset)
+                .Take(max)
+                .Select(toSchulungDTO)
+                .AsEnumerable());
+        }
+
+        [Route("upcoming")]
+        public ActionResult<IEnumerable<Schulung>> GetUpcoming(int offset = 0, int max = 100) {
+            // don't allow negative offsets and limit max to 200
+            if (offset < 0 || max < 0 || max > 200) {
+                return StatusCode(400);
+            }
+            return Json(_context.Schulung
+                .Where(s => s.Anmeldefrist > DateTime.Now)
+                .Include(s => s.Anmeldungen)
+                .Include(s => s.Termine)
+                .Skip(offset)
+                .Take(max)
+                .Select(toSchulungDTO)
+                .AsEnumerable());
+        }
+
+        private class TerminDTO {
+            public DateTime Start { get; set; }
+            public DateTime End { get; set; }
+        }
+
+        private class SchulungDTO {
+            public string SchulungGUID { get; set; }
+
+            public String Titel { get; set; }
+
+            public String OrganisatorInstitution { get; set; }
+
+            public String Beschreibung { get; set; }
+
+            public String Ort { get; set; }
+            
+            public DateTime Anmeldefrist { get; set; }
+
+            public IEnumerable<TerminDTO> Termine { get; set; }
+
+            public int AnmeldungsZahl { get; set; }
+        }
+
+        private SchulungDTO toSchulungDTO(Schulung s) {
+            var termine = s.Termine.Select(t => new TerminDTO
+            {
+                Start = t.Start,
+                End = t.End,
+            });
+            return new SchulungDTO
+                {
+                Anmeldefrist = s.Anmeldefrist,
+                Beschreibung = s.Beschreibung,
+                AnmeldungsZahl = s.Anmeldungen.Count,
+                OrganisatorInstitution = s.OrganisatorInstitution,
+                Ort = s.Ort,
+                SchulungGUID = s.SchulungGUID,
+                Termine = termine,
+                Titel = s.Titel,
+            };
         }
     }
 }

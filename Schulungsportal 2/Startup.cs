@@ -25,7 +25,6 @@ namespace Schulungsportal_2
     {
         public Startup(IHostingEnvironment env)
         {
-            Console.WriteLine(env.EnvironmentName);
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
