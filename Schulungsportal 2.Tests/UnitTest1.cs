@@ -11,6 +11,7 @@ using Schulungsportal_2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Schulungsportal_2.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Schulungsportal_2_Tests
 {
@@ -20,6 +21,7 @@ namespace Schulungsportal_2_Tests
         SchulungRepository sr;
         AnmeldungRepository ar;
         AnmeldungController ac;
+        SchulungApiController sac;
         MockEmailSender emailSender = new MockEmailSender();
 
         public UnitTest1()
@@ -30,135 +32,7 @@ namespace Schulungsportal_2_Tests
             sr = new SchulungRepository(context);
             ar = new AnmeldungRepository(context, mapper);
             ac = new AnmeldungController(context, emailSender, mapper);
-        }
-
-        internal List<Termin> CreateSingletonTermine(DateTime start, DateTime end)
-        {
-            List<Termin> testTermin = new List<Termin>(1);
-            testTermin.Add(new Termin { Start = start, End = end});
-            return testTermin;
-        }
-
-        internal Schulung HelpCreateSchulung(string name, string id, DateTime anmeldefrist)
-        {
-            return new Schulung
-            {
-                AccessToken = id + "0",
-                Anmeldefrist = anmeldefrist,
-                Beschreibung = name,
-                EmailDozent = "test@test.test",
-                IsAbgesagt = false,
-                IsGeprüft = false,
-                NameDozent = "test",
-                NummerDozent = "12345",
-                OrganisatorInstitution = "CC",
-                Ort = "hier",
-                SchulungGUID = id,
-                Termine = CreateSingletonTermine(anmeldefrist.AddDays(1), anmeldefrist.AddDays(2)),
-                Titel = name,
-            };
-        }
-
-        internal void CreateTestData(DateTime now)
-        {
-            context.Schulung.RemoveRange(context.Schulung);
-            context.Anmeldung.RemoveRange(context.Anmeldung);
-            context.SaveChanges();
-            sr.Add(new Schulung {
-                Titel = "Schulung 1",
-                Beschreibung = "Schulung 1",
-                EmailDozent = "test@test.test",
-                Termine = CreateSingletonTermine(now.AddDays(2), now.AddDays(3)),
-                IsAbgesagt = false,
-                IsGeprüft = false,
-                NameDozent = "Test Dozent",
-                NummerDozent = "123",
-                OrganisatorInstitution = "CC",
-                Ort = "Büro",
-                SchulungGUID = "00000000-0000-0000-0000-000000000000",
-                Anmeldefrist = now.AddDays(1),
-            });
-            sr.Add(new Schulung
-            {
-                Titel = "Schulung 2",
-                Beschreibung = "Schulung 2",
-                EmailDozent = "test@test.test",
-                Termine = CreateSingletonTermine(now.AddDays(2), now.AddDays(3)),
-                IsAbgesagt = false,
-                IsGeprüft = false,
-                NameDozent = "Test Dozent",
-                NummerDozent = "123",
-                OrganisatorInstitution = "CC",
-                Ort = "Büro",
-                SchulungGUID = "00000000-0000-0000-0000-000000000001",
-                Anmeldefrist = now.AddDays(-1),
-            });
-            ar.Add(new Anmeldung
-            {
-                Email = "test@test.test",
-                Nachname = "Nach",
-                Vorname = "Vor",
-                Nummer = "123",
-                SchulungGuid = "00000000-0000-0000-0000-000000000000",
-                Status = "Mitglied"
-            });
-            ar.Add(new Anmeldung
-            {
-                Email = "test@test.test",
-                Nachname = "asdf",
-                Vorname = "VorVor",
-                Nummer = "123",
-                SchulungGuid = "00000000-0000-0000-0000-000000000000",
-                Status = "Mitglied"
-            });
-            ar.Add(new Anmeldung
-            {
-                Email = "test@test.test",
-                Nachname = "ASdf",
-                Vorname = "test",
-                Nummer = "123",
-                SchulungGuid = "00000000-0000-0000-0000-000000000000",
-                Status = "Mitglied"
-            });
-            ar.Add(new Anmeldung
-            {
-                Email = "test@test.test",
-                Nachname = "something",
-                Vorname = "completely",
-                Nummer = "different",
-                SchulungGuid = "00000000-0000-0000-0000-000000000000",
-                Status = "Mitglied"
-            });
-        }
-
-        internal void CreateTestDataForAnmeldung(DateTime now)
-        {
-            context.Anmeldung.RemoveRange(context.Anmeldung);
-            context.Schulung.RemoveRange(context.Schulung);
-            context.SaveChanges();
-            // Kann sich anmelden
-            sr.Add(HelpCreateSchulung("Test 0", "00000000-0000-0000-0000-000000000000", now.AddDays(1)));
-            // Kann sich nicht anmelden, da schon angemeldet
-            sr.Add(HelpCreateSchulung("Test 1", "00000000-0000-0000-0000-000000000001", now.AddDays(1)));
-            ar.Add(new Anmeldung
-            {
-                Email = "test@test.test",
-                Nachname = "something",
-                Vorname = "completely",
-                Nummer = "different",
-                SchulungGuid = "00000000-0000-0000-0000-000000000001",
-                Status = "Mitglied"
-            });
-            // nicht angezeigt, kann nicht anmelden da anmeldefrist abgelaufen
-            sr.Add(HelpCreateSchulung("Test 2", "00000000-0000-0000-0000-000000000002", now.AddDays(-1)));
-            // nicht angezeigt, kann nicht anmelden, da abgesagt
-            Schulung abgesagt = HelpCreateSchulung("Test 3", "00000000-0000-0000-0000-000000000003", now.AddDays(1));
-            abgesagt.IsAbgesagt = true;
-            sr.Add(abgesagt);
-            // Kann sich anmelden
-            sr.Add(HelpCreateSchulung("Test 4", "00000000-0000-0000-0000-000000000004", now.AddDays(1)));
-            // Kann sich anmelden
-            sr.Add(HelpCreateSchulung("Test 5", "00000000-0000-0000-0000-000000000005", now.AddDays(1)));
+            sac = new SchulungApiController(context, emailSender, mapper);
         }
 
         [Fact]
@@ -166,7 +40,7 @@ namespace Schulungsportal_2_Tests
         {
             // save current datetime so it isn't affected by programm execution and can be checked later
             DateTime now = DateTime.Now;
-            CreateTestData(now);
+            Utils.CreateTestData(context,now);
             // test with one match
             IEnumerable<AnmeldungRepository.AnmeldungWithMatchCount> results = ar.SearchAnmeldungenWithMatchCount("Vor", "Nach", "irrelevant", "");
             Assert.NotNull(results);
@@ -197,7 +71,7 @@ namespace Schulungsportal_2_Tests
         {
             // save current datetime so it isn't affected by programm execution and can be checked later
             DateTime now = DateTime.Now;
-            CreateTestData(now);
+            Utils.CreateTestData(context,now);
             MockEmailSender.sentMessages.Clear();
 
             // check types
@@ -234,7 +108,7 @@ namespace Schulungsportal_2_Tests
         {
             // save current datetime so it isn't affected by programm execution and can be checked later
             DateTime now = DateTime.Now;
-            CreateTestDataForAnmeldung(now);
+            Utils.CreateTestDataForAnmeldung(context,now);
             MockEmailSender.sentMessages.Clear();
 
             // check types
@@ -298,7 +172,7 @@ namespace Schulungsportal_2_Tests
         [Fact]
         public void testAnmeldungError()
         {
-            CreateTestData(DateTime.Now);
+            Utils.CreateTestData(context,DateTime.Now);
 
             // check types
             ActionResult result = ac.Anmeldung();
