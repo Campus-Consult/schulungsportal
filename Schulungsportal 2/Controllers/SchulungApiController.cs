@@ -44,7 +44,7 @@ namespace Schulungsportal_2.Controllers
         }
 
         [Route("")]
-        public ActionResult<IEnumerable<Schulung>> GetAll(int offset = 0, int max = 100) {
+        public ActionResult<IEnumerable<SchulungDTO>> GetAll(int offset = 0, int max = 100) {
             // don't allow negative offsets and limit max to 200
             if (offset < 0 || max < 0 || max > 200) {
                 return StatusCode(400);
@@ -60,13 +60,14 @@ namespace Schulungsportal_2.Controllers
         }
 
         [Route("upcoming")]
-        public ActionResult<IEnumerable<Schulung>> GetUpcoming(int offset = 0, int max = 100) {
+        public ActionResult<IEnumerable<SchulungDTO>> GetUpcoming(int offset = 0, int max = 100) {
             // don't allow negative offsets and limit max to 200
             if (offset < 0 || max < 0 || max > 200) {
                 return StatusCode(400);
             }
             return Json(_context.Schulung
                 .Where(s => s.Anmeldefrist > DateTime.Now)
+                .Where(s => !s.IsAbgesagt)
                 .Include(s => s.Anmeldungen)
                 .Include(s => s.Termine)
                 .OrderBy(s => s.Anmeldefrist)
@@ -76,12 +77,12 @@ namespace Schulungsportal_2.Controllers
                 .AsEnumerable());
         }
 
-        private class TerminDTO {
+        public class TerminDTO {
             public DateTime Start { get; set; }
             public DateTime End { get; set; }
         }
 
-        private class SchulungDTO {
+        public class SchulungDTO {
             public string SchulungGUID { get; set; }
 
             public String Titel { get; set; }
@@ -97,6 +98,8 @@ namespace Schulungsportal_2.Controllers
             public IEnumerable<TerminDTO> Termine { get; set; }
 
             public int AnmeldungsZahl { get; set; }
+
+            public Boolean IsAbgesagt { get; set; }
         }
 
         private SchulungDTO toSchulungDTO(Schulung s) {
@@ -110,6 +113,7 @@ namespace Schulungsportal_2.Controllers
                 Anmeldefrist = s.Anmeldefrist,
                 Beschreibung = s.Beschreibung,
                 AnmeldungsZahl = s.Anmeldungen.Count,
+                IsAbgesagt = s.IsAbgesagt,
                 OrganisatorInstitution = s.OrganisatorInstitution,
                 Ort = s.Ort,
                 SchulungGUID = s.SchulungGUID,
