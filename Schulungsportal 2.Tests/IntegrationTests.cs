@@ -54,5 +54,46 @@ namespace Schulungsportal_2_Tests
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
+
+        // second result
+        [Theory]
+        [InlineData(1,1)]
+        [InlineData(1,100)]
+        [InlineData(1,200)]
+        public async Task Get_SchulungsApiAllSecond(int offset, int max) {
+            // Arrange
+            var client = _factory.CreateClient();
+
+            // Act
+            var response = await client.GetAsync("/api/schulungen?offset="+offset+"&max="+max);
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            Assert.Equal("application/json; charset=utf-8", 
+                response.Content.Headers.ContentType.ToString());
+            var gotJson = await response.Content.ReadAsStringAsync();
+            var expectedJson = "[{\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Schulung 1\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 1\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-20T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"anmeldungsZahl\":4,\"isAbgesagt\":false}]";
+            Assert.Equal(expectedJson, gotJson);
+        }
+
+        [Theory]
+        [InlineData(0,0)]
+        [InlineData(2,100)]
+        [InlineData(123456,1)]
+        public async Task Get_SchulungsApiAllNone(int offset, int max) {
+            // Arrange
+            var client = _factory.CreateClient();
+
+            // Act
+            var response = await client.GetAsync("/api/schulungen?offset="+offset+"&max="+max);
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            Assert.Equal("application/json; charset=utf-8", 
+                response.Content.Headers.ContentType.ToString());
+            var gotJson = await response.Content.ReadAsStringAsync();
+            var expectedJson = "[]";
+            Assert.Equal(expectedJson, gotJson);
+        }
     }
 }
