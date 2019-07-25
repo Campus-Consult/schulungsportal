@@ -11,6 +11,7 @@
     <h1>@ViewBag.Title</h1>
 </hgroup>
 
+
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -56,3 +57,6 @@
         </div>
     </div>
 }
+
+<div id="app"></div>
+<script src="~/dist/teilnehmer-suche.js"></script>

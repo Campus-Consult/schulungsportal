@@ -265,7 +265,7 @@ FakesAssemblies/
 
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
-node_modules/
+**/node_modules/
 
 # Visual Studio 6 build log
 *.plg
@@ -344,3 +344,6 @@ healthchecksdb
 
 # Private release settings
 appsettings.Production.json
+
+# generated files by parcel
+Schulungsportal\ 2/wwwroot/dist
