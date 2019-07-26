@@ -121,6 +121,34 @@ namespace Schulungsportal_2_Tests
             context.SaveChanges();
         }
 
+        public static void CreateTestDataForSearch(ApplicationDbContext context, DateTime now) {
+            context.Anmeldung.RemoveRange(context.Anmeldung);
+            context.Schulung.RemoveRange(context.Schulung);
+            context.SaveChanges();
+            context.Add(HelpCreateSchulung("Test 0", "00000000-0000-0000-0000-000000000000", now.AddDays(-100), geprüft: true));
+            context.Add(HelpCreateSchulung("Test 1", "00000000-0000-0000-0000-000000000001", now.AddDays(-99), geprüft: true));
+            context.Add(HelpCreateSchulung("Test 2", "00000000-0000-0000-0000-000000000002", now.AddDays(-98), geprüft: true));
+            context.Add(HelpCreateSchulung("Test 3", "00000000-0000-0000-0000-000000000003", now.AddDays(-97), geprüft: true));
+            context.Add(HelpCreateSchulung("Test 4", "00000000-0000-0000-0000-000000000004", now.AddDays(-96), geprüft: true));
+            var vorname = "Test";
+            var nachname = "User";
+            var email = "test@test.test";
+            var handynummer = "12345";
+            for (int i = 0; i < 5; i++)
+            {
+                context.Add(new Anmeldung
+                {
+                    Email = (i%3==0)?email:email+i,
+                    Nachname = (i%2==0)?nachname:nachname+i,
+                    Vorname = (i%5==0)?vorname:vorname+i,
+                    Nummer = (i%7==0)?handynummer:handynummer+i,
+                    SchulungGuid = "00000000-0000-0000-0000-00000000000"+(i%5),
+                    Status = "Mitglied"
+                });
+            }
+            context.SaveChanges();
+        }
+
         public static List<Termin> CreateSingletonTermine(DateTime start, DateTime end)
         {
             List<Termin> testTermin = new List<Termin>(1);
@@ -128,7 +156,7 @@ namespace Schulungsportal_2_Tests
             return testTermin;
         }
 
-        public static Schulung HelpCreateSchulung(string name, string id, DateTime anmeldefrist)
+        public static Schulung HelpCreateSchulung(string name, string id, DateTime anmeldefrist, bool geprüft=false)
         {
             return new Schulung
             {
@@ -137,7 +165,7 @@ namespace Schulungsportal_2_Tests
                 Beschreibung = name,
                 EmailDozent = "test@test.test",
                 IsAbgesagt = false,
-                IsGeprüft = false,
+                IsGeprüft = geprüft,
                 NameDozent = "test",
                 NummerDozent = "12345",
                 OrganisatorInstitution = "CC",

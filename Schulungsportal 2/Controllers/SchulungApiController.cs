@@ -55,7 +55,7 @@ namespace Schulungsportal_2.Controllers
                 .OrderBy(s => s.Anmeldefrist)
                 .Skip(offset)
                 .Take(max)
-                .Select(toSchulungDTO)
+                .Select(toSchulungDTOAnmeldungsZahl)
                 .AsEnumerable());
         }
 
@@ -73,8 +73,22 @@ namespace Schulungsportal_2.Controllers
                 .OrderBy(s => s.Anmeldefrist)
                 .Skip(offset)
                 .Take(max)
-                .Select(toSchulungDTO)
+                .Select(toSchulungDTOAnmeldungsZahl)
                 .AsEnumerable());
+        }
+
+        [Authorize(Roles="Verwaltung")]
+        [Route("foranmeldungen")]
+        public ActionResult<IEnumerable<SchulungDTO>> GetForAnmeldungen(String ids) {
+            try {
+                var anmeldungen = ids.Split(",").Select(id => int.Parse(id));
+                return Json(_schulungRepository.GetSchulungenForAnmeldungIDs(anmeldungen)
+                    .Where(s => s.IsGeprüft)
+                    .Select(toSchulungDTO)
+                    .AsEnumerable());
+            } catch (FormatException) {
+                return BadRequest();
+            }
         }
 
         public class TerminDTO {
@@ -97,9 +111,31 @@ namespace Schulungsportal_2.Controllers
 
             public IEnumerable<TerminDTO> Termine { get; set; }
 
-            public int AnmeldungsZahl { get; set; }
-
             public Boolean IsAbgesagt { get; set; }
+        }
+
+        public class SchulungDTOAnmeldungsZahl: SchulungDTO {
+            public int AnmeldungsZahl { get; set; }
+        }
+
+        private SchulungDTOAnmeldungsZahl toSchulungDTOAnmeldungsZahl(Schulung s) {
+            var termine = s.Termine.Select(t => new TerminDTO
+            {
+                Start = t.Start,
+                End = t.End,
+            });
+            return new SchulungDTOAnmeldungsZahl
+                {
+                Anmeldefrist = s.Anmeldefrist,
+                Beschreibung = s.Beschreibung,
+                AnmeldungsZahl = s.Anmeldungen.Count,
+                IsAbgesagt = s.IsAbgesagt,
+                OrganisatorInstitution = s.OrganisatorInstitution,
+                Ort = s.Ort,
+                SchulungGUID = s.SchulungGUID,
+                Termine = termine,
+                Titel = s.Titel,
+            };
         }
 
         private SchulungDTO toSchulungDTO(Schulung s) {
@@ -112,7 +148,6 @@ namespace Schulungsportal_2.Controllers
                 {
                 Anmeldefrist = s.Anmeldefrist,
                 Beschreibung = s.Beschreibung,
-                AnmeldungsZahl = s.Anmeldungen.Count,
                 IsAbgesagt = s.IsAbgesagt,
                 OrganisatorInstitution = s.OrganisatorInstitution,
                 Ort = s.Ort,

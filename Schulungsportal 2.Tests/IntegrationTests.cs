@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System;
 using System.Threading.Tasks;
+using System.Text;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -11,11 +14,11 @@ using Xunit;
 namespace Schulungsportal_2_Tests
 {
     public class IntegrationTests 
-        : IClassFixture<CustomWebApplicationFactory<Schulungsportal_2.Startup>>
+        : IClassFixture<WebApplicationFactory<Schulungsportal_2.Startup>>
     {
-        private readonly CustomWebApplicationFactory<Schulungsportal_2.Startup> _factory;
+        private readonly WebApplicationFactory<Schulungsportal_2.Startup> _factory;
 
-        public IntegrationTests(CustomWebApplicationFactory<Schulungsportal_2.Startup> factory)
+        public IntegrationTests(WebApplicationFactory<Schulungsportal_2.Startup> factory)
         {
             _factory = factory;
         }
@@ -24,7 +27,9 @@ namespace Schulungsportal_2_Tests
         public async Task Get_SchulungsApiAll()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestData(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }).CreateClient();
 
             // Act
             var response = await client.GetAsync("/api/schulungen");
@@ -34,7 +39,7 @@ namespace Schulungsportal_2_Tests
             Assert.Equal("application/json; charset=utf-8", 
                 response.Content.Headers.ContentType.ToString());
             var gotJson = await response.Content.ReadAsStringAsync();
-            var expectedJson = "[{\"schulungGUID\":\"00000000-0000-0000-0000-000000000001\",\"titel\":\"Schulung 2\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 2\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-18T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"anmeldungsZahl\":0,\"isAbgesagt\":false},{\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Schulung 1\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 1\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-20T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"anmeldungsZahl\":4,\"isAbgesagt\":false}]";
+            var expectedJson = "[{\"anmeldungsZahl\":0,\"schulungGUID\":\"00000000-0000-0000-0000-000000000001\",\"titel\":\"Schulung 2\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 2\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-18T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"isAbgesagt\":false},{\"anmeldungsZahl\":4,\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Schulung 1\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 1\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-20T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"isAbgesagt\":false}]";
             Assert.Equal(expectedJson, gotJson);
         }
 
@@ -46,7 +51,9 @@ namespace Schulungsportal_2_Tests
         [InlineData(0,201)]
         public async Task Get_SchulungsApiAllInvalidRange(int offset, int max) {
             // Arrange
-            var client = _factory.CreateClient();
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestData(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }).CreateClient();
 
             // Act
             var response = await client.GetAsync("/api/schulungen?offset="+offset+"&max="+max);
@@ -62,7 +69,9 @@ namespace Schulungsportal_2_Tests
         [InlineData(1,200)]
         public async Task Get_SchulungsApiAllSecond(int offset, int max) {
             // Arrange
-            var client = _factory.CreateClient();
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestData(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }).CreateClient();
 
             // Act
             var response = await client.GetAsync("/api/schulungen?offset="+offset+"&max="+max);
@@ -72,7 +81,7 @@ namespace Schulungsportal_2_Tests
             Assert.Equal("application/json; charset=utf-8", 
                 response.Content.Headers.ContentType.ToString());
             var gotJson = await response.Content.ReadAsStringAsync();
-            var expectedJson = "[{\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Schulung 1\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 1\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-20T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"anmeldungsZahl\":4,\"isAbgesagt\":false}]";
+            var expectedJson = "[{\"anmeldungsZahl\":4,\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Schulung 1\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 1\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-20T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"isAbgesagt\":false}]";
             Assert.Equal(expectedJson, gotJson);
         }
 
@@ -82,7 +91,9 @@ namespace Schulungsportal_2_Tests
         [InlineData(123456,1)]
         public async Task Get_SchulungsApiAllNone(int offset, int max) {
             // Arrange
-            var client = _factory.CreateClient();
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestData(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }).CreateClient();
 
             // Act
             var response = await client.GetAsync("/api/schulungen?offset="+offset+"&max="+max);
@@ -94,6 +105,80 @@ namespace Schulungsportal_2_Tests
             var gotJson = await response.Content.ReadAsStringAsync();
             var expectedJson = "[]";
             Assert.Equal(expectedJson, gotJson);
+        }
+
+        [Fact]
+        public async Task Get_SchulungenForAnmeldungIDsCheckAuthorized() {
+            // Arrange
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestData(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }, isAuthenticated: false).CreateClient();
+
+            // Act
+            var response = await client.GetAsync("/api/schulungen/foranmeldungen?ids=1");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Get_SchulungenForAnmeldungIDsInvalid() {
+            // Arrange
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestData(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }, isAuthenticated: true).CreateClient();
+
+            // Act
+            var response = await client.GetAsync("/api/schulungen/foranmeldungen?ids=test,123");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Get_SchulungenForAnmeldungIDs() {
+            // Arrange
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestDataForSearch(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }, isAuthenticated: true).CreateClient();
+
+            // Act
+            var response = await client.GetAsync("/api/schulungen/foranmeldungen?ids=1,-1,123456,12");
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            var expectedJson = "[{\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Test 0\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Test 0\",\"ort\":\"hier\",\"anmeldefrist\":\"2019-03-11T00:00:00\",\"termine\":[{\"start\":\"2019-03-12T00:00:00\",\"end\":\"2019-03-13T00:00:00\"}],\"isAbgesagt\":false}]";
+            Assert.Equal(expectedJson, await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Post_TeilnehmerSucheUnauthorized() {
+            // Arrange
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestDataForSearch(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }).CreateClient();
+
+            // Act
+            var response = await client.PostAsync("/api/suche/teilnehmer", new StringContent("{\"vorname\":\"Test\",\"nachname\":\"User\",\"email\":\"test@test.test\",\"handynummer\":\"12345\"}"));
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Equal("", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task Post_TeilnehmerSuche() {
+            // Arrange
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestDataForSearch(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }, isAuthenticated: true).CreateClient();
+
+            // Act
+            var response = await client.PostAsync("/api/suche/teilnehmer", new StringContent("{\"vorname\":\"Test\",\"nachname\":\"User\",\"email\":\"test@test.test\",\"handynummer\":\"12345\"}", Encoding.UTF8, "application/json"));
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            //TODO check response
         }
     }
 }
