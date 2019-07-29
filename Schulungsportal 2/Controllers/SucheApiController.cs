@@ -49,38 +49,7 @@ namespace Schulungsportal_2.Controllers
         [Authorize(Roles = "Verwaltung")]
         public ActionResult<IEnumerable<AnmeldungWithMatchCountDTO>> SucheTeilnehmer([FromBody] SucheRequest sucheRequest) {
             return Json(_anmeldungRepository.SearchAnmeldungenWithMatchCount(CleanNull(sucheRequest.vorname), CleanNull(sucheRequest.nachname), CleanNull(sucheRequest.email), CleanNull(sucheRequest.handynummer))
-               .Select(MapAMWCToDTO));
-        }
-
-        public class SucheRequest {
-            public String vorname {get; set;}
-            public String nachname {get; set;}
-            public String email {get; set;}
-            public String handynummer {get; set;}
-        }
-
-        public class AnmeldungWithMatchCountDTO {
-            public int AnmeldungID {get; set;}
-            public String SchulungGUID {get; set;}
-            public String Vorname {get; set;}
-            public String Nachname {get; set;}
-            public String EMail {get; set;}
-            public String Handynummer {get; set;}
-            public String Status {get; set;}
-            public int MatchCount {get; set;}
-        }
-
-        private AnmeldungWithMatchCountDTO MapAMWCToDTO(AnmeldungRepository.AnmeldungWithMatchCount awmc) {
-            return new AnmeldungWithMatchCountDTO {
-                AnmeldungID = awmc.anmeldungId,
-                EMail = awmc.Email,
-                Handynummer = awmc.Nummer,
-                MatchCount = awmc.matchCount,
-                Nachname = awmc.Nachname,
-                SchulungGUID = awmc.SchulungGuid,
-                Status = awmc.Status,
-                Vorname = awmc.Vorname,
-            };
+               .Select(AnmeldungWithMatchCountDTO.toDTO));
         }
 
         private String CleanNull(String maybeNull) {

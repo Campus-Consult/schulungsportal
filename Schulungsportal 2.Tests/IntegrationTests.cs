@@ -182,7 +182,7 @@ namespace Schulungsportal_2_Tests
             // Assert
             response.EnsureSuccessStatusCode();
             //throw new Exception(await response.Content.ReadAsStringAsync());
-            var obj = JsonConvert.DeserializeObject<List<SucheApiController.AnmeldungWithMatchCountDTO>>(await response.Content.ReadAsStringAsync());
+            var obj = JsonConvert.DeserializeObject<List<AnmeldungWithMatchCountDTO>>(await response.Content.ReadAsStringAsync());
             Assert.Equal(4, obj.Count);
             var cur = obj[0];
             Assert.Equal(1, cur.AnmeldungID);
