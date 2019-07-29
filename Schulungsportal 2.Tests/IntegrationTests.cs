@@ -9,7 +9,10 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Xunit;
+
+using Schulungsportal_2.Controllers;
 
 namespace Schulungsportal_2_Tests
 {
@@ -178,7 +181,45 @@ namespace Schulungsportal_2_Tests
 
             // Assert
             response.EnsureSuccessStatusCode();
-            //TODO check response
+            //throw new Exception(await response.Content.ReadAsStringAsync());
+            var obj = JsonConvert.DeserializeObject<List<SucheApiController.AnmeldungWithMatchCountDTO>>(await response.Content.ReadAsStringAsync());
+            Assert.Equal(4, obj.Count);
+            var cur = obj[0];
+            Assert.Equal(1, cur.AnmeldungID);
+            Assert.Equal("00000000-0000-0000-0000-000000000000", cur.SchulungGUID);
+            Assert.Equal("Test", cur.Vorname);
+            Assert.Equal("User", cur.Nachname);
+            Assert.Equal("test@test.test", cur.EMail);
+            Assert.Equal("12345", cur.Handynummer);
+            Assert.Equal("Mitglied", cur.Status);
+            Assert.Equal(4, cur.MatchCount);
+            cur = obj[1];
+            Assert.Equal(3, cur.AnmeldungID);
+            Assert.Equal("00000000-0000-0000-0000-000000000002", cur.SchulungGUID);
+            Assert.Equal("Test2", cur.Vorname);
+            Assert.Equal("User", cur.Nachname);
+            Assert.Equal("test@test.test2", cur.EMail);
+            Assert.Equal("123452", cur.Handynummer);
+            Assert.Equal("Mitglied", cur.Status);
+            Assert.Equal(1, cur.MatchCount);
+            cur = obj[2];
+            Assert.Equal(4, cur.AnmeldungID);
+            Assert.Equal("00000000-0000-0000-0000-000000000003", cur.SchulungGUID);
+            Assert.Equal("Test3", cur.Vorname);
+            Assert.Equal("User3", cur.Nachname);
+            Assert.Equal("test@test.test", cur.EMail);
+            Assert.Equal("123453", cur.Handynummer);
+            Assert.Equal("Mitglied", cur.Status);
+            Assert.Equal(1, cur.MatchCount);
+            cur = obj[3];
+            Assert.Equal(5, cur.AnmeldungID);
+            Assert.Equal("00000000-0000-0000-0000-000000000004", cur.SchulungGUID);
+            Assert.Equal("Test4", cur.Vorname);
+            Assert.Equal("User", cur.Nachname);
+            Assert.Equal("test@test.test4", cur.EMail);
+            Assert.Equal("123454", cur.Handynummer);
+            Assert.Equal("Mitglied", cur.Status);
+            Assert.Equal(1, cur.MatchCount);
         }
     }
 }
