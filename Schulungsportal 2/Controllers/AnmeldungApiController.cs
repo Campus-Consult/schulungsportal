@@ -15,11 +15,11 @@ using System.Threading.Tasks;
 
 namespace Schulungsportal_2.Controllers
 {
-    [Route("api/suche")]
+    [Route("api/anmeldungen")]
     /// <summary>
     /// Der SchulungController beinhaltet alle Aktionen zur  Verwaltung und Anzeige von Schulungen oder deren Inhalten
     /// </summary>
-    public class SucheApiController : Controller
+    public class AnmeldungApiController : Controller
     {
         private SchulungRepository _schulungRepository;
         private AnmeldungRepository _anmeldungRepository;
@@ -34,7 +34,7 @@ namespace Schulungsportal_2.Controllers
         /// <summary>
         /// SchulungController Konstruktor legt Repositories für Datenzugriff an.
         /// </summary>
-        public SucheApiController(ApplicationDbContext context, IEmailSender emailSender, IMapper mapper)
+        public AnmeldungApiController(ApplicationDbContext context, IEmailSender emailSender, IMapper mapper)
         {
             _schulungRepository = new SchulungRepository(context);
             _anmeldungRepository = new AnmeldungRepository(context, mapper);
@@ -43,17 +43,15 @@ namespace Schulungsportal_2.Controllers
             this.emailSender = emailSender;
         }
 
-        /// Sucht Teilnehmer nach dem übergebenen request
-        [Route("teilnehmer")]
+        [Route("anonymize")]
         [HttpPost]
-        [Authorize(Roles = "Verwaltung")]
-        public ActionResult<IEnumerable<AnmeldungWithMatchCountDTO>> SucheTeilnehmer([FromBody] SucheRequest sucheRequest) {
-            if (sucheRequest == null || sucheRequest.IsAllNull()) {
+        [Authorize(Roles="Verwaltung")]
+        public ActionResult BulkAnonymizeAnmeldungen([FromBody] List<int> ids) {
+            if (ids == null) {
                 return BadRequest();
             }
-            sucheRequest.CleanNulls();
-            return Json(_anmeldungRepository.SearchAnmeldungenWithMatchCount(sucheRequest.vorname, sucheRequest.nachname, sucheRequest.email, sucheRequest.handynummer)
-               .Select(AnmeldungWithMatchCountDTO.toDTO));
+            _anmeldungRepository.BulkAnonymizeIDs(ids);
+            return Ok();
         }
 
         private String CleanNull(String maybeNull) {

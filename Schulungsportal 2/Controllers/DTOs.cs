@@ -56,10 +56,44 @@ namespace Schulungsportal_2.Controllers {
         }
     }
 
+    public class InternalSchulungDTO : SchulungDTO {
+
+        public String EmailDozent { get; set; }
+
+        public String NameDozent { get; set; }
+
+        public String NummerDozent { get; set; }
+
+        public bool IsGeprueft { get; set; }
+
+        public new static InternalSchulungDTO toDTO(Schulung s) {
+            var termine = s.Termine.Select(t => new TerminDTO
+            {
+                Start = t.Start,
+                End = t.End,
+            });
+            return new InternalSchulungDTO
+                {
+                Anmeldefrist = s.Anmeldefrist,
+                Beschreibung = s.Beschreibung,
+                IsAbgesagt = s.IsAbgesagt,
+                OrganisatorInstitution = s.OrganisatorInstitution,
+                Ort = s.Ort,
+                SchulungGUID = s.SchulungGUID,
+                Termine = termine,
+                Titel = s.Titel,
+                EmailDozent = s.EmailDozent,
+                NummerDozent = s.NummerDozent,
+                NameDozent = s.NameDozent,
+                IsGeprueft = s.IsGeprüft,
+            };
+        }
+    }
+
     public class SchulungDTOAnmeldungsZahl: SchulungDTO {
         public int AnmeldungsZahl { get; set; }
 
-        public static SchulungDTOAnmeldungsZahl toDTO(Schulung s) {
+        public new static SchulungDTOAnmeldungsZahl toDTO(Schulung s) {
             var termine = s.Termine.Select(t => new TerminDTO
             {
                 Start = t.Start,
@@ -85,6 +119,17 @@ namespace Schulungsportal_2.Controllers {
         public String nachname {get; set;}
         public String email {get; set;}
         public String handynummer {get; set;}
+
+        public bool IsAllNull() {
+            return vorname == null && nachname == null && email == null && handynummer == null;
+        }
+
+        public void CleanNulls() {
+            vorname = vorname == null ? "" : vorname;
+            nachname = nachname == null ? "" : nachname;
+            email = email == null ? "" : email;
+            handynummer = handynummer == null ? "" : handynummer;
+        }
     }
 
     public class AnmeldungWithMatchCountDTO {
@@ -96,6 +141,7 @@ namespace Schulungsportal_2.Controllers {
         public String Handynummer {get; set;}
         public String Status {get; set;}
         public int MatchCount {get; set;}
+        public InternalSchulungDTO Schulung {get; set;}
 
         public static AnmeldungWithMatchCountDTO toDTO(AnmeldungRepository.AnmeldungWithMatchCount awmc) {
             return new AnmeldungWithMatchCountDTO {
@@ -107,6 +153,7 @@ namespace Schulungsportal_2.Controllers {
                 SchulungGUID = awmc.SchulungGuid,
                 Status = awmc.Status,
                 Vorname = awmc.Vorname,
+                Schulung = InternalSchulungDTO.toDTO(awmc.Schulung),
             };
         }
     }

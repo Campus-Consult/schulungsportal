@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Xunit;
+using Schulungsportal_2.Data;
 
 using Schulungsportal_2.Controllers;
 
@@ -193,6 +195,10 @@ namespace Schulungsportal_2_Tests
             Assert.Equal("12345", cur.Handynummer);
             Assert.Equal("Mitglied", cur.Status);
             Assert.Equal(4, cur.MatchCount);
+            // only test a few
+            Assert.Equal("00000000-0000-0000-0000-000000000000", cur.Schulung.SchulungGUID);
+            Assert.Equal("Test 0", cur.Schulung.Titel);
+            Assert.Equal(DateTime.Parse("2019-06-19T00:00:00").AddDays(-99), cur.Schulung.Termine.ElementAt(0).Start);
             cur = obj[1];
             Assert.Equal(3, cur.AnmeldungID);
             Assert.Equal("00000000-0000-0000-0000-000000000002", cur.SchulungGUID);
@@ -202,6 +208,9 @@ namespace Schulungsportal_2_Tests
             Assert.Equal("123452", cur.Handynummer);
             Assert.Equal("Mitglied", cur.Status);
             Assert.Equal(1, cur.MatchCount);
+            Assert.Equal("00000000-0000-0000-0000-000000000002", cur.Schulung.SchulungGUID);
+            Assert.Equal("Test 2", cur.Schulung.Titel);
+            Assert.Equal(DateTime.Parse("2019-06-19T00:00:00").AddDays(-97), cur.Schulung.Termine.ElementAt(0).Start);
             cur = obj[2];
             Assert.Equal(4, cur.AnmeldungID);
             Assert.Equal("00000000-0000-0000-0000-000000000003", cur.SchulungGUID);
@@ -211,6 +220,9 @@ namespace Schulungsportal_2_Tests
             Assert.Equal("123453", cur.Handynummer);
             Assert.Equal("Mitglied", cur.Status);
             Assert.Equal(1, cur.MatchCount);
+            Assert.Equal("00000000-0000-0000-0000-000000000003", cur.Schulung.SchulungGUID);
+            Assert.Equal("Test 3", cur.Schulung.Titel);
+            Assert.Equal(DateTime.Parse("2019-06-19T00:00:00").AddDays(-96), cur.Schulung.Termine.ElementAt(0).Start);
             cur = obj[3];
             Assert.Equal(5, cur.AnmeldungID);
             Assert.Equal("00000000-0000-0000-0000-000000000004", cur.SchulungGUID);
@@ -220,6 +232,81 @@ namespace Schulungsportal_2_Tests
             Assert.Equal("123454", cur.Handynummer);
             Assert.Equal("Mitglied", cur.Status);
             Assert.Equal(1, cur.MatchCount);
+            Assert.Equal("00000000-0000-0000-0000-000000000004", cur.Schulung.SchulungGUID);
+            Assert.Equal("Test 4", cur.Schulung.Titel);
+            Assert.Equal(DateTime.Parse("2019-06-19T00:00:00").AddDays(-95), cur.Schulung.Termine.ElementAt(0).Start);
+        }
+
+        [Fact]
+        public async void Post_TeilnehmerSucheIncompleteForm() {
+            // Arrange
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestDataForSearch(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }, isAuthenticated: true).CreateClient();
+
+            // Act
+            var response = await client.PostAsync("/api/suche/teilnehmer", new StringContent("{\"vorname\":\"Test4\"}", Encoding.UTF8, "application/json"));
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            //throw new Exception(await response.Content.ReadAsStringAsync());
+            var obj = JsonConvert.DeserializeObject<List<AnmeldungWithMatchCountDTO>>(await response.Content.ReadAsStringAsync());
+            Assert.Equal(1, obj.Count);
+            var cur = obj[0];
+            Assert.Equal(5, cur.AnmeldungID);
+            Assert.Equal("00000000-0000-0000-0000-000000000004", cur.SchulungGUID);
+            Assert.Equal("Test4", cur.Vorname);
+            Assert.Equal("User", cur.Nachname);
+            Assert.Equal("test@test.test4", cur.EMail);
+            Assert.Equal("123454", cur.Handynummer);
+            Assert.Equal("Mitglied", cur.Status);
+            Assert.Equal(1, cur.MatchCount);
+        }
+
+        [Fact]
+        public async void Post_TeilnehmerSucheNoForm() {
+            // Arrange
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestDataForSearch(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }, isAuthenticated: true).CreateClient();
+
+            // Act
+            var response = await client.PostAsync("/api/suche/teilnehmer", new StringContent("", Encoding.UTF8, "application/json"));
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal("", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async void Post_TeilnehmerAnonymizeUnauthorized() {
+            // Arrange
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestDataForSearch(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }, isAuthenticated: false).CreateClient();
+
+            // Act
+            var response = await client.PostAsync("/api/anmeldungen/anonymize", new StringContent("", Encoding.UTF8, "application/json"));
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.Equal("", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async void Post_TeilnehmerAnonymize() {
+            // Arrange
+            var client = CustomWebApplicationFactoryHelper.GetFactory(_factory, db => {
+                Utils.CreateTestDataForSearch(db, DateTime.Parse("2019-06-19T00:00:00"));
+            }, isAuthenticated: true).CreateClient();
+
+            // Act
+            var response = await client.PostAsync("/api/anmeldungen/anonymize", new StringContent("[1,2,3]", Encoding.UTF8, "application/json"));
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("", await response.Content.ReadAsStringAsync());
+            // TODO check database
         }
     }
 }

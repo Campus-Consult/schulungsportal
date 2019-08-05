@@ -14,7 +14,7 @@ namespace Schulungsportal_2.Models
     {
         public MapperProfile()
         {
-            CreateMap<Anmeldung, AnmeldungWithMatchCount>().ForMember(x => x.Schulung, y => y.Ignore());
+            CreateMap<Anmeldung, AnmeldungWithMatchCount>();
             CreateMap<Schulung, SchulungCreateViewModel>();
             CreateMap<Schulung, SchulungViewModel>();
         }

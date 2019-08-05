@@ -9,14 +9,21 @@
             <div class="form-group hidden-print" style="height: 1em;">
                 <span v-if="searching">Lade...</span>
             </div>
+            <div class="form-group">
+                {{errorMessage}}
+            </div>
             <div v-if="anmeldungen.length">
                 <div class="form-group hidden-print">
-                    <button v-bind:disabled="!anyselected" @click="printSelected" class="btn btn-default">Historie anzeigen</button>
                     <button v-bind:disabled="!anyselected" @click="deleteSelected" class="btn btn-danger">Teilnehmer anonymisieren</button>
+                    <button @click="toggleSchulungView" class="btn btn-default">{{showSchulungViewText}}</button>
+                    <button v-bind:disabled="!anyselected" @click="printSelected" class="btn btn-default">Historie drucken</button>
+                </div>
+                <div class="form-group hidden-print">
+                    <input type="checkbox" v-model="showSelectedOnly">Nur ausgewählte anzeigen
                 </div>
                 <div class="form-group">
                     <h2>Suchergebnisse für {{fullname}}</h2>
-                    <table class="table">
+                    <table class="table" v-bind:class="{'hidden' : showSchulungView}">
                         <tbody>
                             <tr>
                                 <th class="hidden-print"><input type="checkbox" v-model="selectAll"></th>
@@ -26,13 +33,31 @@
                                 <th>Email</th>
                                 <th>Telefonnummer</th>
                             </tr>
-                            <tr v-bind:class="{ 'hidden-print': !anmeldung.checked }" v-bind:key="anmeldung.AnmeldungID" v-for="anmeldung in anmeldungen">
+                            <tr v-bind:key="anmeldung.AnmeldungID" v-for="anmeldung in anmeldungen" v-bind:class="{ 'hidden': !anmeldung.checked && showSelectedOnly,'hidden-print': !anmeldung.checked }">
                                 <td class="hidden-print"><input type="checkbox" @change="checkAllChecked" v-model="anmeldung.checked"></td>
                                 <td>{{anmeldung.matchCount}}</td>
                                 <td>{{anmeldung.vorname}}</td>
                                 <td>{{anmeldung.nachname}}</td>
                                 <td>{{anmeldung.eMail}}</td>
                                 <td>{{anmeldung.handynummer}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table" v-bind:class="{'hidden' : !showSchulungView}">
+                        <tbody>
+                            <tr>
+                                <th>Titel</th>
+                                <th>Organisation</th>
+                                <th>Start-Termin</th>
+                                <th>End-Termin</th>
+                                <th></th>
+                            </tr>
+                            <tr v-bind:key="anmeldung.AnmeldungID" v-for="anmeldung in anmeldungen" v-bind:class="{ 'hidden': !anmeldung.checked && showSelectedOnly,'hidden-print': !anmeldung.checked }">
+                                <td>{{anmeldung.schulung.titel}}</td>
+                                <td>{{anmeldung.schulung.organisatorInstitution}}</td>
+                                <td v-html="formatTermineStart(anmeldung.schulung.termine)"></td>
+                                <td v-html="formatTermineEnd(anmeldung.schulung.termine)"></td>
+                                <td class="hidden-print"><a v-bind:href="'/Schulung/Details/'+anmeldung.schulungGUID" target="_blank">Details</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -51,6 +76,22 @@ import 'vuejs-dialog/dist/vuejs-dialog.min.css';
 // Tell Vue to install the plugin.
 Vue.use(VuejsDialog);
 
+interface Termin {
+    start: string;
+    end: string;
+}
+
+interface Schulung {
+    schulungGUID: string;
+    titel: string;
+    organisatorInstitution: string;
+    beschreibung: string;
+    ort: string;
+    anmeldefrist: string;
+    termine: Array<Termin>;
+    isAbgesagt: boolean;
+}
+
 interface AnmeldungWithMatchCount {
     anmeldungID: number,
     schulungGUID: string,
@@ -60,6 +101,7 @@ interface AnmeldungWithMatchCount {
     handynummer: string,
     status: string,
     matchCount: number,
+    schulung: Schulung;
 }
 
 interface AnmeldungWithMatchCountCheck extends AnmeldungWithMatchCount {
@@ -83,6 +125,9 @@ export default class TeilnehmerSuche extends Vue {
     sucheTimeout: number;
     searching: boolean = false;
     selectAll: boolean = false;
+    showSelectedOnly: boolean = false;
+    showSchulungView: boolean = false;
+    errorMessage: string = "";
     $dialog: any;
 
     // --- computed properties
@@ -101,6 +146,22 @@ export default class TeilnehmerSuche extends Vue {
         } else {
             // at least one is empty so no unnecessary space
             return this.vorname + this.nachname;
+        }
+    }
+
+    get shownAnmeldungen(): Array<AnmeldungWithMatchCountCheck> {
+        if (this.showSelectedOnly) {
+            return this.anmeldungen.filter(a => a.checked);
+        } else {
+            return this.anmeldungen;
+        }
+    }
+
+    get showSchulungViewText(): string {
+        if (this.showSchulungView) {
+            return "Anmeldungsansicht";
+        } else {
+            return "Schulungsansicht";
         }
     }
 
@@ -131,9 +192,21 @@ export default class TeilnehmerSuche extends Vue {
     }
 
     deleteSelected() {
-        this.$dialog.confirm(`Alle ${this.anmeldungen.filter(a => a.checked).length} ausgewählten Anmeldungen anonymisieren?`, {loader: true})
+        const toDelete = this.anmeldungen.filter(a => a.checked).map(a => a.anmeldungID);
+        this.$dialog.confirm(`Alle ${toDelete.length} ausgewählten Anmeldungen anonymisieren?`, {loader: true})
             .then(dialog => {
-                dialog.close();
+                axios.post("/api/anmeldungen/anonymize", toDelete)
+                    .then(() => {
+                        // remove deleted entries
+                        this.anmeldungen = this.anmeldungen.filter(a => !toDelete.includes(a.anmeldungID));
+                        dialog.close();
+                    })
+                    .catch(e => {
+                        // TODO proper error handling
+                        console.log(e);
+                        this.errorMessage = "Fehler beim Löschen der Teilnehmer!";
+                        dialog.close();
+                    })
             })
             .catch(()=>{});
     }
@@ -142,12 +215,35 @@ export default class TeilnehmerSuche extends Vue {
         window.print();
     }
 
+    toggleSchulungView() {
+        this.showSchulungView = !this.showSchulungView;
+    }
+
     // -- helpers
 
     doSearch() {
         axios.post<Array<AnmeldungWithMatchCountCheck>>("/api/suche/teilnehmer", {vorname: this.vorname, nachname: this.nachname, email: this.email, handynummer: this.handynummer})
-            .then(r => this.anmeldungen = r.data.map(a => {a.checked = false; return a;}).sort((a,b)=>b.matchCount-a.matchCount));
+            .then(r => {
+                this.anmeldungen = r.data.map(a => {a.checked = false; return a;}).sort((a,b)=>b.matchCount-a.matchCount);
+                console.log(this.anmeldungen);
+            })
+            .catch(e => {
+                console.log(e);
+                this.errorMessage = "Fehler beim Suchen der Teilnehmer!";
+            });
         this.searching = false;
+    }
+
+    formatDate(date: string): string {
+        return new Date(date).toLocaleString();
+    }
+
+    formatTermineStart(termine: Array<Termin>): string {
+        return termine.map(t => this.formatDate(t.start)).join('</br>');
+    }
+
+    formatTermineEnd(termine: Array<Termin>): string {
+        return termine.map(t => this.formatDate(t.end)).join('</br>');
     }
 }
 </script>
