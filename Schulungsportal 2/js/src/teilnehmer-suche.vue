@@ -69,50 +69,16 @@
 import { Component, Vue , Watch} from "vue-property-decorator";
 import VuejsDialog from "vuejs-dialog";
 import VuejsDialogMixin from 'vuejs-dialog/dist/vuejs-dialog-mixin.min.js'; // only needed in custom components
-import axios from "axios";
 
 import 'vuejs-dialog/dist/vuejs-dialog.min.css';
+
+import {Termin, Schulung, AnmeldungWithMatchCount, SucheRequest, SucheApi, AnmeldungApi} from './api';
 
 // Tell Vue to install the plugin.
 Vue.use(VuejsDialog);
 
-interface Termin {
-    start: string;
-    end: string;
-}
-
-interface Schulung {
-    schulungGUID: string;
-    titel: string;
-    organisatorInstitution: string;
-    beschreibung: string;
-    ort: string;
-    anmeldefrist: string;
-    termine: Array<Termin>;
-    isAbgesagt: boolean;
-}
-
-interface AnmeldungWithMatchCount {
-    anmeldungID: number,
-    schulungGUID: string,
-    vorname: string,
-    nachname: string,
-    eMail: string,
-    handynummer: string,
-    status: string,
-    matchCount: number,
-    schulung: Schulung;
-}
-
 interface AnmeldungWithMatchCountCheck extends AnmeldungWithMatchCount {
     checked: boolean,
-}
-
-interface SucheRequest {
-    vorname: string,
-    nachname: string,
-    email: string,
-    handynummer: string,
 }
 
 @Component({})
@@ -195,7 +161,7 @@ export default class TeilnehmerSuche extends Vue {
         const toDelete = this.anmeldungen.filter(a => a.checked).map(a => a.anmeldungID);
         this.$dialog.confirm(`Alle ${toDelete.length} ausgewählten Anmeldungen anonymisieren?`, {loader: true})
             .then(dialog => {
-                axios.post("/api/anmeldungen/anonymize", toDelete)
+                AnmeldungApi.anonymize(toDelete)
                     .then(() => {
                         // remove deleted entries
                         this.anmeldungen = this.anmeldungen.filter(a => !toDelete.includes(a.anmeldungID));
@@ -222,9 +188,9 @@ export default class TeilnehmerSuche extends Vue {
     // -- helpers
 
     doSearch() {
-        axios.post<Array<AnmeldungWithMatchCountCheck>>("/api/suche/teilnehmer", {vorname: this.vorname, nachname: this.nachname, email: this.email, handynummer: this.handynummer})
+        SucheApi.teilnehmer({vorname: this.vorname, nachname: this.nachname, email: this.email, handynummer: this.handynummer})
             .then(r => {
-                this.anmeldungen = r.data.map(a => {a.checked = false; return a;}).sort((a,b)=>b.matchCount-a.matchCount);
+                this.anmeldungen = r.data.map(a => {var ac = a as AnmeldungWithMatchCountCheck; ac.checked = false; return ac;}).sort((a,b)=>b.matchCount-a.matchCount);
                 console.log(this.anmeldungen);
             })
             .catch(e => {
