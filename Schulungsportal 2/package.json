@@ -5,7 +5,7 @@
   "scripts": {
     "watch": "parcel watch js/src/teilnehmer-suche.ts --out-dir wwwroot/dist",
     "build": "parcel build js/src/teilnehmer-suche.ts --out-dir wwwroot/dist",
-    "lint": "vue-cli-service lint"
+    "release": "parcel build js/src/teilnehmer-suche.ts --out-dir wwwroot/dist && dotnet publish -c Release"
   },
   "license": "MIT",
   "dependencies": {
