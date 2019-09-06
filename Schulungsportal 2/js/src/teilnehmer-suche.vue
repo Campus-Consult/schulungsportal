@@ -22,7 +22,7 @@
                     <input type="checkbox" v-model="showSelectedOnly">Nur ausgewählte anzeigen
                 </div>
                 <div class="form-group">
-                    <h2>Suchergebnisse für {{fullname}}</h2>
+                    <h2>Alle Anmeldungen von {{fullname}}</h2>
                     <table class="table" v-bind:class="{'hidden' : showSchulungView}">
                         <tbody>
                             <tr>
@@ -32,6 +32,7 @@
                                 <th>Nachname</th>
                                 <th>Email</th>
                                 <th>Telefonnummer</th>
+                                <th>Schulung</th>
                             </tr>
                             <tr v-bind:key="anmeldung.AnmeldungID" v-for="anmeldung in anmeldungen" v-bind:class="{ 'hidden': !anmeldung.checked && showSelectedOnly,'hidden-print': !anmeldung.checked }">
                                 <td class="hidden-print"><input type="checkbox" @change="checkAllChecked" v-model="anmeldung.checked"></td>
@@ -40,12 +41,14 @@
                                 <td>{{anmeldung.nachname}}</td>
                                 <td>{{anmeldung.eMail}}</td>
                                 <td>{{anmeldung.handynummer}}</td>
+                                <td>{{anmeldung.schulung.titel}}</td>
                             </tr>
                         </tbody>
                     </table>
                     <table class="table" v-bind:class="{'hidden' : !showSchulungView}">
                         <tbody>
                             <tr>
+                                <th class="hidden-print"><input type="checkbox" v-model="selectAll"></th>
                                 <th>Titel</th>
                                 <th>Organisation</th>
                                 <th>Start-Termin</th>
@@ -53,6 +56,7 @@
                                 <th></th>
                             </tr>
                             <tr v-bind:key="anmeldung.AnmeldungID" v-for="anmeldung in anmeldungen" v-bind:class="{ 'hidden': !anmeldung.checked && showSelectedOnly,'hidden-print': !anmeldung.checked }">
+                                <td class="hidden-print"><input type="checkbox" @change="checkAllChecked" v-model="anmeldung.checked"></td>
                                 <td>{{anmeldung.schulung.titel}}</td>
                                 <td>{{anmeldung.schulung.organisatorInstitution}}</td>
                                 <td v-html="formatTermineStart(anmeldung.schulung.termine)"></td>
@@ -190,7 +194,17 @@ export default class TeilnehmerSuche extends Vue {
     doSearch() {
         SucheApi.teilnehmer({vorname: this.vorname, nachname: this.nachname, email: this.email, handynummer: this.handynummer})
             .then(r => {
-                this.anmeldungen = r.data.map(a => {var ac = a as AnmeldungWithMatchCountCheck; ac.checked = false; return ac;}).sort((a,b)=>b.matchCount-a.matchCount);
+                var newAnmeldungen = r.data.map(a => {
+                    var ac = a as AnmeldungWithMatchCountCheck;
+                    var oldAnmeldung = this.anmeldungen.find(an => an.anmeldungID == ac.anmeldungID);
+                    if (oldAnmeldung && oldAnmeldung.checked) {
+                        ac.checked = true;
+                    } else {
+                        ac.checked = false;
+                    }
+                    return ac;
+                }).sort((a,b)=>b.matchCount-a.matchCount);
+                this.anmeldungen = newAnmeldungen;
                 console.log(this.anmeldungen);
             })
             .catch(e => {
