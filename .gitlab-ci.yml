@@ -16,14 +16,14 @@ build:js:
   cache:
     key: npm-cache
     paths:
-      - 'Schulungsportal\ 2/node_modules'
+      - $CI_PROJECT_DIR/Schulungsportal 2/node_modules
   artifacts:
     paths:
-      - 'Schulungsportal\ 2/wwwroot/dist'
+      - $CI_PROJECT_DIR/Schulungsportal 2/wwwroot/dist
   script:
     - 'cd Schulungsportal\ 2'
-    - "npm i"
-    - "npm build"
+    - 'npm i'
+    - 'npm run build'
 
 # compile asp.net c# code
 build:cs:
