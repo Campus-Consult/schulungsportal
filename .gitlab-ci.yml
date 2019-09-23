@@ -39,9 +39,9 @@ build:cs:
     - build:js
   artifacts:
     paths:
-      - 'Schulungsportal\ 2/bin/Release/netcoreapp2.2'
+      - $CI_PROJECT_DIR/Schulungsportal 2/bin/Release/netcoreapp2.2
   script:
-    - "dotnet publish --packages ./.nuget --configuration Release"
+    - 'dotnet publish --packages ./.nuget --configuration Release'
 
 test:
   image: $ASPNET_IMAGE
@@ -55,4 +55,4 @@ test:
     policy: pull
   dependencies: []
   script:
-    - "dotnet test --no-restore"
+    - 'dotnet test --no-restore'
