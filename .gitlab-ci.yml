@@ -1,21 +1,51 @@
 image: mcr.microsoft.com/dotnet/core/sdk:2.2
 
+variables:
+  ASPNET_IMAGE: mcr.microsoft.com/dotnet/core/sdk:2.2
+  NODE_IMAGE: node:10.16.3
+
 stages:
-  - restore
+  - build
   - test
 
-restore:
+# compile the typescript/vue frontend
+build:js:
+  image: $NODE_IMAGE
   tags:
     - shared
-  stage: restore
+  stage: build
+  cache:
+    key: npm-cache
+    paths:
+      - Schulungsportal\ 2/node_modules
+  artifacts:
+    paths:
+      - Schulungsportal\ 2/wwwroot/dist
+  script:
+    - "cd Schulungsportal\ 2"
+    - "npm i"
+    - "npm build"
+
+# compile asp.net c# code
+build:cs:
+  image: $ASPNET_IMAGE
+  tags:
+    - shared
+  stage: build
   cache:
     key: nuget-cache
     paths:
       - .nuget/
+  dependencies:
+    - build:js
+  artifacts:
+    paths:
+      - Schulungsportal\ 2/bin/Release/netcoreapp2.2
   script:
-    - "dotnet restore --packages ./.nuget"
+    - "dotnet publish --packages ./.nuget --configuration Release"
 
 test:
+  image: $ASPNET_IMAGE
   tags:
     - shared
   stage: test
