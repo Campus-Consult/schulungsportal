@@ -31,5 +31,8 @@ namespace Schulungsportal_2.Models
         [Required]
         [Display(Name = "Anschrift:")]
         public string Anschrift { get; set; }
+        [Required]
+        [Display(Name = "elektronische Postadresse:")]
+        public string KontaktEMail { get; set; }
     }
 }

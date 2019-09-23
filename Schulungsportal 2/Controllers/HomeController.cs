@@ -59,6 +59,7 @@ namespace Schulungsportal_2.Controllers
                         JournalistischeVerantwortung = "Campus Consult e.V., Technologiepark 13, 33100 Paderborn",
                         Kommunikation = "Tel.: +49 (0) 52 51 /14 80 780",
                         Anschrift = "Technologiepark 13, 33100 Paderborn",
+                        KontaktEMail = "kontakt@campus-consult.org",
                     };
                     _context.Impressum.Add(defaultImpressum);
                     _context.SaveChanges();
