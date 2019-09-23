@@ -5,7 +5,8 @@ variables:
   NODE_IMAGE: node:10.16.3
 
 stages:
-  - build
+  - build:js
+  - build:cs
   - test
 
 # compile the typescript/vue frontend
@@ -13,7 +14,7 @@ build:js:
   image: $NODE_IMAGE
   tags:
     - shared
-  stage: build
+  stage: build:js
   cache:
     key: npm-cache
     paths:
@@ -31,7 +32,7 @@ build:cs:
   image: $ASPNET_IMAGE
   tags:
     - shared
-  stage: build
+  stage: build:cs
   cache:
     key: nuget-cache
     paths:
@@ -54,5 +55,6 @@ test:
     paths:
       - .nuget/
     policy: pull
+  dependencies: []
   script:
     - "dotnet test --no-restore"
