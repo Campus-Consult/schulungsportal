@@ -21,7 +21,7 @@ build:js:
     paths:
       - 'Schulungsportal\ 2/wwwroot/dist'
   script:
-    - 'cd "Schulungsportal\ 2"'
+    - 'cd Schulungsportal\ 2'
     - "npm i"
     - "npm build"
 
