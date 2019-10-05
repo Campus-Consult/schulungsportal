@@ -36,3 +36,10 @@ Die Source Dateien für die JS-Client-Seite befinden sich in `js/src`, Vue mit T
 Um das Javascript zu bauen muss man `npm run build` ausführen, die fertigen Dateien liegen dann in `wwwroot/dist`. Um während des Developments alle Änderungen zu überwachen, muss man `npm run watch` ausführen.
 
 Um das gesammte Programm mit allen Komponenten releasefertig vorzubereiten, übernimmt `npm run release` die Schritte des JavaScript und C# Übersetzens.
+
+## GitLab CI/CD
+
+Das Projekt wird bei jedem push automatisch gebaut und die vorkonfigurierten Tests werden ausgeführt.
+
+Außerdem werden alle pushes auf master automatisch auf den CC-Server hochgeladen und sind damit sofort live. Dafür mussten ein paar Konfigurationsschritte unternommen werden. [Anleitung zur Verwendung von SSH-Keys in GitLab CI](https://docs.gitlab.com/ee/ci/ssh_keys/README.html).
+
