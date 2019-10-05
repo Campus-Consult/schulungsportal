@@ -65,7 +65,6 @@ publish:
     - shared
   only:
     - master
-    - ci-test
   stage: deploy
   dependencies:
     - build:cs
