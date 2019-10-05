@@ -163,6 +163,7 @@ namespace Schulungsportal.Controllers
         }
 
 
+        /* Deprecated, replaced by vue frontend
         [HttpPost]
         public ActionResult SucheTeilnehmer(TeilnehmerSucheViewModel teilnehmerSucheViewModel)
         {
@@ -276,7 +277,7 @@ namespace Schulungsportal.Controllers
                 e = new Exception("Fehler beim Erstellen der View " + code, e);
                 return View("Error", e);
             }
-        }
+        }*/
 
         // seperate Klasse zum Vergleichen, da IDs nicht beachtet werden
         private AWMCComparer awmcComparer = new AWMCComparer();

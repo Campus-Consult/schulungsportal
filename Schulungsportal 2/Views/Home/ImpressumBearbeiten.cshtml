@@ -48,6 +48,15 @@
                 <div class="col-md-5"></div>
             </div>
 
+            @* Label und Eingabefeld für KontaktEMail*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.KontaktEMail, htmlAttributes: new { @class = "col-md-2 control-label" })
+                <div class="col-md-5">
+                    @Html.TextAreaFor(model => model.KontaktEMail, htmlAttributes: new { @class = "text-box multi-line", @style = "width: 456px; height: 70px" })
+                </div>
+                <div class="col-md-5"></div>
+            </div>
+
             @* Label und Eingabefeld für Kommunikation*@
             <div class="form-group">
                 @Html.LabelFor(model => model.Kommunikation , htmlAttributes: new { @class = "col-md-2 control-label" })

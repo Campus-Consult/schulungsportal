@@ -21,6 +21,25 @@ Um zu vermeiden, dass Passwörter eingeschickt werden müssen, wird die Konfigur
     "Passwort": "p4ssw0rd"
   }
 ```
-  Diese Konfiguration kann man anlegen wenn man unter Schulungsportal 2 Rechtsklickt um dann `Geheime Benutzerschlüssel verwalten` auswählt
+Diese Konfiguration kann man anlegen wenn man unter Schulungsportal 2 Rechtsklickt um dann `Geheime Benutzerschlüssel verwalten` auswählt
 
-  Leider scheint es damit nicht möglich zu sein, sich selber Termine zu schicken, da office365 sich querstellt
+Leider scheint es damit nicht möglich zu sein, sich selber Termine zu schicken, da office365 sich querstellt
+
+## Development
+
+Um dynamische Elemente auf der Clientseite zu ermöglichen, wird das Javascript-Framework Vue verwendet. Um die Dateien zusammenzufassen und so zu "bundlen" wird der Parcel-Bundler mit npm verwendet.
+
+Als erstes muss npm über node.js heruntergeladen und installiert werden: [download](https://nodejs.org/en/). Dann muss in der Kommandozeile im Ordner `Schulungsportal 2` der Befehl `npm install` ausgeführt werden, um alle Abhängigkeiten zu installieren. Diese Abhängigkeiten und auch alle `npm run` Befehle sind in `package.json` konfiguriert.
+
+Die Source Dateien für die JS-Client-Seite befinden sich in `js/src`, Vue mit TypeScript.
+
+Um das Javascript zu bauen muss man `npm run build` ausführen, die fertigen Dateien liegen dann in `wwwroot/dist`. Um während des Developments alle Änderungen zu überwachen, muss man `npm run watch` ausführen.
+
+Um das gesammte Programm mit allen Komponenten releasefertig vorzubereiten, übernimmt `npm run release` die Schritte des JavaScript und C# Übersetzens.
+
+## GitLab CI/CD
+
+Das Projekt wird bei jedem push automatisch gebaut und die vorkonfigurierten Tests werden ausgeführt.
+
+Außerdem werden alle pushes auf master automatisch auf den CC-Server hochgeladen und sind damit sofort live. Dafür mussten ein paar Konfigurationsschritte unternommen werden. [Anleitung zur Verwendung von SSH-Keys in GitLab CI](https://docs.gitlab.com/ee/ci/ssh_keys/README.html).
+

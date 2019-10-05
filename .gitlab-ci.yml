@@ -1,21 +1,51 @@
-image: mcr.microsoft.com/dotnet/core/sdk:2.2
+variables:
+  ASPNET_IMAGE: mcr.microsoft.com/dotnet/core/sdk:2.2
+  NODE_IMAGE: node:10.16.3
 
 stages:
-  - restore
+  - build:js
+  - build:cs
   - test
+  - deploy
 
-restore:
+# compile the typescript/vue frontend
+build:js:
+  image: $NODE_IMAGE
   tags:
     - shared
-  stage: restore
+  stage: build:js
+  cache:
+    key: npm-cache
+    paths:
+      - $CI_PROJECT_DIR/Schulungsportal 2/node_modules
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/Schulungsportal 2/wwwroot/dist
+  script:
+    - 'cd Schulungsportal\ 2'
+    - 'npm i'
+    - 'npm run build'
+
+# compile asp.net c# code
+build:cs:
+  image: $ASPNET_IMAGE
+  tags:
+    - shared
+  stage: build:cs
   cache:
     key: nuget-cache
     paths:
       - .nuget/
+  dependencies:
+    - build:js
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/Schulungsportal 2/bin/Release/netcoreapp2.2
   script:
-    - "dotnet restore --packages ./.nuget"
+    - 'dotnet publish --packages ./.nuget --configuration Release'
 
 test:
+  image: $ASPNET_IMAGE
   tags:
     - shared
   stage: test
@@ -24,5 +54,52 @@ test:
     paths:
       - .nuget/
     policy: pull
+  dependencies: []
   script:
-    - "dotnet test --no-restore"
+    - 'dotnet test --no-restore'
+
+# push the project to the server, only for master
+publish:
+  image: kroniak/ssh-client:3.1
+  tags:
+    - shared
+  only:
+    - master
+  stage: deploy
+  dependencies:
+    - build:cs
+  script:
+    ##
+    ## Run ssh-agent (inside the build environment)
+    ##
+    - eval $(ssh-agent -s)
+
+    ##
+    ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    ## We're using tr to fix line endings which makes ed25519 keys work
+    ## without extra base64 encoding.
+    ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
+    ##
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+    ##
+    ## Create the SSH directory and give it the right permissions
+    ##
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+
+    ##
+    ## Add our own server as a trusted host
+    ##
+    - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+    ##
+    ## copy compiled stuff to the server
+    ##
+    - scp -r "$CI_PROJECT_DIR/Schulungsportal 2/bin/Release/netcoreapp2.2/publish" cc@campus-consult.org:/tmp/schulungsportal
+
+    ##
+    ## run the update script, which copies the tmp files to the correct location and restarts the service
+    ##
+    - ssh cc@campus-consult.org '/var/www/schulungsportal2/update-schulungsportal.sh'

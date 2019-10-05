@@ -11,48 +11,10 @@
     <h1>@ViewBag.Title</h1>
 </hgroup>
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-    <div class="form-horizontal">
-        @*Eingabefeld für den Vornamen des Teilnehmers*@
-        <div class="form-group">
-            @Html.LabelFor(model => model.VornameTeilnehmer, htmlAttributes: new { @class = "col-md-3 control-label" })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.VornameTeilnehmer, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.VornameTeilnehmer, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        @*Eingabefeld für den Nachnamen*@
-        <div class="form-group">
-            @Html.LabelFor(model => model.NachnameTeilnehmer, htmlAttributes: new { @class = "col-md-3 control-label" })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.NachnameTeilnehmer, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.NachnameTeilnehmer, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        @*Eingabefeld für die E-Mail Adresse des Teilnehmers*@
-        <div class="form-group">
-            @Html.LabelFor(model => model.EmailTeilnehmer, htmlAttributes: new { @class = "col-md-3 control-label" })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.EmailTeilnehmer, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.EmailTeilnehmer, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        @*Eingabefeld für die Handynummer des Teilnehmers*@
-        <div class="form-group">
-            @Html.LabelFor(model => model.TelefonTeinehmer, htmlAttributes: new { @class = "col-md-3 control-label" })
-            <div class="col-md-4">
-                @Html.EditorFor(model => model.TelefonTeinehmer, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.TelefonTeinehmer, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        @* "Löschen"- Button*@
-        <div class="form-group">
-            <div class="col-md-offset-3 col-md-9">
-                <input type="submit" value="Suchen" class="btn btn-default" />
-            </div>
-        </div>
-    </div>
+<div id="app"></div>
+@section Scripts {
+    <script src="~/dist/teilnehmer-suche.js"></script>
+}
+@section Styles {
+    <link rel="stylesheet" href="~/dist/teilnehmer-suche.css" />
 }

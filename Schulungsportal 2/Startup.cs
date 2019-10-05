@@ -76,10 +76,25 @@ namespace Schulungsportal_2
                     o.Password.RequiredLength = 8;
                     o.Password.RequiredUniqueChars = 1;
                 });
+
             services.AddDefaultIdentity<IdentityUser>()
                 .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            // if api request are not authorized return 401 instead of redirect to avoid problems with frontend
+            services.ConfigureApplicationCookie(options => {
+                options.Events.OnRedirectToLogin = ctx => {
+                    if (ctx.Request.Path.StartsWithSegments("/api"))
+                    {
+                        ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    }
+            
+                    ctx.Response.Redirect(ctx.RedirectUri);
+                    return Task.CompletedTask;
+                };
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSingleton<IEmailSender, AuthMessageSender>();
@@ -111,6 +126,7 @@ namespace Schulungsportal_2
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+            // For requests not going to WebAPI controllers
 
             app.UseMvc(routes =>
             {
