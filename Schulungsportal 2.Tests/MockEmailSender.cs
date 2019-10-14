@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Schulungsportal_2_Tests
 {
-    class MockEmailSender : IEmailSender
+    class MockEmailSender : ISchulungsportalEmailSender
     {
         public static List<MimeMessage> sentMessages = new List<MimeMessage>();
 

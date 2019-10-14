@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -80,7 +81,8 @@ namespace Schulungsportal_2
             services.AddDefaultIdentity<IdentityUser>()
                 .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             // if api request are not authorized return 401 instead of redirect to avoid problems with frontend
             services.ConfigureApplicationCookie(options => {
@@ -96,8 +98,12 @@ namespace Schulungsportal_2
                 };
             });
 
+            // For the framework, only method to send mails
+            services.AddTransient<IEmailSender, AuthMessageSender>();
+            // For some of our stuff, has some more specific methods to send mails
+            services.AddTransient<ISchulungsportalEmailSender, AuthMessageSender>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSingleton<IEmailSender, AuthMessageSender>();
             services.AddAutoMapper();
         }
 

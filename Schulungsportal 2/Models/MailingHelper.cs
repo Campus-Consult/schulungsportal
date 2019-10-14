@@ -1,5 +1,4 @@
-﻿using MailKit.Net.Smtp;
-using Microsoft.EntityFrameworkCore.Internal;
+﻿using Microsoft.EntityFrameworkCore.Internal;
 using MimeKit;
 using RazorLight;
 using Schulungsportal_2.Models.Anmeldungen;
@@ -31,7 +30,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung, die beim anmelden erstellt wird.</param>
         /// <param name="schulung">Die Schulung, zu der sich der Nutzer angemeldet hat.</param>
-        public static Task GenerateAndSendBestätigungsMail(Anmeldung anmeldung, Schulung schulung, string vorstand, IEmailSender emailSender)
+        public static Task GenerateAndSendBestätigungsMail(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
         {
             try
             {
@@ -86,7 +85,7 @@ namespace Schulungsportal_2.Models
         /// Diese Methode wird aufgerufen, wenn eine Schulung angelegt wurde und generiert und schickt eine Mail an den Dozenten der Schulung.
         /// </summary>
         /// <param name="schulung">Die Schulung, die angelegt wurde</param>
-        public static Task GenerateAndSendAnlegeMail(Schulung schulung, string rootUrl, string vorstand, IEmailSender emailSender)
+        public static Task GenerateAndSendAnlegeMail(Schulung schulung, string rootUrl, string vorstand, ISchulungsportalEmailSender emailSender)
         {
             try
             {
@@ -146,7 +145,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung.</param>
         /// <param name="schulung">Die Schulung, zu die abgesagt wird.</param>
-        public static Task GenerateAndSendAbsageMail(Anmeldung anmeldung, Schulung schulung, string vorstand, IEmailSender emailSender)
+        public static Task GenerateAndSendAbsageMail(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
         {
             try
             {
@@ -198,7 +197,7 @@ namespace Schulungsportal_2.Models
             }
         }
 
-        public static Task GenerateAndSendSchulungsNewsletter(List<Schulung> schulungen, string vorstand, IEmailSender emailSender)
+        public static Task GenerateAndSendSchulungsNewsletter(List<Schulung> schulungen, string vorstand, ISchulungsportalEmailSender emailSender)
         {
             // Kein newsletter ohne Schulungen
             if (schulungen.Count() == 0)
@@ -247,7 +246,7 @@ namespace Schulungsportal_2.Models
             }
         }
 
-        public static Task GenerateAndSendInviteMail(Invite invite, string rootUrl, string vorstand, IEmailSender emailSender) {
+        public static Task GenerateAndSendInviteMail(Invite invite, string rootUrl, string vorstand, ISchulungsportalEmailSender emailSender) {
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
             message.To.Add(new MailboxAddress(invite.EMailAdress)); // Empfaenger

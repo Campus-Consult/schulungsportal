@@ -36,7 +36,7 @@ namespace Schulungsportal_2_Tests
                         options.UseInternalServiceProvider(serviceProvider);
                     });
 
-                    services.AddSingleton<IEmailSender, MockEmailSender>();
+                    services.AddSingleton<ISchulungsportalEmailSender, MockEmailSender>();
                     // bypass authentication
                     if (isAuthenticated) {
                         services.AddMvc(options => {

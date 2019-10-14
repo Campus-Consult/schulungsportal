@@ -22,7 +22,7 @@ namespace Schulungsportal_2.Controllers
         private AnmeldungRepository _anmeldungRepository;
         private ApplicationDbContext _context;
         private IMapper _mapper;
-        private IEmailSender emailSender;
+        private ISchulungsportalEmailSender emailSender;
 
         // logger
         private static readonly log4net.ILog logger =
@@ -31,7 +31,7 @@ namespace Schulungsportal_2.Controllers
         /// <summary>
         /// SchulungController Konstruktor legt Repositories für Datenzugriff an.
         /// </summary>
-        public SchulungController(ApplicationDbContext context, IEmailSender emailSender, IMapper mapper)
+        public SchulungController(ApplicationDbContext context, ISchulungsportalEmailSender emailSender, IMapper mapper)
         {
             _schulungRepository = new SchulungRepository(context);
             _anmeldungRepository = new AnmeldungRepository(context, mapper);

@@ -19,13 +19,13 @@ namespace Schulungsportal_2.Controllers
 
         private UserManager<IdentityUser> userManager;
         private RoleManager<IdentityRole> roleManager;
-        private IEmailSender mailSender;
+        private ISchulungsportalEmailSender mailSender;
         private InviteRepository InviteRepository;
         private ApplicationDbContext _context;
 
         public ManageController(UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            IEmailSender mailSender,
+            ISchulungsportalEmailSender mailSender,
             ApplicationDbContext _context)
         {
             this.userManager = userManager;

@@ -1,5 +1,6 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using MimeKit;
 using Schulungsportal_2.Models;
 using System;
@@ -10,13 +11,20 @@ using System.Threading.Tasks;
 namespace Schulungsportal_2.Services
 {
 
+    public interface ISchulungsportalEmailSender : IEmailSender
+    {
+        Task SendEmailAsync(MimeMessage nachricht);
+        string GetAdresseSchulungsbeauftragter();
+        string GetAbsendeAdresse();
+    }
+
     /// <summary>
     /// Das ist die Klasse, die den IEmailSender implementiert. Diese wird benutzt um den Verwaltungszugang zu Authentifizieren.
     /// </summary>
     // This class is used by the application to send Email and SMS
     // when you turn on two-factor authentication in ASP.NET Identity.
     // For more details see this link http://go.microsoft.com/fwlink/?LinkID=532713
-    public class AuthMessageSender : IEmailSender, ISmsSender
+    public class AuthMessageSender : ISchulungsportalEmailSender, IEmailSender
     {
         // logger
         private static readonly log4net.ILog logger =
@@ -34,14 +42,14 @@ namespace Schulungsportal_2.Services
         public async Task SendEmailAsync(string email, string subject, string message)
         {
             MimeMessage mimeMessage = new MimeMessage();
-            mimeMessage.From.Add(new MailboxAddress("Schulungsportal", "schulungsportal@campus-consult.org")); //Absender
+            mimeMessage.From.Add(new MailboxAddress("Schulungsportal", GetAbsendeAdresse())); //Absender
             mimeMessage.To.Add(new MailboxAddress(email, email)); // Empfaenger
             mimeMessage.Subject = subject; //Betreff
 
-            mimeMessage.Body = new TextPart("plain") //Inhalt
-            {
-                Text = @message
-            };
+            BodyBuilder builder = new BodyBuilder();
+            builder.HtmlBody = message;
+
+            mimeMessage.Body = builder.ToMessageBody();
 
             await SendEmailAsync(mimeMessage);
             //return Task.FromResult(0);
@@ -87,14 +95,6 @@ namespace Schulungsportal_2.Services
         public static void UpdateProperties(MailProperties mailproperties)
         {
             adresseSchulungsbeauftragter = mailproperties.adresseSchulungsbeauftragter;
-        }
-
-        /// <summary>
-        /// Teil des Frameworks zum Versenden von SMS, wird nicht benutzt.
-        /// </summary>
-        public async Task SendSmsAsync(string number, string message)
-        {
-            // Plug in your SMS service here to send a text message.
         }
     }
 }
