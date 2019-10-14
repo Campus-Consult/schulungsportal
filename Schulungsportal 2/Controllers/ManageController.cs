@@ -87,6 +87,7 @@ namespace Schulungsportal_2.Controllers
                 var newUser = new IdentityUser{
                     Email = invite.EMailAdress,
                     UserName = invite.EMailAdress,
+                    EmailConfirmed = true,
                 };
                 var result = await this.userManager.CreateAsync(newUser, register.Password);
                 if (result.Succeeded) {

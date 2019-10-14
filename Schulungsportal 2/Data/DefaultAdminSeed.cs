@@ -42,6 +42,7 @@ namespace Schulungsportal_2.Data
                 {
                     Email = username,
                     UserName = username,
+                    EmailConfirmed = true,
                 };
                 var createUser = await UserManager.CreateAsync(newUser, password);
                 if (createUser.Succeeded)

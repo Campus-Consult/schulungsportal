@@ -76,6 +76,7 @@ namespace Schulungsportal_2
                     o.Password.RequireUppercase = false;
                     o.Password.RequiredLength = 8;
                     o.Password.RequiredUniqueChars = 1;
+                    o.SignIn.RequireConfirmedEmail = true;
                 });
 
             services.AddDefaultIdentity<IdentityUser>()
