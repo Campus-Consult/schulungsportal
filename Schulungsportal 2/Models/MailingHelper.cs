@@ -30,7 +30,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung, die beim anmelden erstellt wird.</param>
         /// <param name="schulung">Die Schulung, zu der sich der Nutzer angemeldet hat.</param>
-        public static Task GenerateAndSendBestätigungsMail(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
+        public static Task GenerateAndSendBestätigungsMail(Anmeldung anmeldung, Schulung schulung, string vorstand, string rootUrl, ISchulungsportalEmailSender emailSender)
         {
             try
             {
@@ -38,6 +38,8 @@ namespace Schulungsportal_2.Models
                 message.From.Add(new MailboxAddress(emailSender.GetAbsendeAdresse())); //Absender
                 message.To.Add(new MailboxAddress(anmeldung.Vorname + " " + anmeldung.Nachname, anmeldung.Email)); // Empfaenger
                 message.Subject = "[INFO/noreply] Schulungsanmeldung " + schulung.Titel; //Betreff
+
+                var selbstmanagementUrl = rootUrl + "/Anmeldung/Selbstmanagement/" + anmeldung.AccessToken;
                     
                 var attachments = GetAppointment(schulung, anmeldung.Email, emailSender.GetAbsendeAdresse(), istAbsage: false);
 
@@ -46,6 +48,7 @@ namespace Schulungsportal_2.Models
                     //CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
                     //FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
                     //InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
+                    SelbstmanagementUrl = selbstmanagementUrl,
                     Schulung = schulung,
                     Vorstand = vorstand,
                 };
@@ -246,6 +249,41 @@ namespace Schulungsportal_2.Models
             }
         }
 
+        public static Task GenerateAndSendAbsageAnSchulungsdozentMail(Anmeldung anmeldung, String begruendung, String vorstand, ISchulungsportalEmailSender emailSender) {
+            var schulung = anmeldung.Schulung;
+            MimeMessage message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
+            message.To.Add(new MailboxAddress(schulung.NameDozent, schulung.EmailDozent)); // Empfaenger
+            message.Subject = "Schulung "+anmeldung.Schulung.Titel + ": Abmeldung eines Teilnehmers"; //Betreff
+
+            MailViewModel mwm = new MailViewModel {
+                Vorstand = vorstand,
+                Begruendung = begruendung,
+                Anmeldung = anmeldung,
+                Schulung = schulung,
+                CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
+                FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
+                InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
+            };
+
+            var body = new TextPart("html") //Inhalt
+            {
+                Text = RunCompile("AbsageAnSchulungsdozentMail", mwm),
+                ContentTransferEncoding = ContentEncoding.Base64,
+            };
+
+            var multipart = new MultipartRelated();
+            multipart.Add(body);
+            // Bilder für Corporate Design
+            multipart.Add(LoadInlinePicture("CCLogo.png", mwm.CCLogoFile));
+            multipart.Add(LoadInlinePicture("FBLogo.png", mwm.FacebookLogoFile));
+            multipart.Add(LoadInlinePicture("InstaLogo.png", mwm.InstaLogoFile));
+            
+            message.Body = multipart;
+
+            return emailSender.SendEmailAsync(message);
+        }
+
         public static Task GenerateAndSendInviteMail(Invite invite, string rootUrl, string vorstand, ISchulungsportalEmailSender emailSender) {
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
@@ -276,6 +314,63 @@ namespace Schulungsportal_2.Models
             message.Body = multipart;
 
             return emailSender.SendEmailAsync(message);
+        }
+
+        /// <summary>
+        /// Diese Methode generiert und schickt eine Absagemail an einen Nutzer, der zu einer Schulung angemeldet ist, die abgesagt wird.
+        /// </summary>
+        /// <param name="anmeldung">Die Anmeldung.</param>
+        /// <param name="schulung">Die Schulung, zu die abgesagt wird.</param>
+        public static Task GenerateAndSendAbmeldungMail(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
+        {
+            try
+            {
+                MimeMessage message = new MimeMessage();
+                message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
+                message.To.Add(new MailboxAddress(anmeldung.Vorname + " " + anmeldung.Nachname, anmeldung.Email)); // Empfaenger
+                message.Subject = "[INFO/noreply] Abmeldung von der Schulung " + schulung.Titel; //Betreff
+                
+                MailViewModel mvm = new MailViewModel
+                {
+                    //CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
+                    //FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
+                    //InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
+                    Schulung = schulung,
+                    Vorstand = vorstand,
+                };
+                
+                var body = new TextPart("html") //Inhalt
+                {
+                    Text = RunCompile("AbmeldungMail", mvm),
+                    ContentTransferEncoding = ContentEncoding.Base64,
+                };
+                var attachments = GetAppointment(schulung, anmeldung.Email, emailSender.GetAbsendeAdresse(), istAbsage: true);
+                
+                var outmultipart = new Multipart("mixed");
+                outmultipart.Add(body);
+                //inmultipart.Add(attachments.First());
+                // Bilder für Corporate Design, funktioniert leider nicht
+                //outmultipart.Add(inmultipart);
+                //outmultipart.Add(LoadInlinePicture("CCLogo.png", mvm.CCLogoFile));
+                //outmultipart.Add(LoadInlinePicture("FBLogo.png", mvm.FacebookLogoFile));
+                //outmultipart.Add(LoadInlinePicture("InstaLogo.png", mvm.InstaLogoFile));
+                foreach (var attachment in attachments)
+                {
+                    outmultipart.Add(attachment);
+                }
+                
+
+                message.Body = outmultipart;
+
+                return emailSender.SendEmailAsync(message);
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+                string code = "#601";
+                e = new Exception("Fehler beim Versenden der Abeldungmail (" + e.Message + ") " + code, e);
+                throw e;
+            }
         }
 
         /// <summary>
@@ -397,7 +492,10 @@ namespace Schulungsportal_2.Models
     public class MailViewModel
     {
         public string TeilnehmerListeUrl { get; set; }
+        public string SelbstmanagementUrl { get; set; }
         public string Vorstand { get; set; }
+        public string Begruendung { get; set; }
+        public Anmeldung Anmeldung { get; set; }
         public Schulung Schulung { get; set; }
         public List<Schulung> Schulungen { get; set; }
         public string CCLogoFile { get; set; }

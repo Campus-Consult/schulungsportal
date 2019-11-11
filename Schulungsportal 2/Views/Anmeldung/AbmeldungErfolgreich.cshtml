@@ -1,0 +1,14 @@
+﻿@* Bestätigung.cshtml: Diese View zeigt eine Anmeldebestätigung für den regulären Nutzer.*@
+@* Diese View verwendet eine Liste des Models "Schulung.cs"*@
+
+@using Schulungsportal_2.Models
+
+@model Schulungsportal_2.Models.Anmeldungen.Anmeldung;
+
+@{
+    ViewBag.Title = "Abmeldung Erfolgreich";
+}
+
+<h3>Erfolgreich von der Schulung abgemeldet!</h3>
+
+@Html.ActionLink("Zurück zur Übersicht", "Anmeldung")

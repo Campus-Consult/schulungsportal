@@ -1,0 +1,16 @@
+@* Bestätigung.cshtml: Diese View zeigt eine Anmeldebestätigung für den regulären Nutzer.*@
+@* Diese View verwendet eine Liste des Models "Schulung.cs"*@
+
+@using Schulungsportal_2.Models
+
+@model Schulungsportal_2.Models.Anmeldungen.Anmeldung;
+
+@{
+    ViewBag.Title = "Selbstmanagement";
+}
+
+<h3>Fehler:</h3>
+
+<p>Die angeforderte Aktion kann leider nicht durchgeführt werden: @ViewBag.cantCancelReason </p>
+
+@Html.ActionLink("Zur Anmeldung", "Anmeldung")

@@ -1,0 +1,37 @@
+﻿@* Bestätigung.cshtml: Diese View zeigt eine Anmeldebestätigung für den regulären Nutzer.*@
+@* Diese View verwendet eine Liste des Models "Schulung.cs"*@
+
+@using Schulungsportal_2.Models
+
+@model Schulungsportal_2.ViewModels.AbmeldungViewModel;
+
+@{
+    ViewBag.Title = "Schulungsabmeldung";
+}
+
+<h3>Schulungsabmeldung</h3>
+<hr />
+
+<p>Bist du dir sicher, dass du dich von folgender Schulung abmelden möchtest? Optional kannst du dem Dozenten eine Nachricht für den Grund der Abmeldung schreiben (z.B. Krankheit)</p>
+
+<p><b>@Html.DisplayFor(modelItem => Model.Schulung.Titel)</b> am @Model.Schulung.Termine.Min(x => x.Start).ToString("dd.MM.yyyy HH:mm") Uhr</p>
+
+@using (Html.BeginForm())
+{
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => Model.anmeldungId)
+
+            @Html.LabelFor(model => model.Nachricht, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-5">
+                    @Html.TextAreaFor(model => model.Nachricht, htmlAttributes: new { @class = "text-box multi-line", @style = "width: 456px; height: 128px" })
+                    @Html.ValidationMessageFor(model => model.Nachricht, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-md-5"></div>
+        </div>
+        <div class="form-actions no-color">
+            <input type="submit" value="Abmelden" class="btn btn-default" />
+        </div>
+    </div>
+}

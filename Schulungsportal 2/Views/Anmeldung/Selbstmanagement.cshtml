@@ -1,0 +1,67 @@
+@* Bestätigung.cshtml: Diese View zeigt eine Anmeldebestätigung für den regulären Nutzer.*@
+@* Diese View verwendet eine Liste des Models "Schulung.cs"*@
+
+@using Schulungsportal_2.Models
+
+@model Schulungsportal_2.Models.Anmeldungen.Anmeldung;
+
+@{
+    ViewBag.Title = "Selbstmanagement";
+}
+
+<h3>Aktuelle Anmeldung:</h3>
+
+<table class="table table-striped well">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(m => m.Vorname):
+        </th>
+        <td>
+            @Html.DisplayFor(m => m.Vorname)
+        </td>
+    </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(m => m.Nachname):
+        </th>
+        <td>
+            @Html.DisplayFor(m => m.Nachname)
+        </td>
+    </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(m => m.Email):
+        </th>
+        <td>
+            @Html.DisplayFor(m => m.Email)
+        </td>
+    </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(m => m.Nummer):
+        </th>
+        <td>
+            @Html.DisplayFor(m => m.Nummer)
+        </td>
+    </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(m => m.Status):
+        </th>
+        <td>
+            @Html.DisplayFor(m => m.Status)
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Schulung:
+        </th>
+        <td>
+            @Html.DisplayFor(m => m.Schulung.Titel)
+        </td>
+    </tr>
+</table>
+
+<a href="/Anmeldung/Bearbeiten/@Model.AccessToken">Angaben Bearbeiten</a> |
+<a href="/Anmeldung/Selbstabmeldung/@Model.AccessToken">Von der Schulung abmelden</a> |
+@Html.ActionLink("Zur Anmeldung", "Anmeldung")

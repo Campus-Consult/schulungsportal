@@ -122,7 +122,7 @@ namespace Schulungsportal_2_Tests
             Assert.Equal(4, avm.SchulungsCheckboxen.Count);
 
             // check titel of checkboxes
-            string schulungTime = now.AddDays(2).ToString("dd.MM.yyyy hh:mm");
+            string schulungTime = now.AddDays(2).ToString("dd.MM.yyyy HH:mm");
             Assert.Equal("Test 0 am " + schulungTime + " Uhr", avm.SchulungsCheckboxen.ElementAt(0).Titel);
             Assert.Equal("Test 1 am " + schulungTime + " Uhr", avm.SchulungsCheckboxen.ElementAt(1).Titel);
             Assert.Equal("Test 4 am " + schulungTime + " Uhr", avm.SchulungsCheckboxen.ElementAt(2).Titel);

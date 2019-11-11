@@ -75,16 +75,7 @@ else if (DateTime.Now > Model.Termine.Max(x => x.End))
             <td>
                 @foreach (var termin in Model.Termine.OrderBy(x => x.Start))
                 {
-                    if (termin.Start.Date.Equals(termin.End.Date))
-                    {
-                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @termin.End.ToString("HH:mm") Uhr</div>
-
-                    }
-                    else
-                    {
-                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @Html.DisplayFor(modelItem => termin.End) Uhr</div>
-
-                    }
+                    <div> @termin.FormatFromStartToEnd() </div>
                 }
             </td>
         </tr>

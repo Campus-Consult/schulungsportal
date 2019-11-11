@@ -47,11 +47,10 @@ namespace Schulungsportal_2.Controllers
                 ViewBag.errorMessage = "User is already registered!";
                 return View();
             }
-            var rootUrl = string.Format("https://{0}",Request.Host);
             // create invite
             Invite invite = await InviteRepository.CreateForMail(manAdd.EMailAdress, DateTime.Now.AddDays(2));
             // send invite
-            await MailingHelper.GenerateAndSendInviteMail(invite, rootUrl, getVorstand(), mailSender);
+            await MailingHelper.GenerateAndSendInviteMail(invite, Util.getRootUrl(Request), Util.getVorstand(_context), mailSender);
             ViewBag.successMessage = "Successfully sent invite Mail, this is valid for 2 days";
             return View();
         }
@@ -128,22 +127,6 @@ namespace Schulungsportal_2.Controllers
             [Compare("Password", ErrorMessage = "Passwörter stimmen nicht überein.")]
             [DataType(DataType.Password)]
             public string PasswordRepeat { get; set; }
-        }
-        
-        /// <summary>
-        /// Gibt den aktuellen gespeicherten Vorstand zurück,
-        /// </summary>
-        /// <returns></returns>
-        public string getVorstand()
-        {
-            var impressum = _context.Impressum.FirstOrDefault();
-            if (impressum == null)
-            {
-                return "";
-            } else
-            {
-                return impressum.Vorstand;
-            }
         }
     }
 }

@@ -99,8 +99,7 @@ namespace Schulungsportal_2.Controllers
                     // stellt für alle Termine sicher, dass die Reihenfolge Anmeldefrist<Start<Ende eingehalten ist
                     if (schulung.Termine.Count > 0 && schulung.Termine.All(x => x.Start > schulung.Anmeldefrist && x.End > x.Start))
                     {
-                        var rootUrl = string.Format("https://{0}", Request.Host);
-                        MailingHelper.GenerateAndSendAnlegeMail(schulung, rootUrl, getVorstand(), emailSender);
+                        MailingHelper.GenerateAndSendAnlegeMail(schulung, Util.getRootUrl(Request), Util.getVorstand(_context), emailSender);
                         return RedirectToAction("Uebersicht");
                     }
                     if (schulung.Termine.Count > 0)
@@ -378,7 +377,7 @@ namespace Schulungsportal_2.Controllers
 
                 IEnumerable<Anmeldung> Anmeldungen = _anmeldungRepository.GetBySchulungGuid(schulung.SchulungGUID);
 
-                string vorstand = getVorstand();
+                string vorstand = Util.getVorstand(_context);
 
                 foreach(Anmeldung anmeldung in Anmeldungen)
                 {
@@ -554,25 +553,8 @@ namespace Schulungsportal_2.Controllers
             }
             // hole alle nächsten Schulungen aus der Datenbank und sende newsletter
             // erstmal deaktiviert
-            // MailingHelper.GenerateAndSendSchulungsNewsletter(_schulungRepository.GetForRegSortByDate().ToList(), getVorstand(), emailSender);
+            // MailingHelper.GenerateAndSendSchulungsNewsletter(_schulungRepository.GetForRegSortByDate().ToList(), Util.getVorstand(_context), emailSender);
             return new StatusCodeResult(200);
         }
-        
-        /// <summary>
-        /// Gibt den aktuellen gespeicherten Vorstand zurück,
-        /// </summary>
-        /// <returns></returns>
-        public string getVorstand()
-        {
-            var impressum = _context.Impressum.FirstOrDefault();
-            if (impressum == null)
-            {
-                return "";
-            } else
-            {
-                return impressum.Vorstand;
-            }
-        }
-
     }
 }

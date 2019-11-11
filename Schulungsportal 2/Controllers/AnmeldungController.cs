@@ -10,6 +10,7 @@ using Schulungsportal_2.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Schulungsportal_2.Controllers
 {
@@ -86,6 +87,10 @@ namespace Schulungsportal_2.Controllers
                     }
                     DateTime now = DateTime.Now;
                     List<Schulung> angemeldeteSchulungen = new List<Schulung>();
+
+                    var rootUrl = Util.getRootUrl(Request);
+                    var vorstand = Util.getVorstand(_context);
+
                     foreach (SchulungsCheckBox checkbox in newAnmeldung.SchulungsCheckboxen)
                     {
                         if (checkbox.Checked)
@@ -111,7 +116,8 @@ namespace Schulungsportal_2.Controllers
                                 {
                                     angemeldeteSchulungen.Add(schulung);
                                     _anmeldungRepository.Add(anmeldung);
-                                    MailingHelper.GenerateAndSendBestätigungsMail(newAnmeldung.ToAnmeldung(), schulung, getVorstand(), emailSender);
+                                    //logger.Info(anmeldung.AccessToken);
+                                    MailingHelper.GenerateAndSendBestätigungsMail(anmeldung, schulung, vorstand, rootUrl, emailSender);
                                 }
                             }
                         }
@@ -229,6 +235,111 @@ namespace Schulungsportal_2.Controllers
             }
         }
 
+        [Route("Anmeldung/Selbstmanagement/{accessToken}")]
+        public ActionResult Selbstmanagement(String accessToken) {
+            Anmeldung anmeldung = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            if (anmeldung == null) {
+                return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
+            }
+            var cantCancelReason = getCantCancelReason(anmeldung);
+            if (cantCancelReason != null) {
+                ViewBag.cantCancelReason = cantCancelReason;
+                return View("SelbstmanagementError");
+            }
+            return View("Selbstmanagement", anmeldung);
+        }
+
+        [Route("Anmeldung/Selbstabmeldung/{accessToken}")]
+        public ActionResult Selbstabmeldung(String accessToken) {
+            Anmeldung anmeldung = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            if (anmeldung == null) {
+                return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
+            }
+            var cantCancelReason = getCantCancelReason(anmeldung);
+            if (cantCancelReason != null) {
+                ViewBag.cantCancelReason = cantCancelReason;
+                return View("SelbstmanagementError");
+            }
+            AbmeldungViewModel abmeldung = new AbmeldungViewModel {
+                Nachricht = "",
+                Schulung = anmeldung.Schulung,
+                anmeldungId = anmeldung.anmeldungId,
+            };
+            return View("Selbstabmeldung", abmeldung);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Anmeldung/Selbstabmeldung/{accessToken}")]
+        public ActionResult Selbstabmeldung(AbmeldungViewModel abmeldung, String accessToken) {
+            Anmeldung anmeldungByToken = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            if (anmeldungByToken == null) {
+                return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
+            }
+            var cantCancelReason = getCantCancelReason(anmeldungByToken);
+            if (cantCancelReason != null) {
+                ViewBag.cantCancelReason = cantCancelReason;
+                return View("SelbstmanagementError");
+            }
+            // Just a safety check
+            if (anmeldungByToken.anmeldungId != abmeldung.anmeldungId) {
+                return BadRequest();
+            }
+            _anmeldungRepository.Delete(anmeldungByToken);
+            if (abmeldung.Nachricht == null || abmeldung.Nachricht.Trim() == "") {
+                abmeldung.Nachricht = null;
+            }
+            var vorstand = Util.getVorstand(_context);
+            MailingHelper.GenerateAndSendAbmeldungMail(anmeldungByToken, anmeldungByToken.Schulung, vorstand, emailSender);
+
+            // Sende Mail an Dozenten falls Nachricht existiert oder wenn es nach Anmeldefrist ist
+            if (abmeldung.Nachricht != null || anmeldungByToken.Schulung.Anmeldefrist < DateTime.Now) {
+                MailingHelper.GenerateAndSendAbsageAnSchulungsdozentMail(anmeldungByToken, abmeldung.Nachricht, vorstand, emailSender);
+            }
+            return View("AbmeldungErfolgreich");
+        }
+
+        [Route("Anmeldung/Bearbeiten/{accessToken}")]
+        public ActionResult Bearbeiten(String accessToken) {
+            Anmeldung anmeldungByToken = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            if (anmeldungByToken == null) {
+                return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
+            }
+            var cantCancelReason = getCantCancelReason(anmeldungByToken);
+            if (cantCancelReason != null) {
+                ViewBag.cantCancelReason = cantCancelReason;
+                return View("SelbstmanagementError");
+            }
+            return View("Bearbeiten", anmeldungByToken);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Anmeldung/Bearbeiten/{accessToken}")]
+        public ActionResult Bearbeiten(Anmeldung anmeldung, String accessToken) {
+            Anmeldung anmeldungByToken = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            if (anmeldungByToken == null) {
+                return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
+            }
+            var cantCancelReason = getCantCancelReason(anmeldungByToken);
+            if (cantCancelReason != null) {
+                ViewBag.cantCancelReason = cantCancelReason;
+                return View("SelbstmanagementError");
+            }
+            bool shouldSendNewMail = anmeldungByToken.Email != anmeldung.Email;
+            // update model
+            anmeldungByToken.Vorname = anmeldung.Vorname;
+            anmeldungByToken.Nachname = anmeldung.Nachname;
+            anmeldungByToken.Email = anmeldung.Email;
+            anmeldungByToken.Nummer = anmeldung.Nummer;
+            _anmeldungRepository.Update(anmeldungByToken);
+            // if the Email changed send the appointment to the new Mail
+            if (shouldSendNewMail) {
+                MailingHelper.GenerateAndSendBestätigungsMail(anmeldungByToken, anmeldungByToken.Schulung, Util.getVorstand(_context), Util.getRootUrl(Request), emailSender);
+            }
+            return Redirect("/Anmeldung/Selbstmanagement/"+accessToken);
+        }
+
         /// <summary>
         /// Diese Methode wird vom Framework aufgerufen, wenn die Anmeldung/Nachtragen-Eingabemaske ausgefüllt zurückgesendet wird. Sollte die Anmeldung/Nachtragen-Eingabemaske nicht richtig ausgefüllt worden sein, wird die Nachtragen-View zurückgegeben, ansonsten wird die neue Anmeldung angelegt und auf ../Schulung/Teilnehmerliste/{schulungGuid} umgeleitet.
         /// </summary>
@@ -258,7 +369,7 @@ namespace Schulungsportal_2.Controllers
                     // in Zukunft kommt
                     if (DateTime.Now < schulung.Termine.Min(x => x.Start))
                     {
-                        MailingHelper.GenerateAndSendBestätigungsMail(anmeldung, _schulungRepository.GetById(anmeldung.SchulungGuid), getVorstand(), emailSender);
+                        MailingHelper.GenerateAndSendBestätigungsMail(anmeldung, _schulungRepository.GetById(anmeldung.SchulungGuid), Util.getVorstand(_context), Util.getRootUrl(Request), emailSender);
                     }
                     return Redirect("/Schulung/Teilnehmerliste/" + anmeldung.SchulungGuid);
                 }
@@ -273,21 +384,16 @@ namespace Schulungsportal_2.Controllers
             }
         }
 
-        /// <summary>
-        /// Gibt den aktuellen gespeicherten Vorstand zurück,
-        /// </summary>
-        /// <returns></returns>
-        public string getVorstand()
-        {
-            var impressum = _context.Impressum.FirstOrDefault();
-            if (impressum == null)
-            {
-                return "";
+        /// Get the reason why it can't be cancelled, if it can be cancelled null is returned
+        public String getCantCancelReason(Anmeldung anmeldung) {
+            var earliest = anmeldung.Schulung.Termine.OrderBy(x => x.Start).FirstOrDefault();
+            if (DateTime.Now > earliest.Start) {
+                return "Schulung hat bereits begonnen!";
             }
-            else
-            {
-                return impressum.Vorstand;
+            if (anmeldung.Schulung.IsAbgesagt) {
+                return "Schulung ist bereits abgesagt!";
             }
+            return null;
         }
     }
 }

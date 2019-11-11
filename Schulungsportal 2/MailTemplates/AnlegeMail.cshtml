@@ -32,16 +32,7 @@
     {
         @*Linq extensions doesn't work, but it does work this way...*@
         var termin = System.Linq.Enumerable.First(Model.Schulung.Termine);
-        if (termin.Start.Date.Equals(termin.End.Date))
-        {
-            <p>Termin: @termin.Start.ToString("dd.MM.yyyy hh:mm") Uhr bis @termin.End.ToString("HH:mm") Uhr </p>
-
-        }
-        else
-        {
-            <p>Termin: @termin.Start.ToString("dd.MM.yyyy hh:mm") Uhr bis @termin.End.ToString("dd.MM.yyyy hh:mm") Uhr</p>
-
-        }
+        <p>Termin: @termin.FormatFromStartToEnd() </p>
     }
     else
     {
@@ -49,16 +40,7 @@
         <ul>
             @foreach (var termin in Model.Schulung.Termine)
             {
-                if (termin.Start.Date.Equals(termin.End.Date))
-                {
-                    <li>@termin.Start.ToString("dd.MM.yyyy hh:mm") Uhr bis @termin.End.ToString("HH:mm") Uhr</li>
-
-                }
-                else
-                {
-                    <li>@termin.Start.ToString("dd.MM.yyyy hh:mm") Uhr bis @termin.End.ToString("dd.MM.yyyy hh:mm") Uhr</li>
-
-                }
+                <p>Termin: @termin.FormatFromStartToEnd() </p>
             }
         </ul>
     }
