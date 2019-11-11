@@ -62,17 +62,17 @@
                 </tr>
                 <tr>
                     <th>
-                        Ort:
-                    </th>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Ort)
-                    </td>
-                </tr>
-                <tr>
-                    <th>
                         Beschreibung:
                     </th>
                     <td class="multi-line">@Html.DisplayFor(m => item.Beschreibung)</td>
+                </tr>
+                <tr>
+                    <th>
+                        Anmeldungen:
+                    </th>
+                    <td>
+                        @item.Anmeldungen.Count
+                    </td>
                 </tr>
             </table>
             <hr />

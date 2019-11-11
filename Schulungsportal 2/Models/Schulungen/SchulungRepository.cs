@@ -58,6 +58,7 @@ namespace Schulungsportal_2.Models.Schulungen
                 DateTime now = DateTime.Now;
                 return context.Schulung
                     .Include(s => s.Termine)
+                    .Include(s => s.Anmeldungen)
                     .Where(x => !x.IsAbgesagt && x.Anmeldefrist > now)
                     .OrderBy(x => x.Anmeldefrist).AsEnumerable();
             }
