@@ -40,12 +40,12 @@ namespace Schulungsportal_2.ViewModels
         
         [Display(Name = "Start-Termin")]
         [DataType(DataType.DateTime)]
-        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy hh:mm}")]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}")]
         public DateTime Start { get; set; }
         
         [Display(Name = "End-Termin")]
         [DataType(DataType.DateTime)]
-        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy hh:mm}")]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}")]
         public DateTime End { get; set; }
         
         [Display(Name = "Anmeldefrist")]

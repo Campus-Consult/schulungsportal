@@ -24,7 +24,7 @@
     <p>auch in der n&auml;chsten Zeit gibt es wieder einige spannende Schulungen</p>
     @foreach (var schulung in Model.Schulungen)
     {
-        <p><b>@schulung.Titel</b>, Anmeldefrist: @schulung.Anmeldefrist.ToString("dd.MM.yyyy hh:mm") Uhr</p>
+        <p><b>@schulung.Titel</b>, Anmeldefrist: @schulung.Anmeldefrist.ToString("dd.MM.yyyy HH:mm") Uhr</p>
     }
     <br />
     <p>Diese Email wurde automatisch generiert, bitte nicht antworten. Bei Fragen wende dich bitte an <a href="mailto:@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter">@Schulungsportal_2.Services.AuthMessageSender.adresseSchulungsbeauftragter</a>.</p>

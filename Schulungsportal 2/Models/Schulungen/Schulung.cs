@@ -122,6 +122,18 @@ namespace Schulungsportal_2.Models.Schulungen
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime End { get; set; }
 
+        ///
+        /// Formatiert das Datum zu "11.11.2011 11:11 Uhr bis 13:11 Uhr" bzw
+        /// 11.11.2011 20:11 Uhr bis 12.11.2011 01:11 Uhr
+        ///
+        public String FormatFromStartToEnd() {
+            if (Start.Date.Equals(End.Date)) {
+                return $"{Start.ToString("dd.MM.yyyy HH:mm")} Uhr bis {End.ToString("HH:mm")} Uhr";
+            } else {
+                return $"{Start.ToString("dd.MM.yyyy HH:mm")} Uhr bis {End.ToString("dd.MM.yyyy HH:mm")} Uhr";
+            }
+        }
+
         public TerminViewModel ToTerminViewModel()
         {
             return new TerminViewModel { EndDate = End.Date, EndTime = End.TimeOfDay, StartDate = Start.Date, StartTime = Start.TimeOfDay };

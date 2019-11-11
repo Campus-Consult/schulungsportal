@@ -94,7 +94,7 @@
                             <span class="field-validation-valid text-danger" data-valmsg-for="termin.StartDate" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-md-2">
-                            <input class="form-control text-box single-line start-time" data-val="true" data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." id="TermineVM_@(i)_StartTime" name="TermineVM[@(i)].StartTime" placeholder="hh:mm" type="time" value="@termin.StartTime.ToString("hh\\:mm")">
+                            <input class="form-control text-box single-line start-time" data-val="true" data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." id="TermineVM_@(i)_StartTime" name="TermineVM[@(i)].StartTime" placeholder="HH:mm" type="time" value="@termin.StartTime.ToString("hh\\:mm")">
                             <span class="field-validation-valid text-danger" data-valmsg-for="termin.StartTime" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-md-1">bis</div>
@@ -103,7 +103,7 @@
                             <span class="field-validation-valid text-danger" data-valmsg-for="termin.EndDate" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-md-2">
-                            <input class="form-control text-box single-line end-time" data-val="true" data-val-required="Das Feld &quot;End-Uhrzeit&quot; ist erforderlich." id="TermineVM_@(i)_EndTime" name="TermineVM[@(i)].EndTime" placeholder="hh:mm" type="time" value="@termin.EndTime.ToString("hh\\:mm")">
+                            <input class="form-control text-box single-line end-time" data-val="true" data-val-required="Das Feld &quot;End-Uhrzeit&quot; ist erforderlich." id="TermineVM_@(i)_EndTime" name="TermineVM[@(i)].EndTime" placeholder="HH:mm" type="time" value="@termin.EndTime.ToString("hh\\:mm")">
                             <span class="field-validation-valid text-danger" data-valmsg-for="termin.EndTime" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-md-1"><button class="btn btn-danger termin-remove" title="entfernen" type="button">-</button></div>
@@ -127,7 +127,7 @@
                 @Html.ValidationMessageFor(model => model.AnmeldefristDate, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-2">
-                @Html.EditorFor(model => model.AnmeldefristTime, new { htmlAttributes = new { @class = "form-control", @placeholder = "hh:mm" } })
+                @Html.EditorFor(model => model.AnmeldefristTime, new { htmlAttributes = new { @class = "form-control", @placeholder = "HH:mm" } })
                 @Html.ValidationMessageFor(model => model.AnmeldefristTime, "", new { @class = "text-danger" })
             </div>
             <div class="col-md-5"></div>

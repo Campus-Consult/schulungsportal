@@ -50,7 +50,7 @@ namespace Schulungsportal_2.ViewModels
             SchulungsCheckboxen = new List<SchulungsCheckBox>();
             foreach (Schulung schulung in Schulungen)
             {
-                SchulungsCheckBox checkbox = new SchulungsCheckBox(schulung.Titel + " am " + schulung.Termine.Min(x => x.Start).ToString("dd.MM.yyyy hh:mm") + " Uhr", schulung.SchulungGUID);
+                SchulungsCheckBox checkbox = new SchulungsCheckBox(schulung.Titel + " am " + schulung.Termine.Min(x => x.Start).ToString("dd.MM.yyyy HH:mm") + " Uhr", schulung.SchulungGUID);
                 SchulungsCheckboxen.Add(checkbox);
             }
         }

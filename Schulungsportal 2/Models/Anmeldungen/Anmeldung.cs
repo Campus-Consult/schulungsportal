@@ -41,6 +41,10 @@ namespace Schulungsportal_2.Models.Anmeldungen
         [Display(Name = "Status bei CC")]
         public String Status { get; set; }
 
+        [Required]
+        [MaxLength(40)]
+        public String AccessToken { get; set; }
+
         [ForeignKey("Schulung")]
         public String SchulungGuid { get; set; }
 

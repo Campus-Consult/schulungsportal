@@ -75,6 +75,9 @@ namespace Schulungsportal_2.Models.Anmeldungen
         {
             try
             {
+                if (anmeldung.AccessToken == null) {
+                    anmeldung.AccessToken = Guid.NewGuid().ToString();
+                }
                 context.Anmeldung.Add(anmeldung);
                 context.SaveChanges();
             }
@@ -103,6 +106,19 @@ namespace Schulungsportal_2.Models.Anmeldungen
                 string code = "#104";
                 e = new Exception("Fehler beim Finden der Anmeldung in Datenbank-Anmeldung (" + e.Message + ") " + code, e);
                 throw e;
+            }
+        }
+
+        public Anmeldung GetByAccessTokenWithSchulung(String accessToken) {
+            // first to not throw an exception if it doesn't exists
+            var anmeldungen = context.Anmeldung
+                .Include(a => a.Schulung)
+                .Include(a => a.Schulung.Termine)
+                .Where(m => m.AccessToken == accessToken);
+            if (anmeldungen.Count() == 1) { 
+                return anmeldungen.Single();
+            } else {
+                return null;
             }
         }
 
@@ -139,6 +155,11 @@ namespace Schulungsportal_2.Models.Anmeldungen
                     a.Nummer = "-----";
                     a.Vorname = "-----";
                 });
+            context.SaveChanges();
+        }
+
+        public void Update(Anmeldung anmeldung) {
+            context.Entry(anmeldung).State = EntityState.Modified;
             context.SaveChanges();
         }
 
