@@ -44,7 +44,6 @@ namespace Schulungsportal_2.ViewModels
         [DataType(DataType.EmailAddress)]
         public String Email { get; set; }
 
-        [Required]
         [Display(Name = "Handynummer")]
         public String Nummer { get; set; }
 
@@ -62,6 +61,11 @@ namespace Schulungsportal_2.ViewModels
         public Anmeldung ToAnmeldung()
         {
             Anmeldung result = mapper.Map<Anmeldung>(this);
+
+            // don't use null, use empty string
+            if (result.Nummer == null) {
+                result.Nummer = "";
+            }
 
             return result;
         }

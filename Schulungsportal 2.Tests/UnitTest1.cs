@@ -170,6 +170,69 @@ namespace Schulungsportal_2_Tests
         }
 
         [Fact]
+        public void TestAnmeldungWithoutNummer() // you can still sign up if you don't supply a mobile number
+        {
+            // save current datetime so it isn't affected by programm execution and can be checked later
+            DateTime now = DateTime.Now;
+            Utils.CreateTestDataForAnmeldung(context,now);
+            MockEmailSender.sentMessages.Clear();
+
+            // check types
+            ActionResult result = ac.Anmeldung();
+            Assert.IsType<ViewResult>(result);
+            ViewResult vRes = (ViewResult)result;
+            Assert.IsType<AnmeldungViewModel>(vRes.Model);
+            AnmeldungViewModel avm = (AnmeldungViewModel)vRes.Model;
+
+            Assert.Equal(4, avm.Schulungen.Count);
+            Assert.Equal(4, avm.SchulungsCheckboxen.Count);
+
+            // check titel of checkboxes
+            string schulungTime = now.AddDays(2).ToString("dd.MM.yyyy HH:mm");
+            Assert.Equal("Test 0 am " + schulungTime + " Uhr", avm.SchulungsCheckboxen.ElementAt(0).Titel);
+            Assert.Equal("Test 1 am " + schulungTime + " Uhr", avm.SchulungsCheckboxen.ElementAt(1).Titel);
+            Assert.Equal("Test 4 am " + schulungTime + " Uhr", avm.SchulungsCheckboxen.ElementAt(2).Titel);
+            Assert.Equal("Test 5 am " + schulungTime + " Uhr", avm.SchulungsCheckboxen.ElementAt(3).Titel);
+
+            // mark 0,1,4
+            avm.SchulungsCheckboxen.ElementAt(0).Checked = true;
+            avm.SchulungsCheckboxen.ElementAt(1).Checked = true;
+            avm.SchulungsCheckboxen.ElementAt(2).Checked = true;
+
+            // enter data
+            avm.Nachname = "testN";
+            avm.Vorname = "testV";
+            // specifically don't set this
+            // avm.Nummer = "123";
+            avm.Status = "Mitglied";
+            avm.Email = "test@test.test";
+
+            // submit model back
+            result = ac.Anmeldung(avm);
+            Assert.IsType<ViewResult>(result);
+            vRes = (ViewResult)result;
+            Assert.IsType<List<Schulung>>(vRes.Model);
+            List<Schulung> schulungListRes = (List<Schulung>)vRes.Model;
+
+            // 2 invalid are ignored, same as the one we didn't sign up for
+            Assert.Equal(3, schulungListRes.Count);
+
+            Assert.Equal("Test 0", schulungListRes.ElementAt(0).Titel);
+            Assert.False(schulungListRes.ElementAt(0).Check);
+            // this one is checked cause there already was a signup with this mail
+            Assert.Equal("Test 1", schulungListRes.ElementAt(1).Titel);
+            Assert.True(schulungListRes.ElementAt(1).Check);
+            Assert.Equal("Test 4", schulungListRes.ElementAt(2).Titel);
+            Assert.False(schulungListRes.ElementAt(2).Check);
+
+            // sleep cause sending the mail is async
+            System.Threading.Thread.Sleep(1000);
+
+            // only mails for successful signups should have been sent
+            Assert.Equal(2, MockEmailSender.sentMessages.Count);
+        }
+
+        [Fact]
         public void testAnmeldungError()
         {
             Utils.CreateTestData(context,DateTime.Now);
