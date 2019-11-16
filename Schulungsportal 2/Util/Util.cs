@@ -5,6 +5,8 @@ using Schulungsportal_2.Data;
 
 namespace Schulungsportal_2
 {
+    ///
+    /// Sammlung nützlicher Methoden, die an verschienen Stellen verwendet werden
     public class Util
     {
         // logger
@@ -18,11 +20,16 @@ namespace Schulungsportal_2
             if (request != null) {
                 return string.Format("https://{0}", request.Host);
             } else {
+                // eigentlich sollte dies nicht auftreten, allerdings scheint dies in den Tests doch der Fall zu sein
+                // daher diese Ausnahme
                 logger.Warn("Couldn't get current request, returning default!");
                 return "http://localhost";
             }
         }
 
+        ///
+        /// Liest den aktuellen Vorstand aus der Datenbank und gibt diesen zurück
+        ///
         public static String getVorstand(ApplicationDbContext context) {
             var impressum = context.Impressum.FirstOrDefault();
             if (impressum == null)
