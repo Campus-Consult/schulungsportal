@@ -17,6 +17,7 @@ namespace Schulungsportal.Controllers
     /// </summary>
     public class SucheController : Controller
     {
+        // TODO: alles auf vue umstellen
         private SchulungRepository _schulungRepository;
         private AnmeldungRepository _anmeldungRepository;
 
@@ -159,125 +160,9 @@ namespace Schulungsportal.Controllers
         [Authorize(Roles = "Verwaltung")]
         public ActionResult SucheTeilnehmer()
         {
+            // uses vue frontend
             return View();
         }
-
-
-        /* Deprecated, replaced by vue frontend
-        [HttpPost]
-        public ActionResult SucheTeilnehmer(TeilnehmerSucheViewModel teilnehmerSucheViewModel)
-        {
-            try
-            {
-                teilnehmerSucheViewModel.CleanNulls();
-                // Hole alle Daten aus der DB, die irgendwas mit der Suche gemeinsam haben
-                List<TeilnehmerSucheResultViewModel> vms = _anmeldungRepository.SearchAnmeldungenWithMatchCount(teilnehmerSucheViewModel.VornameTeilnehmer, teilnehmerSucheViewModel.NachnameTeilnehmer, teilnehmerSucheViewModel.EmailTeilnehmer, teilnehmerSucheViewModel.TelefonTeinehmer)
-                    // gruppiere und Zähle die einzelnen Vorkommen für bessere Anzeige
-                    .GroupBy(m => m, awmcComparer)
-                    .Select(m => new TeilnehmerSucheResultViewModel
-                    {
-                        EmailTeilnehmer = m.Key.Email,
-                        matchCount = m.Key.matchCount,
-                        NachnameTeilnehmer = m.Key.Nachname,
-                        VornameTeilnehmer = m.Key.Vorname,
-                        number = m.Count(),
-                        AnmeldungIDs = String.Join(",", m.Select(a => a.anmeldungId.ToString())),
-                        TelefonTeilnehmer = m.Key.Nummer,
-                    })
-                    .ToList();
-                // Sortieren für schönere Anzeige
-                vms.Sort(delegate (TeilnehmerSucheResultViewModel x, TeilnehmerSucheResultViewModel y)
-                {
-                    int compare = x.matchCount.CompareTo(y.matchCount);
-                    if (compare != 0) return -compare;
-                    compare = x.number.CompareTo(y.number);
-                    if (compare != 0) return -compare;
-                    compare = x.VornameTeilnehmer.CompareTo(y.VornameTeilnehmer);
-                    if (compare != 0) return compare;
-                    compare = x.NachnameTeilnehmer.CompareTo(y.NachnameTeilnehmer);
-                    if (compare != 0) return compare;
-                    compare = x.EmailTeilnehmer.CompareTo(y.EmailTeilnehmer);
-                    if (compare != 0) return compare;
-                    compare = x.TelefonTeilnehmer.CompareTo(y.TelefonTeilnehmer);
-                    if (compare != 0) return compare;
-                    return 0;
-                });
-                return View("SucheTeilnehmerResult", vms);
-            }
-            catch (Exception e)
-            {
-                logger.Error(e);
-                string code = "#506";
-                e = new Exception("Fehler beim Erstellen der View " + code, e);
-                return View("Error", e);
-            }
-        }
-
-        [HttpPost]
-        public ActionResult TeilnehmerSelected(List<TeilnehmerSucheResultViewModel> models, string DeleteButton, string RecordButton)
-        {
-            try
-            {
-                if (DeleteButton != null)
-                {
-                    models = models.Where(m => m.Checked).ToList();
-                    // https://stackoverflow.com/a/47170028
-                    ModelState.Clear();
-                    return View("TeilnehmerAnonymisieren", models);
-                }
-                if (RecordButton != null)
-                {
-                    IEnumerable<int> anmeldungIDs = models
-                        .Where(m => m.Checked)
-                        .SelectMany(m => m.AnmeldungIDs.Split(',').Select(s => int.Parse(s)));
-                    SearchResultViewModel srvm = new SearchResultViewModel();
-                    if (anmeldungIDs.Count() > 0)
-                    {
-                        srvm.schulung = _schulungRepository.GetSchulungenForAnmeldungIDs(anmeldungIDs)
-                            .Where(s => s.IsGeprüft)
-                            .ToList();
-                        // geh mal davon aus, dass der beste Treffer mit Name übereinstimmt
-                        srvm.titel = models.First().VornameTeilnehmer + " " + models.First().NachnameTeilnehmer;
-                    }
-                    else
-                    {
-                        srvm.schulung = new List<Schulung>(0);
-                    }
-                    return View("TeilnehmerHistorie", srvm);
-                }
-                return RedirectToAction("SucheTeilnehmer");
-            }
-            catch (Exception e)
-            {
-                logger.Error(e);
-                string code = "#507";
-                e = new Exception("Fehler beim Erstellen der View " + code, e);
-                return View("Error", e);
-            }
-        }
-
-        // Dies ist für die Bestätigung auf der vorherigen View
-        [HttpPost]
-        public ActionResult TeilnehmerAnonymisieren(List<TeilnehmerSucheResultViewModel> models)
-        {
-            try
-            {
-                IEnumerable<int> deleteIDs = models
-                        .SelectMany(m => m.AnmeldungIDs.Split(',').Select(s => int.Parse(s)));
-                logger.Warn("Deleting :" + String.Join(";", deleteIDs));
-                _anmeldungRepository.BulkAnonymizeIDs(
-                    deleteIDs
-                );
-                return RedirectToAction("SucheTeilnehmer");
-            }
-            catch (Exception e)
-            {
-                logger.Error(e);
-                string code = "#508";
-                e = new Exception("Fehler beim Erstellen der View " + code, e);
-                return View("Error", e);
-            }
-        }*/
 
         // seperate Klasse zum Vergleichen, da IDs nicht beachtet werden
         private AWMCComparer awmcComparer = new AWMCComparer();

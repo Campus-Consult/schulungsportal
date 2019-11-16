@@ -45,6 +45,7 @@ namespace Schulungsportal_2.Controllers
         /// <returns> die View für ../Home/Impressum </returns>
         public ActionResult Impressum()
         {
+            // TODO: test
             try
             {
                 //eine neue Instanz des ImpressumViewModels wird instanziiert. Hierüber können Informationen an die View gegeben werden.
@@ -96,6 +97,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Home/ImpressumBearbeiten")]
         public ActionResult ImpressumBearbeiten()
         {
+            // TODO: test
             try
             {
                 Impressum impressum = _context.Impressum.First();
@@ -124,6 +126,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Home/ImpressumBearbeiten")]
         public ActionResult ImpressumBearbeitenBestaetigt(Impressum impressum)
         {
+            // TODO: test
             try
             {
                 if (ModelState.IsValid)
@@ -144,6 +147,7 @@ namespace Schulungsportal_2.Controllers
             }
         }
 
+        /*
         /// <summary>
         /// Diese Methode wird vom Framework aufgerufen, wenn in der Verwaltungsübersicht auf "Mailserver Einstellungen bearbeiten" geklickt wird.
         /// </summary>
@@ -216,6 +220,6 @@ namespace Schulungsportal_2.Controllers
                 e = new Exception("Fehler beim verarbeiten des Inputs " + code, e);
                 return View("Error", e);
             }
-        }
+        }*/
     }
 }

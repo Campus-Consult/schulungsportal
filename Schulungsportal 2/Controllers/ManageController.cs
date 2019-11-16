@@ -43,6 +43,7 @@ namespace Schulungsportal_2.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddManager(ManagerAddModel manAdd) {
+            // TODO: test
             if (await userManager.FindByEmailAsync(manAdd.EMailAdress) != null) {
                 ViewBag.errorMessage = "User is already registered!";
                 return View();
@@ -57,6 +58,7 @@ namespace Schulungsportal_2.Controllers
 
         [Route("Manage/Register/{inviteID}")]
         public async Task<IActionResult> Register(string inviteID) {
+            // TODO: test
             // try to load proper invite and check if expired
             Invite invite = await InviteRepository.GetById(inviteID);
             if (invite == null || invite.ExpirationTime < DateTime.Now) {
@@ -72,6 +74,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Manage/Register/{inviteID}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(string inviteID, RegisterModel register) {
+            // TODO: test
             ViewBag.invalidInvite = false;
             if (register.Password != register.PasswordRepeat) {
                 ViewBag.errorMessage = "Passwörter unterschiedlich!";

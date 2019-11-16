@@ -150,6 +150,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Anmeldung/Loeschen/{anmeldungId}")]
         public ActionResult Loeschen(int anmeldungId)
         {
+            // TODO: test, valid id, invalid id
             try
             {
                 if (anmeldungId == 0)
@@ -182,6 +183,7 @@ namespace Schulungsportal_2.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LoeschenBestaetigt(int anmeldungId)
         {
+            // TODO: test, valid id, invalid id
             try
             {
                 Anmeldung anmeldung = _anmeldungRepository.GetById(anmeldungId);
@@ -209,6 +211,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Anmeldung/Nachtragen/{schulungGuid}")]
         public ActionResult Nachtragen(string schulungGuid)
         {
+            // TODO: test, valid id, invalid id
             try
             {
                 if (schulungGuid == null)
@@ -237,6 +240,7 @@ namespace Schulungsportal_2.Controllers
 
         [Route("Anmeldung/Selbstmanagement/{accessToken}")]
         public ActionResult Selbstmanagement(String accessToken) {
+            // TODO: test, invalid token, already canceled, already started, valid token
             Anmeldung anmeldung = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
             if (anmeldung == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
@@ -251,6 +255,7 @@ namespace Schulungsportal_2.Controllers
 
         [Route("Anmeldung/Selbstabmeldung/{accessToken}")]
         public ActionResult Selbstabmeldung(String accessToken) {
+            // TODO: test, valid token, invalid token (other cases already handled above)
             Anmeldung anmeldung = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
             if (anmeldung == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
@@ -272,6 +277,7 @@ namespace Schulungsportal_2.Controllers
         [ValidateAntiForgeryToken]
         [Route("Anmeldung/Selbstabmeldung/{accessToken}")]
         public ActionResult Selbstabmeldung(AbmeldungViewModel abmeldung, String accessToken) {
+            // TODO: test
             Anmeldung anmeldungByToken = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
             if (anmeldungByToken == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
@@ -301,6 +307,7 @@ namespace Schulungsportal_2.Controllers
 
         [Route("Anmeldung/Bearbeiten/{accessToken}")]
         public ActionResult Bearbeiten(String accessToken) {
+            // TODO: test
             Anmeldung anmeldungByToken = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
             if (anmeldungByToken == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
@@ -317,6 +324,7 @@ namespace Schulungsportal_2.Controllers
         [ValidateAntiForgeryToken]
         [Route("Anmeldung/Bearbeiten/{accessToken}")]
         public ActionResult Bearbeiten(Anmeldung anmeldung, String accessToken) {
+            // TODO: test
             Anmeldung anmeldungByToken = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
             if (anmeldungByToken == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
@@ -350,6 +358,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Anmeldung/Nachtragen/{schulungGuid}")]
         public ActionResult Nachtragen(AnmeldungNachtragenViewModel anmeldungViewModel, String schulungGuid)
         {
+            // TODO: test
             try
             {
                 if (ModelState.IsValid)

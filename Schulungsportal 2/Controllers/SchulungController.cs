@@ -47,6 +47,7 @@ namespace Schulungsportal_2.Controllers
         [Authorize(Roles = "Verwaltung")]
         public ActionResult Uebersicht()
         {
+            // TODO: test
             try
             {
                 return View("Uebersicht", _schulungRepository.GetForOverviewSortByDate().ToList());
@@ -67,6 +68,7 @@ namespace Schulungsportal_2.Controllers
         [Authorize(Roles = "Verwaltung")]
         public ActionResult Anlegen()
         {
+            // TODO: test
             try
             {
                 List<string> orgs = _schulungRepository.GetPreviousOrganizers();
@@ -91,6 +93,7 @@ namespace Schulungsportal_2.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Anlegen(SchulungCreateViewModel newSchulung)
         {
+            // TODO: test
             try
             {
                 if (ModelState.IsValid)
@@ -132,6 +135,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Teilnehmerliste/{schulungGuid}")]
         public ActionResult Teilnehmerliste(string schulungGuid)
         {
+            // TODO: test
             try
             {
                 if (schulungGuid == null)
@@ -172,6 +176,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Teilnehmer/{accessToken}")]
         public ActionResult Teilnehmer(string accessToken)
         {
+            // TODO: test
             try
             {
                 if (accessToken == null)
@@ -212,6 +217,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Details/{schulungGuid}")]
         public ActionResult Details(string schulungGuid)
         {
+            // TODO: test
             try
             {
                 if (schulungGuid == null)
@@ -248,6 +254,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Loeschen/{schulungGuid}")]
         public ActionResult Loeschen(string schulungGuid)
         {
+            // TODO: test
             try
             {
                 if (schulungGuid == null)
@@ -281,6 +288,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Loeschen/{schulungGuid}")]
         public ActionResult LoeschenBestaetigt(Schulung schulung, string schulungGuid)
         {
+            // TODO: test
             try
             {
                 schulung = _schulungRepository.GetById(schulung.SchulungGUID);
@@ -308,6 +316,7 @@ namespace Schulungsportal_2.Controllers
         [Authorize(Roles = "Verwaltung")]
         public ActionResult Archiv()
         {
+            // TODO: test
             try {
                 ArchivViewModel archivViewModel = new ArchivViewModel();
                 archivViewModel.schulung = _schulungRepository.GetForArchivSortByDate();
@@ -332,6 +341,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Absagen/{schulungGuid}")]
         public ActionResult Absagen(string schulungGuid)
         {
+            // TODO: test
             try
             {
                 if (schulungGuid == null)
@@ -365,6 +375,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Absagen/{schulungGuid}")]
         public ActionResult AbsagenBestaetigt(Schulung schulung, string schulungGuid)
         {
+            // TODO: test
             try
             {
                 schulung = _schulungRepository.GetById(schulung.SchulungGUID);
@@ -404,6 +415,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Bearbeiten/{SchulungGUID}")]
         public ActionResult Bearbeiten(string SchulungGuid)
         {
+            // TODO: test
             try
             {
                 if (SchulungGuid == null)
@@ -439,6 +451,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Bearbeiten/{SchulungGuid}")]
         public ActionResult BearbeitenBestaetigt(SchulungCreateViewModel schulungVM, string SchulungGuid)
         {
+            // TODO: test
             try
             {
                 if (ModelState.IsValid)
@@ -485,6 +498,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Geprueft/{schulungGuid}")]
         public ActionResult Geprueft(string schulungGuid)
         {
+            // TODO: test
             try
             {
             if (schulungGuid == null)
@@ -519,6 +533,7 @@ namespace Schulungsportal_2.Controllers
         [Route("Schulung/Geprueft/{schulungGuid}")]
         public ActionResult GeprueftBestaetigt(Schulung schulung, string schulungGuid)
         {
+            // TODO: test
             try
             {
                 schulung = _schulungRepository.GetById(schulung.SchulungGUID);
