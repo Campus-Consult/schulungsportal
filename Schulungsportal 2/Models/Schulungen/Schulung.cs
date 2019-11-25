@@ -69,6 +69,9 @@ namespace Schulungsportal_2.Models.Schulungen
         [HiddenInput]
         public bool IsGeprüft { get; set; }
 
+        [HiddenInput]
+        public bool GeprüftReminderSent { get; set; }
+
         [Required]
         [MaxLength(40)]
         public string AccessToken { get; set; }

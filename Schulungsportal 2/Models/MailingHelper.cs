@@ -374,6 +374,47 @@ namespace Schulungsportal_2.Models
         }
 
         /// <summary>
+        /// Diese Methode generiert und schickt eine Mail an die Dozenten der Schulungen einen Tag nach dieser um zu erinnern,
+        /// die Anwesenheitsliste an den Schulungsbeauftragten zu senden
+        /// </summary>
+        /// <param name="anmeldung">Die Anmeldung.</param>
+        /// <param name="schulung">Die Schulung, zu die abgesagt wird.</param>
+        public static Task GenerateAndSendGeprueftReminderMail(Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
+        {
+            MimeMessage message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
+            message.To.Add(new MailboxAddress(schulung.NameDozent, schulung.EmailDozent)); // Empfaenger
+            message.Subject = "[INFO/noreply] Reminder Teilnehmerliste " + schulung.Titel; //Betreff
+
+            var multipart = new MultipartRelated();
+            
+            MailViewModel mvm = new MailViewModel
+            {
+                CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
+                FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
+                InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
+                Schulung = schulung,
+                Vorstand = vorstand,
+            };
+            
+            var body = new TextPart("html") //Inhalt
+            {
+                Text = RunCompile("GeprueftReminder", mvm),
+                ContentTransferEncoding = ContentEncoding.Base64,
+            };
+
+            multipart.Add(body);
+            // Bilder für Corporate Design
+            multipart.Add(LoadInlinePicture("CCLogo.png", mvm.CCLogoFile));
+            multipart.Add(LoadInlinePicture("FBLogo.png", mvm.FacebookLogoFile));
+            multipart.Add(LoadInlinePicture("InstaLogo.png", mvm.InstaLogoFile));
+            message.Body = multipart;
+
+            return emailSender.SendEmailAsync(message);
+        }
+
+
+        /// <summary>
         /// Generiert den Termin als Anhang (.ics-Datei)
         /// </summary>
         /// <param name="schulung"> Die Schulung für den Termin</param>

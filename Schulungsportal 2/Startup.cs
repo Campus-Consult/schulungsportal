@@ -31,7 +31,7 @@ namespace Schulungsportal_2
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
-            
+
             if (env.IsDevelopment()) {
                 builder.AddUserSecrets<Startup>();
             }
@@ -103,6 +103,8 @@ namespace Schulungsportal_2
             services.AddTransient<IEmailSender, AuthMessageSender>();
             // For some of our stuff, has some more specific methods to send mails
             services.AddTransient<ISchulungsportalEmailSender, AuthMessageSender>();
+            // Background Task for reminders
+            services.AddHostedService<AnwesenheitslisteReminderService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAutoMapper();

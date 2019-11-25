@@ -104,7 +104,6 @@ namespace Schulungsportal_2.Models.Schulungen
         {
             try
             {
-                DateTime now = DateTime.Now;
                 IEnumerable<Schulung> schulungen = context.Schulung
                     .Include(s => s.Termine)
                     .Where(x => x.IsGeprüft || x.IsAbgesagt)
@@ -210,6 +209,18 @@ namespace Schulungsportal_2.Models.Schulungen
         }
 
         /// <summary>
+        /// Gibt alle Schulungen zurück, die bereits vorbei sind, die aber nicht Abgesagt
+        /// und auch noch nicht geprüft sind
+        /// </summary>
+        public IEnumerable<Schulung> GetUngeprüfteSchulungen() {
+            var schulungsEnde = DateTime.Now.AddDays(-1);
+            return context.Schulung
+                .Include(s => s.Termine)
+                .Where(x => !x.IsAbgesagt && !x.IsGeprüft && x.Termine.Max(t => t.End) < schulungsEnde)
+                .OrderBy(x => x.Anmeldefrist).AsEnumerable();
+        }
+
+        /// <summary>
         /// Methode um eine bestehende Schulung mit einer überarbeiteten Version zu ersetzen.
         /// Die bestehende Version und die Überarbeitete müssen die selbe ID haben.
         /// Wenn die ID null ist passiert nichts.
@@ -229,6 +240,7 @@ namespace Schulungsportal_2.Models.Schulungen
                 {
                     schulungAlt.Termine = schulung.Termine;
                 }
+                schulungAlt.GeprüftReminderSent = schulung.GeprüftReminderSent;
                 schulungAlt.IsAbgesagt = schulung.IsAbgesagt;
                 schulungAlt.IsGeprüft = schulung.IsGeprüft;
                 schulungAlt.NameDozent = schulung.NameDozent;
@@ -250,6 +262,16 @@ namespace Schulungsportal_2.Models.Schulungen
                 string code = "#007";
                 e = new Exception("Fehler beim Update der Schulung in der Datenbank-Schulung (" + e.Message + ") " + code, e);
                 throw e;
+            }
+        }
+
+        /// Setzt das Feld, dass die Mail zum Überprüfen der Anwesenheit versendet wurde
+        public async Task SetGeprüftMailSent(String schulungsID, bool reminderSent) {
+            Schulung schulung = await context.Schulung.FindAsync(schulungsID);
+            if (schulung != null) {
+                schulung.GeprüftReminderSent = reminderSent;
+                context.Entry(schulung).State = EntityState.Modified;
+                await context.SaveChangesAsync();
             }
         }
 

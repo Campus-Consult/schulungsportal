@@ -46,6 +46,7 @@
     <EmbeddedResource Include="MailTemplates\AbmeldungMail.cshtml" />
     <EmbeddedResource Include="MailTemplates\InviteMail.cshtml" />
     <EmbeddedResource Include="MailTemplates\BestaetigungsMail.cshtml" />
+    <EmbeddedResource Include="MailTemplates\GeprueftReminder.cshtml" />
     <EmbeddedResource Include="MailTemplates\AbsageAnSchulungsdozentMail.cshtml" />
     <EmbeddedResource Include="MailTemplates\FBLogo.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
