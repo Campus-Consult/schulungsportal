@@ -51,7 +51,7 @@ namespace Schulungsportal_2.Controllers
             // create invite
             Invite invite = await InviteRepository.CreateForMail(manAdd.EMailAdress, DateTime.Now.AddDays(2));
             // send invite
-            await MailingHelper.GenerateAndSendInviteMail(invite, Util.getRootUrl(Request), Util.getVorstand(_context), mailSender);
+            await MailingHelper.GenerateAndSendInviteMailAsync(invite, Util.getRootUrl(Request), Util.getVorstand(_context), mailSender);
             ViewBag.successMessage = "Successfully sent invite Mail, this is valid for 2 days";
             return View();
         }

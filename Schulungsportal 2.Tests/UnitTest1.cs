@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Schulungsportal_2.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Schulungsportal_2_Tests
 {
@@ -67,7 +68,7 @@ namespace Schulungsportal_2_Tests
         }
 
         [Fact]
-        public void TestAnmeldung()
+        public async Task TestAnmeldung()
         {
             // save current datetime so it isn't affected by programm execution and can be checked later
             DateTime now = DateTime.Now;
@@ -94,7 +95,7 @@ namespace Schulungsportal_2_Tests
             avm.Email = "test@test.de";
             avm.SchulungsCheckboxen.ElementAt(0).Checked = true;
 
-            result = ac.Anmeldung(avm);
+            result = await ac.Anmeldung(avm);
 
             // sleep cause sending the mail is async
             System.Threading.Thread.Sleep(1000);
@@ -104,7 +105,7 @@ namespace Schulungsportal_2_Tests
         }
 
         [Fact]
-        public void TestAnmeldung2() // mehr tests fürs anmelden
+        public async Task TestAnmeldung2() // mehr tests fürs anmelden
         {
             // save current datetime so it isn't affected by programm execution and can be checked later
             DateTime now = DateTime.Now;
@@ -145,7 +146,7 @@ namespace Schulungsportal_2_Tests
             avm.SchulungsCheckboxen.Add(new SchulungsCheckBox(true, "asdf", "00000000-0000-0000-0000-000000000003"));
 
             // submit model back
-            result = ac.Anmeldung(avm);
+            result = await ac.Anmeldung(avm);
             Assert.IsType<ViewResult>(result);
             vRes = (ViewResult)result;
             Assert.IsType<List<Schulung>>(vRes.Model);
@@ -170,7 +171,7 @@ namespace Schulungsportal_2_Tests
         }
 
         [Fact]
-        public void TestAnmeldungWithoutNummer() // you can still sign up if you don't supply a mobile number
+        public async Task TestAnmeldungWithoutNummer() // you can still sign up if you don't supply a mobile number
         {
             // save current datetime so it isn't affected by programm execution and can be checked later
             DateTime now = DateTime.Now;
@@ -208,7 +209,7 @@ namespace Schulungsportal_2_Tests
             avm.Email = "test@test.test";
 
             // submit model back
-            result = ac.Anmeldung(avm);
+            result = await ac.Anmeldung(avm);
             Assert.IsType<ViewResult>(result);
             vRes = (ViewResult)result;
             Assert.IsType<List<Schulung>>(vRes.Model);
@@ -233,7 +234,7 @@ namespace Schulungsportal_2_Tests
         }
 
         [Fact]
-        public void testAnmeldungError()
+        public async Task testAnmeldungError()
         {
             Utils.CreateTestData(context,DateTime.Now);
 
@@ -253,7 +254,7 @@ namespace Schulungsportal_2_Tests
             avm.Email = "test@test.test";
 
             // submit model back
-            result = ac.Anmeldung(avm);
+            result = await ac.Anmeldung(avm);
             Assert.IsType<ObjectResult>(result);
             ObjectResult statusCodeResult = (ObjectResult)result;
 
@@ -266,7 +267,7 @@ namespace Schulungsportal_2_Tests
             avm.SchulungsCheckboxen.Add(new SchulungsCheckBox(true, "asdf", "invalid"));
 
             // submit model back
-            result = ac.Anmeldung(avm);
+            result = await ac.Anmeldung(avm);
             Assert.IsType<ObjectResult>(result);
             statusCodeResult = (ObjectResult)result;
 

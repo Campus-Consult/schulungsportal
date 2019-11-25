@@ -81,7 +81,9 @@ namespace Schulungsportal_2.Controllers
         [Route("foranmeldungen")]
         public ActionResult<IEnumerable<SchulungDTO>> GetForAnmeldungen(String ids) {
             try {
-                var anmeldungen = ids.Split(",").Select(id => int.Parse(id));
+                // exhaust the enumerator to make sure the response doesn't start until
+                // the ids are proven valid numbers
+                var anmeldungen = ids.Split(",").Select(id => int.Parse(id)).ToList();
                 return Json(_schulungRepository.GetSchulungenForAnmeldungIDs(anmeldungen)
                     .Where(s => s.IsGeprüft)
                     .Select(SchulungDTO.toDTO)

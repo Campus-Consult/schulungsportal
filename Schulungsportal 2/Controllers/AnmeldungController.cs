@@ -74,7 +74,7 @@ namespace Schulungsportal_2.Controllers
         /// <returns> Bestaetigungs-View oder erneut die View für ../Anmeldung/Anmeldung </returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Anmeldung(AnmeldungViewModel newAnmeldung)
+        public async Task<ActionResult> Anmeldung(AnmeldungViewModel newAnmeldung)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace Schulungsportal_2.Controllers
                         {
                             Anmeldung anmeldung = newAnmeldung.ToAnmeldung();
                             anmeldung.SchulungGuid = checkbox.Guid;
-                            Schulung schulung = _schulungRepository.GetById(anmeldung.SchulungGuid);
+                            Schulung schulung = await _schulungRepository.GetByIdAsync(anmeldung.SchulungGuid);
                             // nur erreicht, wenn absichtlich invalide Id übergeben
                             if (schulung == null)
                             {
@@ -107,7 +107,7 @@ namespace Schulungsportal_2.Controllers
                             if (schulung.Termine.Count == 0) { }
                             // Check ob die Schulung immer noch offen ist, sonst ignorieren
                             if (!schulung.IsAbgesagt && schulung.Anmeldefrist > now) {
-                                if (_anmeldungRepository.AnmeldungAlreadyExist(anmeldung))
+                                if (await _anmeldungRepository.AnmeldungAlreadyExistAsync(anmeldung))
                                 {
                                     schulung.Check = true;
                                     angemeldeteSchulungen.Add(schulung);
@@ -115,9 +115,9 @@ namespace Schulungsportal_2.Controllers
                                 else
                                 {
                                     angemeldeteSchulungen.Add(schulung);
-                                    _anmeldungRepository.Add(anmeldung);
+                                    await _anmeldungRepository.AddAsync(anmeldung);
                                     //logger.Info(anmeldung.AccessToken);
-                                    MailingHelper.GenerateAndSendBestätigungsMail(anmeldung, schulung, vorstand, rootUrl, emailSender);
+                                    MailingHelper.GenerateAndSendBestätigungsMailAsync(anmeldung, schulung, vorstand, rootUrl, emailSender);
                                 }
                             }
                         }
@@ -148,7 +148,7 @@ namespace Schulungsportal_2.Controllers
         [HttpGet, ActionName("Loeschen")]
         [Authorize(Roles = "Verwaltung")]
         [Route("Anmeldung/Loeschen/{anmeldungId}")]
-        public ActionResult Loeschen(int anmeldungId)
+        public async Task<ActionResult> Loeschen(int anmeldungId)
         {
             // TODO: test, valid id, invalid id
             try
@@ -157,7 +157,7 @@ namespace Schulungsportal_2.Controllers
                 {
                     return StatusCode(400);
                 }
-                Anmeldung anmeldung = _anmeldungRepository.GetById(anmeldungId);
+                Anmeldung anmeldung = await _anmeldungRepository.GetByIdAsync(anmeldungId);
                 if (anmeldung == null)
                 {
                     return NotFound();
@@ -181,14 +181,14 @@ namespace Schulungsportal_2.Controllers
         [HttpPost, ActionName("Loeschen")]
         [Route("Anmeldung/Loeschen/{anmeldungId}")]
         [ValidateAntiForgeryToken]
-        public ActionResult LoeschenBestaetigt(int anmeldungId)
+        public async Task<ActionResult> LoeschenBestaetigt(int anmeldungId)
         {
             // TODO: test, valid id, invalid id
             try
             {
-                Anmeldung anmeldung = _anmeldungRepository.GetById(anmeldungId);
+                Anmeldung anmeldung = await _anmeldungRepository.GetByIdAsync(anmeldungId);
                 string guid = anmeldung.SchulungGuid;
-                _anmeldungRepository.Delete(anmeldung);
+                await _anmeldungRepository.Delete(anmeldung);
                 return Redirect("/Schulung/Teilnehmerliste/" + guid);
             }
             catch (Exception e)
@@ -209,7 +209,7 @@ namespace Schulungsportal_2.Controllers
         [HttpGet, ActionName("Nachtragen")]
         [Authorize(Roles = "Verwaltung")]
         [Route("Anmeldung/Nachtragen/{schulungGuid}")]
-        public ActionResult Nachtragen(string schulungGuid)
+        public async Task<ActionResult> Nachtragen(string schulungGuid)
         {
             // TODO: test, valid id, invalid id
             try
@@ -218,7 +218,7 @@ namespace Schulungsportal_2.Controllers
                 {
                     return StatusCode(400);
                 }
-                Schulung schulung = _schulungRepository.GetById(schulungGuid);
+                Schulung schulung = await _schulungRepository.GetByIdAsync(schulungGuid);
                 if (schulung == null)
                 {
                     return StatusCode(404, "Schulung mit angegebener ID nicht gefunden!");
@@ -239,9 +239,9 @@ namespace Schulungsportal_2.Controllers
         }
 
         [Route("Anmeldung/Selbstmanagement/{accessToken}")]
-        public ActionResult Selbstmanagement(String accessToken) {
+        public async Task<ActionResult> Selbstmanagement(String accessToken) {
             // TODO: test, invalid token, already canceled, already started, valid token
-            Anmeldung anmeldung = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            Anmeldung anmeldung = await _anmeldungRepository.GetByAccessTokenWithSchulungAsync(accessToken);
             if (anmeldung == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
             }
@@ -254,9 +254,9 @@ namespace Schulungsportal_2.Controllers
         }
 
         [Route("Anmeldung/Selbstabmeldung/{accessToken}")]
-        public ActionResult Selbstabmeldung(String accessToken) {
+        public async Task<ActionResult> Selbstabmeldung(String accessToken) {
             // TODO: test, valid token, invalid token (other cases already handled above)
-            Anmeldung anmeldung = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            Anmeldung anmeldung = await _anmeldungRepository.GetByAccessTokenWithSchulungAsync(accessToken);
             if (anmeldung == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
             }
@@ -276,9 +276,9 @@ namespace Schulungsportal_2.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Anmeldung/Selbstabmeldung/{accessToken}")]
-        public ActionResult Selbstabmeldung(AbmeldungViewModel abmeldung, String accessToken) {
+        public async Task<ActionResult> Selbstabmeldung(AbmeldungViewModel abmeldung, String accessToken) {
             // TODO: test
-            Anmeldung anmeldungByToken = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            Anmeldung anmeldungByToken = await _anmeldungRepository.GetByAccessTokenWithSchulungAsync(accessToken);
             if (anmeldungByToken == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
             }
@@ -291,24 +291,24 @@ namespace Schulungsportal_2.Controllers
             if (anmeldungByToken.anmeldungId != abmeldung.anmeldungId) {
                 return BadRequest();
             }
-            _anmeldungRepository.Delete(anmeldungByToken);
+            await _anmeldungRepository.Delete(anmeldungByToken);
             if (abmeldung.Nachricht == null || abmeldung.Nachricht.Trim() == "") {
                 abmeldung.Nachricht = null;
             }
             var vorstand = Util.getVorstand(_context);
-            MailingHelper.GenerateAndSendAbmeldungMail(anmeldungByToken, anmeldungByToken.Schulung, vorstand, emailSender);
+            await MailingHelper.GenerateAndSendAbmeldungMailAsync(anmeldungByToken, anmeldungByToken.Schulung, vorstand, emailSender);
 
             // Sende Mail an Dozenten falls Nachricht existiert oder wenn es nach Anmeldefrist ist
             if (abmeldung.Nachricht != null || anmeldungByToken.Schulung.Anmeldefrist < DateTime.Now) {
-                MailingHelper.GenerateAndSendAbsageAnSchulungsdozentMail(anmeldungByToken, abmeldung.Nachricht, vorstand, emailSender);
+                await MailingHelper.GenerateAndSendAbsageAnSchulungsdozentMailAsync(anmeldungByToken, abmeldung.Nachricht, vorstand, emailSender);
             }
             return View("AbmeldungErfolgreich");
         }
 
         [Route("Anmeldung/Bearbeiten/{accessToken}")]
-        public ActionResult Bearbeiten(String accessToken) {
+        public async Task<ActionResult> Bearbeiten(String accessToken) {
             // TODO: test
-            Anmeldung anmeldungByToken = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            Anmeldung anmeldungByToken = await _anmeldungRepository.GetByAccessTokenWithSchulungAsync(accessToken);
             if (anmeldungByToken == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
             }
@@ -323,9 +323,9 @@ namespace Schulungsportal_2.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Anmeldung/Bearbeiten/{accessToken}")]
-        public ActionResult Bearbeiten(Anmeldung anmeldung, String accessToken) {
+        public async Task<ActionResult> Bearbeiten(Anmeldung anmeldung, String accessToken) {
             // TODO: test
-            Anmeldung anmeldungByToken = _anmeldungRepository.GetByAccessTokenWithSchulung(accessToken);
+            Anmeldung anmeldungByToken = await _anmeldungRepository.GetByAccessTokenWithSchulungAsync(accessToken);
             if (anmeldungByToken == null) {
                 return NotFound("Die Anmeldung existiert nicht, vielleicht bereits abgemeldet?");
             }
@@ -340,10 +340,10 @@ namespace Schulungsportal_2.Controllers
             anmeldungByToken.Nachname = anmeldung.Nachname;
             anmeldungByToken.Email = anmeldung.Email;
             anmeldungByToken.Nummer = anmeldung.Nummer;
-            _anmeldungRepository.Update(anmeldungByToken);
+            await _anmeldungRepository.UpdateAsync(anmeldungByToken);
             // if the Email changed send the appointment to the new Mail
             if (shouldSendNewMail) {
-                MailingHelper.GenerateAndSendBestätigungsMail(anmeldungByToken, anmeldungByToken.Schulung, Util.getVorstand(_context), Util.getRootUrl(Request), emailSender);
+                await MailingHelper.GenerateAndSendBestätigungsMailAsync(anmeldungByToken, anmeldungByToken.Schulung, Util.getVorstand(_context), Util.getRootUrl(Request), emailSender);
             }
             return Redirect("/Anmeldung/Selbstmanagement/"+accessToken);
         }
@@ -356,7 +356,7 @@ namespace Schulungsportal_2.Controllers
         [HttpPost, ActionName("Nachtragen")]
         [ValidateAntiForgeryToken]
         [Route("Anmeldung/Nachtragen/{schulungGuid}")]
-        public ActionResult Nachtragen(AnmeldungNachtragenViewModel anmeldungViewModel, String schulungGuid)
+        public async Task<ActionResult> Nachtragen(AnmeldungNachtragenViewModel anmeldungViewModel, String schulungGuid)
         {
             // TODO: test
             try
@@ -368,17 +368,17 @@ namespace Schulungsportal_2.Controllers
                     {
                         throw new Exception("Guid missmatch");
                     }
-                    Schulung schulung = _schulungRepository.GetById(schulungGuid);
+                    Schulung schulung = await _schulungRepository.GetByIdAsync(schulungGuid);
                     if (schulung == null)
                     {
                         return StatusCode(404, "Schulung mit angegebener ID nicht gefunden!");
                     }
-                    _anmeldungRepository.Add(anmeldung);
+                    await _anmeldungRepository.AddAsync(anmeldung);
                     // sende Mail falls mindestens ein Start Termin nach jetzt is, also noch was von der Schulung
                     // in Zukunft kommt
                     if (DateTime.Now < schulung.Termine.Min(x => x.Start))
                     {
-                        MailingHelper.GenerateAndSendBestätigungsMail(anmeldung, _schulungRepository.GetById(anmeldung.SchulungGuid), Util.getVorstand(_context), Util.getRootUrl(Request), emailSender);
+                        await MailingHelper.GenerateAndSendBestätigungsMailAsync(anmeldung, await _schulungRepository.GetByIdAsync(anmeldung.SchulungGuid), Util.getVorstand(_context), Util.getRootUrl(Request), emailSender);
                     }
                     return Redirect("/Schulung/Teilnehmerliste/" + anmeldung.SchulungGuid);
                 }

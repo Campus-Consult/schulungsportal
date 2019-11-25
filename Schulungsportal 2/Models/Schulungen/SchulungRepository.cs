@@ -122,7 +122,7 @@ namespace Schulungsportal_2.Models.Schulungen
         /// Methode um einem Schulung-Objekt eine GUID und dem Repository dieses Schulung-Objekt hinzuzufügen.
         /// </summary>
         /// <param name="schulung"> hinzuzufügende Schulung </param>
-        public Schulung Add(Schulung schulung)
+        public async Task<Schulung> AddAsync(Schulung schulung)
         {
             try
             {
@@ -134,8 +134,9 @@ namespace Schulungsportal_2.Models.Schulungen
                 {
                     schulung.AccessToken = Guid.NewGuid().ToString();
                 }
-                context.Schulung.Add(schulung);
-                context.SaveChanges();
+                await context.Schulung.AddAsync(schulung);
+                await context.SaveChangesAsync();
+                return schulung;
             }
             catch(Exception e)
             {
@@ -144,7 +145,6 @@ namespace Schulungsportal_2.Models.Schulungen
                 e = new Exception("Fehler beim Anlegen der Schulung in der Datenbank-Schulung (" + e.Message + ") " + code, e);
                 throw e;
             }
-            return schulung;
         }
 
         /// <summary>
@@ -152,19 +152,19 @@ namespace Schulungsportal_2.Models.Schulungen
         /// </summary>
         /// <param name="id"> ID des geforderten Schulungs-Objektes </param>
         /// <returns> die geforderte Schulung mit der ID oder null falls die Schulung nicht existiert </returns>
-        public Schulung GetById(string id)
+        public async Task<Schulung> GetByIdAsync(string id)
         {
             try
             {
                 IQueryable<Schulung> schulungen = context.Schulung.Where(m => m.SchulungGUID == id)
                     .Include(s => s.Termine);
-                if (schulungen.Count() != 1)
+                if (await schulungen.CountAsync() != 1)
                 {
                     return null;
                 }
                 else
                 {
-                    return schulungen.First();
+                    return await schulungen.FirstAsync();
                 }
             }
             catch (Exception e)
@@ -180,32 +180,32 @@ namespace Schulungsportal_2.Models.Schulungen
         /// </summary>
         /// <param name="accessToken"> AccessToken des geforderten Schulungs-Objektes, dies wird nur per Mail an den Dozenten gesendet </param>
         /// <returns> die geforderte Schulung mit dem accessToken oder null falls die Schulung nicht existiert </returns>
-        public Schulung GetByAccessToken(string accessToken)
+        public async Task<Schulung> GetByAccessTokenAsync(string accessToken)
         {
             IQueryable<Schulung> schulungen = context.Schulung.Where(m => m.AccessToken == accessToken)
                     .Include(s => s.Termine);
-            if (schulungen.Count() != 1)
+            if (await schulungen.CountAsync() != 1)
             {
                 return null;
             } else
             {
-                return schulungen.First();
+                return await schulungen.FirstAsync();
             }
         }
 
-        public List<string> GetPreviousOrganizers()
+        public async Task<List<string>> GetPreviousOrganizersAsync()
         {
-            return context.Schulung.Select(schulung => schulung.OrganisatorInstitution).Distinct().ToList();
+            return await context.Schulung.Select(schulung => schulung.OrganisatorInstitution).Distinct().ToListAsync();
         }
 
-        public List<Schulung> GetSchulungenForAnmeldungIDs(IEnumerable<int> anmeldungIDs)
+        public IEnumerable<Schulung> GetSchulungenForAnmeldungIDs(IEnumerable<int> anmeldungIDs)
         {
             return context.Anmeldung
                 .Where(a => anmeldungIDs.Contains(a.anmeldungId))
                 .Include(a => a.Schulung)
                 .Select(a => a.Schulung)
                 .Include(s => s.Termine)
-                .OrderBy(s => s.Termine.FirstOrDefault().Start).ToList();
+                .OrderBy(s => s.Termine.FirstOrDefault().Start);
         }
 
         /// <summary>
@@ -227,11 +227,11 @@ namespace Schulungsportal_2.Models.Schulungen
         /// Wenn die Schulung zu der ID nicht existiert passiert nichts.
         /// </summary>
         /// <param name="schulung"> überarbeitete Version der Schulung </param>
-        public void Update(Schulung schulung)
+        public async Task UpdateAsync(Schulung schulung)
         {
             try
             {
-                Schulung schulungAlt = context.Schulung.Include(s => s.Termine).Single(m => m.SchulungGUID == schulung.SchulungGUID);
+                Schulung schulungAlt = await context.Schulung.Include(s => s.Termine).SingleAsync(m => m.SchulungGUID == schulung.SchulungGUID);
                 schulungAlt.Beschreibung = schulung.Beschreibung;
                 schulungAlt.EmailDozent = schulung.EmailDozent;
                 schulungAlt.Anmeldefrist = schulung.Anmeldefrist;
@@ -255,7 +255,7 @@ namespace Schulungsportal_2.Models.Schulungen
                     schulungAlt.AccessToken = schulung.AccessToken;
                 }
                 context.Entry(schulungAlt).State = EntityState.Modified;
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
             catch(Exception e)
             {
@@ -279,12 +279,12 @@ namespace Schulungsportal_2.Models.Schulungen
         /// Methode um eine Schulung zu löschen.
         /// </summary>
         /// <param name="schulung"> ein Schulung-Objekt </param>
-        public void Delete(Schulung schulung)
+        public async Task DeleteAsync(Schulung schulung)
         {
             try
             {
                 context.Schulung.Remove(schulung);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
             catch(Exception e)
             {

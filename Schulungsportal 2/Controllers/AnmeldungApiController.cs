@@ -46,11 +46,11 @@ namespace Schulungsportal_2.Controllers
         [Route("anonymize")]
         [HttpPost]
         [Authorize(Roles="Verwaltung")]
-        public ActionResult BulkAnonymizeAnmeldungen([FromBody] List<int> ids) {
+        public async Task<ActionResult> BulkAnonymizeAnmeldungen([FromBody] List<int> ids) {
             if (ids == null) {
                 return BadRequest();
             }
-            _anmeldungRepository.BulkAnonymizeIDs(ids);
+            await _anmeldungRepository.BulkAnonymizeIDsAsync(ids);
             return Ok();
         }
 

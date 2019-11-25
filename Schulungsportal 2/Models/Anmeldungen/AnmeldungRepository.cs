@@ -71,15 +71,15 @@ namespace Schulungsportal_2.Models.Anmeldungen
         /// Methode um eine neue Anmeldung hinzuzufügen.
         /// </summary>
         /// <param name="anmeldung"> ein Anmeldung-Objekt </param>
-        public void Add(Anmeldung anmeldung)
+        public async Task AddAsync(Anmeldung anmeldung)
         {
             try
             {
                 if (anmeldung.AccessToken == null) {
                     anmeldung.AccessToken = Guid.NewGuid().ToString();
                 }
-                context.Anmeldung.Add(anmeldung);
-                context.SaveChanges();
+                await context.Anmeldung.AddAsync(anmeldung);
+                await context.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -94,11 +94,11 @@ namespace Schulungsportal_2.Models.Anmeldungen
         /// </summary>
         /// <param name="id">anmeldungId der Anmeldung, nach der man sucht</param>
         /// <returns>Die Anmledung zu der ID</returns>
-        public Anmeldung GetById(int id)
+        public async Task<Anmeldung> GetByIdAsync(int id)
         {
             try
             {
-                Anmeldung anmeldung = context.Anmeldung.Single(m => m.anmeldungId == id);
+                Anmeldung anmeldung = await context.Anmeldung.SingleAsync(m => m.anmeldungId == id);
                 return anmeldung;
             }
             catch (Exception e)
@@ -109,14 +109,14 @@ namespace Schulungsportal_2.Models.Anmeldungen
             }
         }
 
-        public Anmeldung GetByAccessTokenWithSchulung(String accessToken) {
+        public async Task<Anmeldung> GetByAccessTokenWithSchulungAsync(String accessToken) {
             // first to not throw an exception if it doesn't exists
             var anmeldungen = context.Anmeldung
                 .Include(a => a.Schulung)
                 .Include(a => a.Schulung.Termine)
                 .Where(m => m.AccessToken == accessToken);
-            if (anmeldungen.Count() == 1) { 
-                return anmeldungen.Single();
+            if (await anmeldungen.CountAsync() == 1) { 
+                return await anmeldungen.SingleAsync();
             } else {
                 return null;
             }
@@ -126,12 +126,12 @@ namespace Schulungsportal_2.Models.Anmeldungen
         /// Methode um eine Anmeldung zu löschen.
         /// </summary>
         /// <param name="anmeldung"> ein Anmeldung-Objekt </param>
-        public void Delete(Anmeldung anmeldung)
+        public async Task Delete(Anmeldung anmeldung)
         {
             try
             {
                 context.Anmeldung.Remove(anmeldung);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -145,7 +145,7 @@ namespace Schulungsportal_2.Models.Anmeldungen
         /// Löscht die übergebenen IDs
         /// </summary>
         /// <param name="ids"></param>
-        public void BulkAnonymizeIDs(IEnumerable<int> ids)
+        public async Task BulkAnonymizeIDsAsync(IEnumerable<int> ids)
         {
             context.Anmeldung.Where(a => ids.Contains(a.anmeldungId))
                 .ToList().ForEach(a =>
@@ -155,12 +155,12 @@ namespace Schulungsportal_2.Models.Anmeldungen
                     a.Nummer = "-----";
                     a.Vorname = "-----";
                 });
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        public void Update(Anmeldung anmeldung) {
+        public async Task UpdateAsync(Anmeldung anmeldung) {
             context.Entry(anmeldung).State = EntityState.Modified;
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -168,11 +168,11 @@ namespace Schulungsportal_2.Models.Anmeldungen
         /// </summary>
         /// <param name="anmeldung"> die zu prüfende Anmeldung </param>
         /// <returns> true wenn die Anmeldung bereits existiert sonst false</returns>
-        public bool AnmeldungAlreadyExist(Anmeldung anmeldung)
+        public async Task<bool> AnmeldungAlreadyExistAsync(Anmeldung anmeldung)
         {
             try
             {
-                if (context.Anmeldung.Where(x => x.SchulungGuid == anmeldung.SchulungGuid && x.Email == anmeldung.Email).Count() != 0)
+                if (await context.Anmeldung.Where(x => x.SchulungGuid == anmeldung.SchulungGuid && x.Email == anmeldung.Email).CountAsync() != 0)
                 {
                     return true;
                 } else

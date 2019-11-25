@@ -8,6 +8,7 @@ using Schulungsportal_2.Models.Schulungen;
 using Schulungsportal_2.Services;
 using Schulungsportal_2.ViewModels;
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -66,12 +67,12 @@ namespace Schulungsportal_2.Controllers
         /// </summary>
         /// <returns> die View für ../Schulungen/Anlegen </returns>
         [Authorize(Roles = "Verwaltung")]
-        public ActionResult Anlegen()
+        public async Task<ActionResult> Anlegen()
         {
             // TODO: test
             try
             {
-                List<string> orgs = _schulungRepository.GetPreviousOrganizers();
+                List<string> orgs = await _schulungRepository.GetPreviousOrganizersAsync();
                 ViewBag.OrganisatorenDatalist = orgs;
                 return View("Anlegen", new SchulungCreateViewModel());
             }
@@ -91,18 +92,18 @@ namespace Schulungsportal_2.Controllers
         /// <returns> Umleitung auf ../Schulung/Uebersicht oder erneut die View für ../Schulungen/Anlegen </returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Anlegen(SchulungCreateViewModel newSchulung)
+        public async Task<ActionResult> Anlegen(SchulungCreateViewModel newSchulung)
         {
             // TODO: test
             try
             {
                 if (ModelState.IsValid)
                 {
-                    Schulung schulung = _schulungRepository.Add(newSchulung.ToSchulung());
+                    Schulung schulung = await _schulungRepository.AddAsync(newSchulung.ToSchulung());
                     // stellt für alle Termine sicher, dass die Reihenfolge Anmeldefrist<Start<Ende eingehalten ist
                     if (schulung.Termine.Count > 0 && schulung.Termine.All(x => x.Start > schulung.Anmeldefrist && x.End > x.Start))
                     {
-                        MailingHelper.GenerateAndSendAnlegeMail(schulung, Util.getRootUrl(Request), Util.getVorstand(_context), emailSender);
+                        await MailingHelper.GenerateAndSendAnlegeMailAsync(schulung, Util.getRootUrl(Request), Util.getVorstand(_context), emailSender);
                         return RedirectToAction("Uebersicht");
                     }
                     if (schulung.Termine.Count > 0)
@@ -114,7 +115,7 @@ namespace Schulungsportal_2.Controllers
                         ViewBag.errorMessage = "Mindestens ein Termin muss vorhanden sein!";
                     }
                 }
-                ViewBag.OrganisatorenDatalist = _schulungRepository.GetPreviousOrganizers();
+                ViewBag.OrganisatorenDatalist = await _schulungRepository.GetPreviousOrganizersAsync();
                 return View("Anlegen", newSchulung);
             }
             catch (Exception e)
@@ -133,7 +134,7 @@ namespace Schulungsportal_2.Controllers
         /// <returns> die View für ../Schulung/Teilnehmerliste/{schulungGuid} </returns>
         [Authorize(Roles = "Verwaltung")]
         [Route("Schulung/Teilnehmerliste/{schulungGuid}")]
-        public ActionResult Teilnehmerliste(string schulungGuid)
+        public async Task<ActionResult> Teilnehmerliste(string schulungGuid)
         {
             // TODO: test
             try
@@ -142,7 +143,7 @@ namespace Schulungsportal_2.Controllers
                 {
                     return new StatusCodeResult(400);
                 }
-                Schulung schulung = _schulungRepository.GetById(schulungGuid);
+                Schulung schulung = await _schulungRepository.GetByIdAsync(schulungGuid);
                 if (schulung == null)
                 {
                     return NotFound("Schulung mit angegebener ID nicht gefunden!");
@@ -174,7 +175,7 @@ namespace Schulungsportal_2.Controllers
         /// <param name="accessToken"> die schulungGuid der Schulung, zu der die Teilnehmerliste angezeigt werden soll </param>
         /// <returns> die View für ../Schulung/Teilnehmerliste/{accessToken} </returns>
         [Route("Schulung/Teilnehmer/{accessToken}")]
-        public ActionResult Teilnehmer(string accessToken)
+        public async Task<ActionResult> Teilnehmer(string accessToken)
         {
             // TODO: test
             try
@@ -184,7 +185,7 @@ namespace Schulungsportal_2.Controllers
                     return new StatusCodeResult(400);
                 }
                 TeilnehmerlisteViewModel tl = new TeilnehmerlisteViewModel();
-                tl.Schulung = _schulungRepository.GetByAccessToken(accessToken);
+                tl.Schulung = await _schulungRepository.GetByAccessTokenAsync(accessToken);
                 if (tl.Schulung == null)
                 {
                     return NotFound("Schulung nicht gefunden!");
@@ -215,7 +216,7 @@ namespace Schulungsportal_2.Controllers
         /// <returns> die View für ../Schulung/Details/{schulungGuid} </returns>
         [Authorize(Roles = "Verwaltung")]
         [Route("Schulung/Details/{schulungGuid}")]
-        public ActionResult Details(string schulungGuid)
+        public async Task<ActionResult> Details(string schulungGuid)
         {
             // TODO: test
             try
@@ -224,7 +225,7 @@ namespace Schulungsportal_2.Controllers
                 {
                     return new StatusCodeResult(400);
                 }
-                Schulung schulung = _schulungRepository.GetById(schulungGuid);
+                Schulung schulung = await _schulungRepository.GetByIdAsync(schulungGuid);
                 if (schulung == null)
                 {
                     return NotFound("Schulung mit angegebener ID nicht gefunden!");
@@ -252,7 +253,7 @@ namespace Schulungsportal_2.Controllers
         [HttpGet, ActionName("Loeschen")]
         [Authorize(Roles = "Verwaltung")]
         [Route("Schulung/Loeschen/{schulungGuid}")]
-        public ActionResult Loeschen(string schulungGuid)
+        public async Task<ActionResult> Loeschen(string schulungGuid)
         {
             // TODO: test
             try
@@ -261,7 +262,7 @@ namespace Schulungsportal_2.Controllers
                 {
                     return new StatusCodeResult(400);
                 }
-                Schulung schulung = _schulungRepository.GetById(schulungGuid);
+                Schulung schulung = await _schulungRepository.GetByIdAsync(schulungGuid);
                 if (schulung == null)
                 {
                     return NotFound("Schulung mit angegebener ID nicht gefunden!");
@@ -286,17 +287,17 @@ namespace Schulungsportal_2.Controllers
         [HttpPost, ActionName("Loeschen")]
         [ValidateAntiForgeryToken]
         [Route("Schulung/Loeschen/{schulungGuid}")]
-        public ActionResult LoeschenBestaetigt(Schulung schulung, string schulungGuid)
+        public async Task<ActionResult> LoeschenBestaetigt(Schulung schulung, string schulungGuid)
         {
             // TODO: test
             try
             {
-                schulung = _schulungRepository.GetById(schulung.SchulungGUID);
+                schulung = await _schulungRepository.GetByIdAsync(schulung.SchulungGUID);
                 if (schulung == null)
                 {
                     return NotFound("Schulung mit angegebener ID nicht gefunden!");
                 }
-                _schulungRepository.Delete(schulung);
+                await _schulungRepository.DeleteAsync(schulung);
 
                 return RedirectToAction("Uebersicht");
             }
@@ -339,7 +340,7 @@ namespace Schulungsportal_2.Controllers
         [HttpGet, ActionName("Absagen")]
         [Authorize(Roles = "Verwaltung")]
         [Route("Schulung/Absagen/{schulungGuid}")]
-        public ActionResult Absagen(string schulungGuid)
+        public async Task<ActionResult> Absagen(string schulungGuid)
         {
             // TODO: test
             try
@@ -348,7 +349,7 @@ namespace Schulungsportal_2.Controllers
                 {
                     return new StatusCodeResult(400);
                 }
-                Schulung schulung = _schulungRepository.GetById(schulungGuid);
+                Schulung schulung = await _schulungRepository.GetByIdAsync(schulungGuid);
                 if (schulung == null)
                 {
                     return NotFound("Schulung mit angegebener ID nicht gefunden!");
@@ -373,18 +374,18 @@ namespace Schulungsportal_2.Controllers
         [HttpPost, ActionName("Absagen")]
         [ValidateAntiForgeryToken]
         [Route("Schulung/Absagen/{schulungGuid}")]
-        public ActionResult AbsagenBestaetigt(Schulung schulung, string schulungGuid)
+        public async Task<ActionResult> AbsagenBestaetigt(Schulung schulung, string schulungGuid)
         {
             // TODO: test
             try
             {
-                schulung = _schulungRepository.GetById(schulung.SchulungGUID);
+                schulung = await _schulungRepository.GetByIdAsync(schulung.SchulungGUID);
                 if (schulung == null)
                 {
                     return NotFound("Schulung mit angegebener ID nicht gefunden!");
                 }
                 schulung.IsAbgesagt = true;
-                _schulungRepository.Update(schulung);
+                await _schulungRepository.UpdateAsync(schulung);
 
                 IEnumerable<Anmeldung> Anmeldungen = _anmeldungRepository.GetBySchulungGuid(schulung.SchulungGUID);
 
@@ -392,7 +393,7 @@ namespace Schulungsportal_2.Controllers
 
                 foreach(Anmeldung anmeldung in Anmeldungen)
                 {
-                    MailingHelper.GenerateAndSendAbsageMail(anmeldung, schulung, vorstand, emailSender);
+                    MailingHelper.GenerateAndSendAbsageMailAsync(anmeldung, schulung, vorstand, emailSender);
                 }
 
                 return RedirectToAction("Uebersicht");
@@ -413,7 +414,7 @@ namespace Schulungsportal_2.Controllers
         [HttpGet, ActionName("Bearbeiten")]
         [Authorize(Roles = "Verwaltung")]
         [Route("Schulung/Bearbeiten/{SchulungGUID}")]
-        public ActionResult Bearbeiten(string SchulungGuid)
+        public async Task<ActionResult> Bearbeiten(string SchulungGuid)
         {
             // TODO: test
             try
@@ -422,13 +423,13 @@ namespace Schulungsportal_2.Controllers
                 {
                     return new StatusCodeResult(400);
                 }
-                SchulungCreateViewModel schulungVM = _schulungRepository.GetById(SchulungGuid).ToSchulungCreateViewModel(_mapper);
+                SchulungCreateViewModel schulungVM = (await _schulungRepository.GetByIdAsync(SchulungGuid)).ToSchulungCreateViewModel(_mapper);
                 if (schulungVM == null)
                 {
                     return NotFound("Schulung mit angegebener ID nicht gefunden!");
                 }
                 // Add suggestions for organizers
-                List<string> orgs = _schulungRepository.GetPreviousOrganizers();
+                List<string> orgs = await _schulungRepository.GetPreviousOrganizersAsync();
                 ViewBag.OrganisatorenDatalist = orgs;
                 return View("Bearbeiten", schulungVM);
             }
@@ -449,7 +450,7 @@ namespace Schulungsportal_2.Controllers
         [HttpPost, ActionName("Bearbeiten")]
         [ValidateAntiForgeryToken]
         [Route("Schulung/Bearbeiten/{SchulungGuid}")]
-        public ActionResult BearbeitenBestaetigt(SchulungCreateViewModel schulungVM, string SchulungGuid)
+        public async Task<ActionResult> BearbeitenBestaetigt(SchulungCreateViewModel schulungVM, string SchulungGuid)
         {
             // TODO: test
             try
@@ -460,7 +461,7 @@ namespace Schulungsportal_2.Controllers
                     // check ob zeiten passen
                     if (schulung.Termine.Count > 0 && schulung.Termine.All(x => x.Start > schulung.Anmeldefrist && x.End > x.Start))
                     {
-                        _schulungRepository.Update(schulung);
+                        await _schulungRepository.UpdateAsync(schulung);
                         return RedirectToAction("Uebersicht"); //Nach Abschluss der Aktion Weiterleitung zur Ubersicht-View
                     }
                     if (schulung.Termine.Count > 0)
@@ -473,7 +474,7 @@ namespace Schulungsportal_2.Controllers
                     }
                 }
                 // Fehlermeldung und view bag wieder aufbereiten
-                List<string> orgs = _schulungRepository.GetPreviousOrganizers();
+                List<string> orgs = await _schulungRepository.GetPreviousOrganizersAsync();
                 ViewBag.OrganisatorenDatalist = orgs;
                 return View("Bearbeiten", schulungVM);
             }
@@ -496,7 +497,7 @@ namespace Schulungsportal_2.Controllers
         [HttpGet, ActionName("Geprueft")]
         [Authorize(Roles = "Verwaltung")]
         [Route("Schulung/Geprueft/{schulungGuid}")]
-        public ActionResult Geprueft(string schulungGuid)
+        public async Task<ActionResult> Geprueft(string schulungGuid)
         {
             // TODO: test
             try
@@ -505,7 +506,7 @@ namespace Schulungsportal_2.Controllers
             {
                 return new StatusCodeResult(400);
             }
-            Schulung schulung = _schulungRepository.GetById(schulungGuid);
+            Schulung schulung = await _schulungRepository.GetByIdAsync(schulungGuid);
             if (schulung == null)
                 {
                     return NotFound("Schulung mit angegebener ID nicht gefunden!");
@@ -531,18 +532,18 @@ namespace Schulungsportal_2.Controllers
         [HttpPost, ActionName("Geprueft")]
         [ValidateAntiForgeryToken]
         [Route("Schulung/Geprueft/{schulungGuid}")]
-        public ActionResult GeprueftBestaetigt(Schulung schulung, string schulungGuid)
+        public async Task<ActionResult> GeprueftBestaetigt(Schulung schulung, string schulungGuid)
         {
             // TODO: test
             try
             {
-                schulung = _schulungRepository.GetById(schulung.SchulungGUID);
+                schulung = await _schulungRepository.GetByIdAsync(schulung.SchulungGUID);
                 if (schulung == null)
                 {
                     return NotFound("Schulung mit angegebener ID nicht gefunden!");
                 }
                 schulung.IsGeprüft = true;
-                _schulungRepository.Update(schulung);
+                await _schulungRepository.UpdateAsync(schulung);
 
                 return RedirectToAction("Uebersicht");
             }

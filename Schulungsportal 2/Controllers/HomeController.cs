@@ -6,6 +6,7 @@ using Schulungsportal_2.Models;
 using Schulungsportal_2.Services;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Schulungsportal_2.Controllers
 {
@@ -95,12 +96,12 @@ namespace Schulungsportal_2.Controllers
         [HttpGet, ActionName("ImpressumBearbeiten")]
         [Authorize(Roles = "Verwaltung")]
         [Route("Home/ImpressumBearbeiten")]
-        public ActionResult ImpressumBearbeiten()
+        public async Task<ActionResult> ImpressumBearbeiten()
         {
             // TODO: test
             try
             {
-                Impressum impressum = _context.Impressum.First();
+                Impressum impressum = await _context.Impressum.FirstAsync();
                 if (impressum == null)
                 {
                     return NotFound();

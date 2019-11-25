@@ -30,7 +30,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung, die beim anmelden erstellt wird.</param>
         /// <param name="schulung">Die Schulung, zu der sich der Nutzer angemeldet hat.</param>
-        public static Task GenerateAndSendBestätigungsMail(Anmeldung anmeldung, Schulung schulung, string vorstand, string rootUrl, ISchulungsportalEmailSender emailSender)
+        public static async Task GenerateAndSendBestätigungsMailAsync(Anmeldung anmeldung, Schulung schulung, string vorstand, string rootUrl, ISchulungsportalEmailSender emailSender)
         {
             try
             {
@@ -55,7 +55,7 @@ namespace Schulungsportal_2.Models
 
                 var body = new TextPart("html") //Inhalt
                 {
-                    Text = RunCompile("BestaetigungsMail", mvm),
+                    Text = await RunCompileAsync("BestaetigungsMail", mvm),
                     ContentTransferEncoding = ContentEncoding.Base64,
                 };
 
@@ -74,7 +74,7 @@ namespace Schulungsportal_2.Models
 
                 message.Body = outmultipart;
 
-                return emailSender.SendEmailAsync(message);
+                await emailSender.SendEmailAsync(message);
             } catch(Exception e)
             {
                 logger.Error(e);
@@ -88,7 +88,7 @@ namespace Schulungsportal_2.Models
         /// Diese Methode wird aufgerufen, wenn eine Schulung angelegt wurde und generiert und schickt eine Mail an den Dozenten der Schulung.
         /// </summary>
         /// <param name="schulung">Die Schulung, die angelegt wurde</param>
-        public static Task GenerateAndSendAnlegeMail(Schulung schulung, string rootUrl, string vorstand, ISchulungsportalEmailSender emailSender)
+        public static async Task GenerateAndSendAnlegeMailAsync(Schulung schulung, string rootUrl, string vorstand, ISchulungsportalEmailSender emailSender)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace Schulungsportal_2.Models
 
                 var body = new TextPart("html") //Inhalt
                 {
-                    Text = RunCompile("AnlegeMail", mvm),
+                    Text = await RunCompileAsync("AnlegeMail", mvm),
                     ContentTransferEncoding = ContentEncoding.Base64,
                 };
 
@@ -132,7 +132,7 @@ namespace Schulungsportal_2.Models
 
                 message.Body = outmultipart;
 
-                return emailSender.SendEmailAsync(message);
+                await emailSender.SendEmailAsync(message);
             }
             catch (Exception e)
             {
@@ -148,7 +148,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung.</param>
         /// <param name="schulung">Die Schulung, zu die abgesagt wird.</param>
-        public static Task GenerateAndSendAbsageMail(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
+        public static async Task GenerateAndSendAbsageMailAsync(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace Schulungsportal_2.Models
                 
                 var body = new TextPart("html") //Inhalt
                 {
-                    Text = RunCompile("AbsageMail", mvm),
+                    Text = await RunCompileAsync("AbsageMail", mvm),
                     ContentTransferEncoding = ContentEncoding.Base64,
                 };
                 var attachments = GetAppointment(schulung, anmeldung.Email, emailSender.GetAbsendeAdresse(), istAbsage: true);
@@ -189,7 +189,7 @@ namespace Schulungsportal_2.Models
 
                 message.Body = outmultipart;
 
-                return emailSender.SendEmailAsync(message);
+                await emailSender.SendEmailAsync(message);
             }
             catch (Exception e)
             {
@@ -200,12 +200,12 @@ namespace Schulungsportal_2.Models
             }
         }
 
-        public static Task GenerateAndSendSchulungsNewsletter(List<Schulung> schulungen, string vorstand, ISchulungsportalEmailSender emailSender)
+        public static async Task GenerateAndSendSchulungsNewsletterAsync(List<Schulung> schulungen, string vorstand, ISchulungsportalEmailSender emailSender)
         {
             // Kein newsletter ohne Schulungen
             if (schulungen.Count() == 0)
             {
-                return Task.FromResult(0);
+                return;
             }
             try
             {
@@ -225,7 +225,7 @@ namespace Schulungsportal_2.Models
 
                 var body = new TextPart("html") //Inhalt
                 {
-                    Text = RunCompile("NewsletterMail", mvm),
+                    Text = await RunCompileAsync("NewsletterMail", mvm),
                     ContentTransferEncoding = ContentEncoding.Base64,
                 };
 
@@ -238,7 +238,7 @@ namespace Schulungsportal_2.Models
                 
                 message.Body = multipart;
 
-                return emailSender.SendEmailAsync(message);
+                await emailSender.SendEmailAsync(message);
             }
             catch (Exception e)
             {
@@ -249,7 +249,7 @@ namespace Schulungsportal_2.Models
             }
         }
 
-        public static Task GenerateAndSendAbsageAnSchulungsdozentMail(Anmeldung anmeldung, String begruendung, String vorstand, ISchulungsportalEmailSender emailSender) {
+        public static async Task GenerateAndSendAbsageAnSchulungsdozentMailAsync(Anmeldung anmeldung, String begruendung, String vorstand, ISchulungsportalEmailSender emailSender) {
             var schulung = anmeldung.Schulung;
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
@@ -268,7 +268,7 @@ namespace Schulungsportal_2.Models
 
             var body = new TextPart("html") //Inhalt
             {
-                Text = RunCompile("AbsageAnSchulungsdozentMail", mwm),
+                Text = await RunCompileAsync("AbsageAnSchulungsdozentMail", mwm),
                 ContentTransferEncoding = ContentEncoding.Base64,
             };
 
@@ -281,10 +281,10 @@ namespace Schulungsportal_2.Models
             
             message.Body = multipart;
 
-            return emailSender.SendEmailAsync(message);
+            await emailSender.SendEmailAsync(message);
         }
 
-        public static Task GenerateAndSendInviteMail(Invite invite, string rootUrl, string vorstand, ISchulungsportalEmailSender emailSender) {
+        public static async Task GenerateAndSendInviteMailAsync(Invite invite, string rootUrl, string vorstand, ISchulungsportalEmailSender emailSender) {
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
             message.To.Add(new MailboxAddress(invite.EMailAdress)); // Empfaenger
@@ -300,7 +300,7 @@ namespace Schulungsportal_2.Models
 
             var body = new TextPart("html") //Inhalt
             {
-                Text = RunCompile("InviteMail", imwm),
+                Text = await RunCompileAsync("InviteMail", imwm),
                 ContentTransferEncoding = ContentEncoding.Base64,
             };
 
@@ -313,7 +313,7 @@ namespace Schulungsportal_2.Models
             
             message.Body = multipart;
 
-            return emailSender.SendEmailAsync(message);
+            await emailSender.SendEmailAsync(message);
         }
 
         /// <summary>
@@ -321,7 +321,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung.</param>
         /// <param name="schulung">Die Schulung, zu die abgesagt wird.</param>
-        public static Task GenerateAndSendAbmeldungMail(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
+        public static async Task GenerateAndSendAbmeldungMailAsync(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
         {
             try
             {
@@ -341,7 +341,7 @@ namespace Schulungsportal_2.Models
                 
                 var body = new TextPart("html") //Inhalt
                 {
-                    Text = RunCompile("AbmeldungMail", mvm),
+                    Text = await RunCompileAsync("AbmeldungMail", mvm),
                     ContentTransferEncoding = ContentEncoding.Base64,
                 };
                 var attachments = GetAppointment(schulung, anmeldung.Email, emailSender.GetAbsendeAdresse(), istAbsage: true);
@@ -362,7 +362,7 @@ namespace Schulungsportal_2.Models
 
                 message.Body = outmultipart;
 
-                return emailSender.SendEmailAsync(message);
+                await emailSender.SendEmailAsync(message);
             }
             catch (Exception e)
             {
@@ -379,7 +379,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung.</param>
         /// <param name="schulung">Die Schulung, zu die abgesagt wird.</param>
-        public static Task GenerateAndSendGeprueftReminderMail(Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
+        public static async Task GenerateAndSendGeprueftReminderMail(Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
         {
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
@@ -399,7 +399,7 @@ namespace Schulungsportal_2.Models
             
             var body = new TextPart("html") //Inhalt
             {
-                Text = RunCompile("GeprueftReminder", mvm),
+                Text = await RunCompileAsync("GeprueftReminder", mvm),
                 ContentTransferEncoding = ContentEncoding.Base64,
             };
 
@@ -410,7 +410,7 @@ namespace Schulungsportal_2.Models
             multipart.Add(LoadInlinePicture("InstaLogo.png", mvm.InstaLogoFile));
             message.Body = multipart;
 
-            return emailSender.SendEmailAsync(message);
+            await emailSender.SendEmailAsync(message);
         }
 
 
@@ -503,17 +503,17 @@ namespace Schulungsportal_2.Models
             return parts;
         }
 
-        private static string RunCompile<T>(string filename, T mvm)
+        private static async Task<string> RunCompileAsync<T>(string filename, T mvm)
         {
             var cacheResult = engine.TemplateCache.RetrieveTemplate(filename);
             if (cacheResult.Success)
             {
-                return engine.RenderTemplateAsync(cacheResult.Template.TemplatePageFactory(), mvm).Result;
+                return await engine.RenderTemplateAsync(cacheResult.Template.TemplatePageFactory(), mvm);
             } else
             {
                 var stream = Assembly.GetAssembly(typeof(MailingHelper)).GetManifestResourceStream("Schulungsportal_2.MailTemplates." + filename + ".cshtml");
-                var template = new StreamReader(stream).ReadToEnd();
-                return engine.CompileRenderAsync(filename, template, mvm).Result;
+                var template = await new StreamReader(stream).ReadToEndAsync();
+                return await engine.CompileRenderAsync(filename, template, mvm);
             }
         }
 
