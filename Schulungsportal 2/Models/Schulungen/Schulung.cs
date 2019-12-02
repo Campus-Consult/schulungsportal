@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Schulungsportal_2.Models.Anmeldungen;
 using System.ComponentModel.DataAnnotations.Schema;
 using Schulungsportal_2.ViewModels;
-using static Schulungsportal_2.ViewModels.SchulungViewModel;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -75,20 +74,6 @@ namespace Schulungsportal_2.Models.Schulungen
         [Required]
         [MaxLength(40)]
         public string AccessToken { get; set; }
-
-        /// <summary>
-        /// Die Methode wandelt die Schulung in ein SchulungViewModel um. Die if-else-Zeilen sind da, damit das Datum im Format DD.MM.YYYY dargestellt wird. Fuehrende Nullen wurden sonst weggelassen.
-        /// </summary>
-        /// <returns>Ein SchulungViewModel mit den gleichen Werten wie die Schulung, die diese Methode aufruft</returns>
-        public SchulungViewModel ToSchulungViewModel(IMapper mapper)
-        {
-            SchulungViewModel result = mapper.Map<SchulungViewModel>(this);
-
-            result.Start = Termine.First().Start;
-            result.End = Termine.First().End;
-
-            return result;
-        }
 
         /// <summary>
         /// Übersetzt das Model in ein CreateView Model zum bearbeiten

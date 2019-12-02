@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Schulungsportal_2.Models.Anmeldungen;
 using System.ComponentModel.DataAnnotations.Schema;
 using Schulungsportal_2.ViewModels;
-using static Schulungsportal_2.ViewModels.SchulungViewModel;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 

@@ -16,7 +16,6 @@ namespace Schulungsportal_2.Models
         {
             CreateMap<Anmeldung, AnmeldungWithMatchCount>();
             CreateMap<Schulung, SchulungCreateViewModel>();
-            CreateMap<Schulung, SchulungViewModel>();
         }
     }
 }
