@@ -114,6 +114,7 @@ namespace Schulungsportal_2.Models.Anmeldungen
             var anmeldungen = context.Anmeldung
                 .Include(a => a.Schulung)
                 .Include(a => a.Schulung.Termine)
+                .Include(a => a.Schulung.Dozenten)
                 .Where(m => m.AccessToken == accessToken);
             if (await anmeldungen.CountAsync() == 1) { 
                 return await anmeldungen.SingleAsync();

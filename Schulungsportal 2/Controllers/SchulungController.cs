@@ -151,11 +151,14 @@ namespace Schulungsportal_2.Controllers
                 TeilnehmerlisteViewModel tl = new TeilnehmerlisteViewModel();
                 tl.Schulung = schulung;
                 tl.Anmeldungen = _anmeldungRepository.GetBySchulungGuid(schulungGuid);
-                tl.RundmailLink = ";%20" + tl.Schulung.EmailDozent + "&subject=Informationen%20zur%20" + tl.Schulung.Titel + "&body=Hallo%20Teilnehmer%20der%20" + tl.Schulung.Titel + ",%0D%0A%0D%0Ahier%20steht%20die%20Nachricht.";
-                tl.RundmailLink = String.Join(";%20", tl.Anmeldungen
+                tl.RundmailLink = "&subject=Informationen%20zur%20" + tl.Schulung.Titel + "&body=Hallo%20Teilnehmer%20der%20" + tl.Schulung.Titel + ",%0D%0A%0D%0Ahier%20steht%20die%20Nachricht.";
+                var empfaenger = tl.Anmeldungen
                     // filtert anonymisierte raus
                     .Where(a => a.Email.Contains("@"))
-                    .Select(a => a.Email)) + tl.RundmailLink;
+                    .Select(a => a.Email);
+                // füge Dozenten zu Empfängern hinzu
+                empfaenger = empfaenger.Concat(tl.Schulung.Dozenten.Select(d => d.EMail));
+                tl.RundmailLink = String.Join(";%20", empfaenger) + tl.RundmailLink;
                 tl.RundmailLink = tl.RundmailLink.Insert(0, "mailto:?bcc=");
 
                 return View("Teilnehmerliste", tl);
@@ -191,11 +194,14 @@ namespace Schulungsportal_2.Controllers
                     return NotFound("Schulung nicht gefunden!");
                 }
                 tl.Anmeldungen = _anmeldungRepository.GetBySchulungGuid(tl.Schulung.SchulungGUID);
-                tl.RundmailLink = ";%20" + tl.Schulung.EmailDozent + "&subject=Informationen%20zur%20" + tl.Schulung.Titel + "&body=Hallo%20Teilnehmer%20der%20" + tl.Schulung.Titel + ",%0D%0A%0D%0Ahier%20steht%20die%20Nachricht.";
-                tl.RundmailLink = String.Join(";%20", tl.Anmeldungen
+                tl.RundmailLink = "&subject=Informationen%20zur%20" + tl.Schulung.Titel + "&body=Hallo%20Teilnehmer%20der%20" + tl.Schulung.Titel + ",%0D%0A%0D%0Ahier%20steht%20die%20Nachricht.";
+                var empfaenger = tl.Anmeldungen
                     // filtert anonymisierte raus
                     .Where(a => a.Email.Contains("@"))
-                    .Select(a => a.Email)) + tl.RundmailLink;
+                    .Select(a => a.Email);
+                // füge Dozenten zu Empfängern hinzu
+                empfaenger = empfaenger.Concat(tl.Schulung.Dozenten.Select(d => d.EMail));
+                tl.RundmailLink = String.Join(";%20", empfaenger) + tl.RundmailLink;
                 tl.RundmailLink = tl.RundmailLink.Insert(0, "mailto:?bcc=");
 
                 return View("Teilnehmer", tl);

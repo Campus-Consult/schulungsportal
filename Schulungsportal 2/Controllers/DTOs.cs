@@ -19,6 +19,20 @@ namespace Schulungsportal_2.Controllers {
         public DateTime End { get; set; }
     }
 
+    public class DozentDTO {
+        public string Name { get; set; }
+        public String Nummer { get; set; }
+        public string EMail { get; set; }
+
+        public static DozentDTO toDTO(Dozent dozent) {
+            return new DozentDTO {
+                EMail = dozent.EMail,
+                Name = dozent.Name,
+                Nummer = dozent.Nummer,
+            };
+        }
+    }
+
     public class SchulungDTO {
         public string SchulungGUID { get; set; }
 
@@ -58,11 +72,7 @@ namespace Schulungsportal_2.Controllers {
 
     public class InternalSchulungDTO : SchulungDTO {
 
-        public String EmailDozent { get; set; }
-
-        public String NameDozent { get; set; }
-
-        public String NummerDozent { get; set; }
+        public IEnumerable<DozentDTO> Dozenten { get; set; }
 
         public bool IsGeprueft { get; set; }
 
@@ -72,19 +82,18 @@ namespace Schulungsportal_2.Controllers {
                 Start = t.Start,
                 End = t.End,
             });
+            var dozenten = s.Dozenten.Select(d => DozentDTO.toDTO(d));
             return new InternalSchulungDTO
                 {
                 Anmeldefrist = s.Anmeldefrist,
                 Beschreibung = s.Beschreibung,
+                Dozenten = dozenten,
                 IsAbgesagt = s.IsAbgesagt,
                 OrganisatorInstitution = s.OrganisatorInstitution,
                 Ort = s.Ort,
                 SchulungGUID = s.SchulungGUID,
                 Termine = termine,
                 Titel = s.Titel,
-                EmailDozent = s.EmailDozent,
-                NummerDozent = s.NummerDozent,
-                NameDozent = s.NameDozent,
                 IsGeprueft = s.IsGeprüft,
             };
         }

@@ -30,18 +30,7 @@ namespace Schulungsportal_2.Models.Schulungen
         [Display(Name = "Organisator")]
         public String OrganisatorInstitution { get; set; }
 
-        [Required]
-        [Display(Name = "Name des Dozenten")]
-        public String NameDozent { get; set; }
-
-        [Required]
-        [Display(Name = "Handynummer des Dozenten")]
-        public String NummerDozent { get; set; }
-
-        [Required]
-        [Display(Name = "E-Mail-Adresse des Dozenten")]
-        [DataType(DataType.EmailAddress)]
-        public String EmailDozent { get; set; }
+        public ICollection<Dozent> Dozenten { get; set; }
 
         [Required]
         public String Beschreibung { get; set; }
@@ -92,6 +81,27 @@ namespace Schulungsportal_2.Models.Schulungen
         }
 
         
+    }
+
+    public class Dozent
+    {
+        public string SchulungGUID { get; set; }
+
+        public Schulung Schulung { get; set; }
+        
+        [Required]
+        [Display(Name = "Name des Dozenten")]
+        public string Name { get; set; }
+
+        [Required]
+        [Display(Name = "Handynummer des Dozenten")]
+        public String Nummer { get; set; }
+
+        [Required]
+        [Display(Name = "E-Mail-Adresse des Dozenten")]
+        [DataType(DataType.EmailAddress)]
+        public string EMail { get; set; }
+
     }
 
     public class Termin

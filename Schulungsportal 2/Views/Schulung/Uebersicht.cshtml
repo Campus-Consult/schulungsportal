@@ -28,7 +28,7 @@
             @Html.DisplayNameFor(model => model.OrganisatorInstitution)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.NameDozent)
+            @Html.DisplayNameFor(model => model.Dozenten.FirstOrDefault().Name)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Ort)
@@ -65,7 +65,9 @@
                 @Html.DisplayFor(modelItem => item.OrganisatorInstitution)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.NameDozent)
+                @foreach (var dozent in item.Dozenten) {
+                    <div><a href="mailto:@dozent.EMail">@Html.DisplayFor(modelItem => dozent.Name)</a></div>
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Ort)

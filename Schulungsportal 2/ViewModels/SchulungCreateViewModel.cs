@@ -85,6 +85,13 @@ namespace Schulungsportal_2.ViewModels
 
             result.Termine = TermineVM.ConvertAll(x => x.ToTermin(SchulungGUID));
             result.Anmeldefrist = AnmeldefristDate.Add(AnmeldefristTime);
+            result.Dozenten = new List<Dozent>() {
+                new Dozent {
+                    EMail = this.EmailDozent,
+                    Name = this.NameDozent,
+                    Nummer = this.NummerDozent,
+                }
+            };
 
             return result;
         }
