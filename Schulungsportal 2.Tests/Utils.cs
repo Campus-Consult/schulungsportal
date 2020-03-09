@@ -25,12 +25,10 @@ namespace Schulungsportal_2_Tests
             context.Add(new Schulung {
                 Titel = "Schulung 1",
                 Beschreibung = "Schulung 1",
-                EmailDozent = "test@test.test",
+                Dozenten = CreateSingletonDozent("Test Dozent", "123", "test@test.test"),
                 Termine = CreateSingletonTermine(now.AddDays(2), now.AddDays(3)),
                 IsAbgesagt = false,
                 IsGeprüft = false,
-                NameDozent = "Test Dozent",
-                NummerDozent = "123",
                 OrganisatorInstitution = "CC",
                 Ort = "Büro",
                 SchulungGUID = "00000000-0000-0000-0000-000000000000",
@@ -40,12 +38,10 @@ namespace Schulungsportal_2_Tests
             {
                 Titel = "Schulung 2",
                 Beschreibung = "Schulung 2",
-                EmailDozent = "test@test.test",
+                Dozenten = CreateSingletonDozent("Test Dozent", "123", "test@test.test"),
                 Termine = CreateSingletonTermine(now.AddDays(2), now.AddDays(3)),
                 IsAbgesagt = false,
                 IsGeprüft = false,
-                NameDozent = "Test Dozent",
-                NummerDozent = "123",
                 OrganisatorInstitution = "CC",
                 Ort = "Büro",
                 SchulungGUID = "00000000-0000-0000-0000-000000000001",
@@ -156,6 +152,16 @@ namespace Schulungsportal_2_Tests
             return testTermin;
         }
 
+        public static List<Dozent> CreateSingletonDozent(String name, String nummer, String eMail) {
+            return new List<Dozent> {
+                new Dozent {
+                    Name = name,
+                    EMail = eMail,
+                    Nummer = nummer,
+                }
+            };
+        }
+
         public static Schulung HelpCreateSchulung(string name, string id, DateTime anmeldefrist, bool geprüft=false)
         {
             return new Schulung
@@ -163,11 +169,9 @@ namespace Schulungsportal_2_Tests
                 AccessToken = id + "0",
                 Anmeldefrist = anmeldefrist,
                 Beschreibung = name,
-                EmailDozent = "test@test.test",
+                Dozenten = CreateSingletonDozent("Test Dozent", "12345", "test@test.test"),
                 IsAbgesagt = false,
                 IsGeprüft = geprüft,
-                NameDozent = "test",
-                NummerDozent = "12345",
                 OrganisatorInstitution = "CC",
                 Ort = "hier",
                 SchulungGUID = id,
