@@ -27,67 +27,7 @@ else if (DateTime.Now > Model.Termine.Max(x => x.End))
 
 <div>
     <hr/>
-    <table class="table table-striped well">
-        <tr>
-            <th>
-                Titel:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.Titel)
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(m => m.OrganisatorInstitution):
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.OrganisatorInstitution)
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Dozent:
-            </th>
-            <td>
-                @foreach (var dozent in Model.Dozenten) {
-                    <div><a href="mailto:@dozent.EMail">@Html.DisplayFor(modelItem => dozent.Name)</a>, Tel: @dozent.Nummer</div>
-                }
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Termin:
-            </th>
-            <td>
-                @foreach (var termin in Model.Termine.OrderBy(x => x.Start))
-                {
-                    <div> @termin.FormatFromStartToEnd() </div>
-                }
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Anmeldefrist:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.Anmeldefrist) Uhr
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Ort:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.Ort)
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Beschreibung:
-            </th>
-            <td class="multi-line">@Html.DisplayFor(m => m.Beschreibung)</td>
-        </tr>
-    </table>
+    @await Html.PartialAsync("_SchulungDetails", Model)
     <p>
     <a href="/Schulung/Teilnehmerliste/@Model.SchulungGUID">Teilnehmerliste</a> |
     <a href="/Schulung/Bearbeiten/@Model.SchulungGUID">Bearbeiten</a>

@@ -11,45 +11,7 @@
 <h3>Sind Sie sicher, dass die Anwesenheit der Teilnehmer an dieser Schulung vollständig überprüft wurde und Sie diese Schulung als "Geprüft" setzen möchten?</h3>
 <div>
     <hr />
-    <table class="table table-striped well">
-        <tr>
-            <th>
-                Titel:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.Titel)
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Dozent:
-            </th>
-            <td>
-                @foreach (var dozent in Model.Dozenten) {
-                    <div><a href="mailto:@dozent.EMail">@Html.DisplayFor(modelItem => dozent.Name)</a></div>
-                }
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Termin:
-            </th>
-            <td>
-                @foreach (var termin in Model.Termine.OrderBy(x => x.Start))
-                {
-                    <div>@termin.FormatFromStartToEnd() </div>
-                }
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Ort:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.Ort)
-            </td>
-        </tr>
-    </table>
+    @await Html.PartialAsync("_SchulungDetails", Model)
 
     <p>Die Schulung wird automatisch ins Archiv verschoben. Diese Aktion kann nicht Rückgängig gemacht werden!</p>
 

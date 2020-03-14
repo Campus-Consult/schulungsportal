@@ -11,70 +11,8 @@
 <h3>Sind Sie sicher, das Sie diese Schulung absagen möchten?</h3>
 <div>
     <hr />
-    <table class="table table-striped well">
-        <tr>
-            <th>
-                Titel:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.Titel)
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(m => m.OrganisatorInstitution):
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.OrganisatorInstitution)
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Dozent:
-            </th>
-            <td>
-                @foreach (var dozent in Model.Dozenten) {
-                    <div><a href="mailto:@dozent.EMail">@Html.DisplayFor(modelItem => dozent.Name)</a></div>
-                }
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Termin:
-            </th>
-            <td>
-                @foreach (var termin in Model.Termine.OrderBy(x => x.Start))
-                {
-                    if (termin.Start.Date.Equals(termin.End.Date))
-                    {
-                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @termin.End.ToString("HH:mm") Uhr</div>
-
-                    }
-                    else
-                    {
-                        <div>@Html.DisplayFor(modelItem => termin.Start) Uhr bis @Html.DisplayFor(modelItem => termin.End) Uhr</div>
-
-                    }
-                }
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Ort:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.Ort)
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Beschreibung:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.Beschreibung)
-            </td>
-        </tr>
-    </table>
+    
+    @await Html.PartialAsync("_SchulungDetails", Model)
 
     <p> Diese Aktion kann nicht Rückgängig gemacht werden!</p>
 
