@@ -26,18 +26,7 @@ namespace Schulungsportal_2.ViewModels
         [Display(Name = "Organisator")]
         public String OrganisatorInstitution { get; set; }
 
-        [Required]
-        [Display(Name = "Name des Dozenten")]
-        public String NameDozent { get; set; }
-
-        [Required]
-        [Display(Name = "Handynummer des Dozenten")]
-        public String NummerDozent { get; set; }
-
-        [Required]
-        [Display(Name = "E-Mail-Adresse des Dozenten")]
-        [DataType(DataType.EmailAddress)]
-        public String EmailDozent { get; set; }
+        public List<Dozent> Dozenten { get; set; }
 
         [Required]
         [DataType(DataType.MultilineText)]
@@ -73,6 +62,12 @@ namespace Schulungsportal_2.ViewModels
         {
             TermineVM = new List<TerminViewModel>();
             TermineVM.Add(new TerminViewModel { EndDate = DateTime.Now.Date, StartDate = DateTime.Now.Date });
+            Dozenten = new List<Dozent>();
+            Dozenten.Add(new Dozent() {
+                Name = "",
+                Nummer = "",
+                EMail = "",
+            });
         }
 
         /// <summary>
@@ -85,14 +80,6 @@ namespace Schulungsportal_2.ViewModels
 
             result.Termine = TermineVM.ConvertAll(x => x.ToTermin(SchulungGUID));
             result.Anmeldefrist = AnmeldefristDate.Add(AnmeldefristTime);
-            result.Dozenten = new List<Dozent>() {
-                new Dozent {
-                    EMail = this.EmailDozent,
-                    Name = this.NameDozent,
-                    Nummer = this.NummerDozent,
-                }
-            };
-
             return result;
         }
     }
