@@ -1,17 +1,59 @@
 ﻿$(() => {
-    $('#termine-container').on('click', '.termin-remove', (event) => {
-        console.log('asdf');
-        $(event.target).parents('.termin').remove();
-        $('.termin').each(function (index) {
-            $(this).find('.start-date').attr('name', 'TermineVM[' + index + '].StartDate').attr('id', 'TermineVM_' + index + '_StartDate');
-            $(this).find('.start-time').attr('name', 'TermineVM[' + index + '].StartTime').attr('id', 'TermineVM_' + index + '_StartTime');
-            $(this).find('.end-date').attr('name', 'TermineVM[' + index + '].EndDate').attr('id', 'TermineVM_' + index + '_EndDate');
-            $(this).find('.end-time').attr('name', 'TermineVM[' + index + '].EndTime').attr('id', 'TermineVM_' + index + '_EndTime');
+    // the validation library doesn't work with dynamic forms, so this is a workaround
+    function resetValidation() {
+        var form = $("form")
+            .removeData("validator") /* added by the raw jquery.validate plugin */
+            .removeData("unobtrusiveValidation");  /* added by the jquery unobtrusive plugin*/
+
+        $.validator.unobtrusive.parse(form);
+    }
+    // dozenten
+    function fixDozentIdAndName() {
+        $('#dozenten-container .dozent').each(function (index) {
+            // fix name + id for the input
+            $(this).find('.dozent-name').attr('name', 'Dozenten[' + index + '].Name').attr('id', 'Dozenten_' + index + '_Name')
+                .siblings().first().attr('data-valmsg-for', 'Dozenten[' + index + '].Name');
+            $(this).find('.dozent-nummer').attr('name', 'Dozenten[' + index + '].Nummer').attr('id', 'Dozenten_' + index + '_Nummer')
+                .siblings().first().attr('data-valmsg-for', 'Dozenten[' + index + '].Nummer');
+            $(this).find('.dozent-email').attr('name', 'Dozenten[' + index + '].EMail').attr('id', 'Dozenten_' + index + '_EMail')
+                .siblings().first().attr('data-valmsg-for', 'Dozenten[' + index + '].EMail');
         });
+        resetValidation();
+    }
+    $('#dozenten-container').on('click', '.dozent-remove', (event) => {
+        $(event.target).parents('.dozent').remove();
+        fixDozentIdAndName();
+    });
+    $('#dozent-add').on('click', () => {
+        // load template
+        let template = $('#dozent-template > div:first-child').clone();
+        $('#dozenten-container').append(template);
+        fixDozentIdAndName();
+    });
+    // termine
+    function fixTerminIdAndName() {
+        $('#termine-container .termin').each(function (index) {
+            // fix name + id for the input
+            $(this).find('.start-date').attr('name', 'TermineVM[' + index + '].StartDate').attr('id', 'TermineVM_' + index + '_StartDate').attr('aria-describedby', 'TermineVM_' + index + '_StartDate')
+            // fix name + id for the validation text
+                .siblings().first().attr('data-valmsg-for', 'TermineVM[' + index + '].StartDate');
+            $(this).find('.start-time').attr('name', 'TermineVM[' + index + '].StartTime').attr('id', 'TermineVM_' + index + '_StartTime').attr('aria-describedby', 'TermineVM_' + index + '_StartTime')
+                .siblings().first().attr('data-valmsg-for', 'TermineVM[' + index + '].StartTime');
+            $(this).find('.end-date').attr('name', 'TermineVM[' + index + '].EndDate').attr('id', 'TermineVM_' + index + '_EndDate')
+                .siblings().first().attr('data-valmsg-for', 'TermineVM[' + index + '].EndDate').attr('aria-describedby', 'TermineVM_' + index + '_EndDate');
+            $(this).find('.end-time').attr('name', 'TermineVM[' + index + '].EndTime').attr('id', 'TermineVM_' + index + '_EndTime')
+                .siblings().first().attr('data-valmsg-for', 'TermineVM[' + index + '].EndTime').attr('aria-describedby', 'TermineVM_' + index + '_EndTime');
+        });
+        resetValidation();
+    }
+    $('#termine-container').on('click', '.termin-remove', (event) => {
+        $(event.target).parents('.termin').remove();
+        fixTerminIdAndName();
     });
     $('#termin-add').on('click', () => {
-        var rowCount = $('.termin').length;
-        // line of doom, wie in Bearbeiten.cshtml zum dynamisch hinzufügen
-        $('#termine-container').append('<div class="termin form-group"><div class="col-md-2" ></div ><div class="col-md-2"><input class="form-control text-box single-line start-date" data-val="true" data-val-date="Das Feld &quot;Start-Termin&quot; muss eine Datumsangabe sein." data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." id="TermineVM_' + rowCount + '_StartDate" name="TermineVM[' + rowCount + '].StartDate" placeholder="dd.mm.yyyy" type="date" value=""><span class="field-validation-valid text-danger" data-valmsg-for="termin.StartDate" data-valmsg-replace="true"></span></div><div class="col-md-2"><input class="form-control text-box single-line start-time" data-val="true" data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." id="TermineVM_' + rowCount + '_StartTime" name="TermineVM[' + rowCount + '].StartTime" placeholder="HH:mm" type="time" value=""><span class="field-validation-valid text-danger" data-valmsg-for="termin.StartTime" data-valmsg-replace="true"></span></div><div class="col-md-1">bis</div><div class="col-md-2"><input class="form-control text-box single-line end-date" data-val="true" data-val-date="Das Feld &quot;End-Termin&quot; muss eine Datumsangabe sein." data-val-required="Das Feld &quot;End-Termin&quot; ist erforderlich." id="TermineVM_' + rowCount + '_EndDate" name="TermineVM[' + rowCount + '].EndDate" placeholder="dd.mm.yyyy" type="date" value=""><span class="field-validation-valid text-danger" data-valmsg-for="termin.EndDate" data-valmsg-replace="true"></span></div><div class="col-md-2"><input class="form-control text-box single-line end-time" data-val="true" data-val-required="Das Feld &quot;End-Uhrzeit&quot; ist erforderlich." id="TermineVM_' + rowCount + '_EndTime" name="TermineVM[' + rowCount + '].EndTime" placeholder="HH:mm" type="time" value=""><span class="field-validation-valid text-danger" data-valmsg-for="termin.EndTime" data-valmsg-replace="true"></span></div><div class="col-md-1"><button class="btn btn-danger termin-remove" title="entfernen" type="button">-</button></div></div >')
+        // load template
+        let template = $('#termin-template > div:first-child').clone();
+        $('#termine-container').append(template);
+        fixTerminIdAndName();
     });
 })

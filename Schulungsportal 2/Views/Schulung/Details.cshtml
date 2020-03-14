@@ -49,23 +49,9 @@ else if (DateTime.Now > Model.Termine.Max(x => x.End))
                 Dozent:
             </th>
             <td>
-                @Html.DisplayFor(m => m.NameDozent)
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Handynummer:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.NummerDozent)
-            </td>
-        </tr>
-        <tr>
-            <th>
-                E-Mail:
-            </th>
-            <td>
-                @Html.DisplayFor(m => m.EmailDozent)
+                @foreach (var dozent in Model.Dozenten) {
+                    <div><a href="mailto:@dozent.EMail">@Html.DisplayFor(modelItem => dozent.Name)</a>, Tel: @dozent.Nummer</div>
+                }
             </td>
         </tr>
         <tr>

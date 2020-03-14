@@ -82,6 +82,7 @@ namespace Schulungsportal_2.Models.Schulungen
                 DateTime now = DateTime.Now;
                 IEnumerable<Schulung> schulungen = context.Schulung
                     .Include(s => s.Termine)
+                    .Include(s => s.Dozenten)
                     .Where(x => !x.IsAbgesagt && !x.IsGeprüft)
                     // TODO: select alle, die noch nicht komplett fertig sind, also wo die überprüfung noch fehlt
                     .OrderBy(x => x.Anmeldefrist).AsEnumerable();
@@ -106,6 +107,7 @@ namespace Schulungsportal_2.Models.Schulungen
             {
                 IEnumerable<Schulung> schulungen = context.Schulung
                     .Include(s => s.Termine)
+                    .Include(s => s.Dozenten)
                     .Where(x => x.IsGeprüft || x.IsAbgesagt)
                     .OrderBy(x => x.Anmeldefrist).AsEnumerable().Reverse();
                 return schulungen;
@@ -157,7 +159,8 @@ namespace Schulungsportal_2.Models.Schulungen
             try
             {
                 IQueryable<Schulung> schulungen = context.Schulung.Where(m => m.SchulungGUID == id)
-                    .Include(s => s.Termine);
+                    .Include(s => s.Termine)
+                    .Include(s => s.Dozenten);
                 if (await schulungen.CountAsync() != 1)
                 {
                     return null;
@@ -183,7 +186,8 @@ namespace Schulungsportal_2.Models.Schulungen
         public async Task<Schulung> GetByAccessTokenAsync(string accessToken)
         {
             IQueryable<Schulung> schulungen = context.Schulung.Where(m => m.AccessToken == accessToken)
-                    .Include(s => s.Termine);
+                    .Include(s => s.Termine)
+                    .Include(s => s.Dozenten);
             if (await schulungen.CountAsync() != 1)
             {
                 return null;
@@ -216,6 +220,7 @@ namespace Schulungsportal_2.Models.Schulungen
             var schulungsEnde = DateTime.Now.AddDays(-1);
             return context.Schulung
                 .Include(s => s.Termine)
+                    .Include(s => s.Dozenten)
                 .Where(x => !x.IsAbgesagt && !x.IsGeprüft && x.Termine.Max(t => t.End) < schulungsEnde)
                 .OrderBy(x => x.Anmeldefrist).AsEnumerable();
         }
@@ -231,11 +236,16 @@ namespace Schulungsportal_2.Models.Schulungen
         {
             try
             {
-                Schulung schulungAlt = await context.Schulung.Include(s => s.Termine).SingleAsync(m => m.SchulungGUID == schulung.SchulungGUID);
+                Schulung schulungAlt = await context.Schulung
+                    .Include(s => s.Termine)
+                    .Include(s => s.Dozenten)
+                    .SingleAsync(m => m.SchulungGUID == schulung.SchulungGUID);
                 schulungAlt.Beschreibung = schulung.Beschreibung;
-                schulungAlt.EmailDozent = schulung.EmailDozent;
                 schulungAlt.Anmeldefrist = schulung.Anmeldefrist;
                 schulungAlt.Check = schulung.Check;
+                if (!schulungAlt.Dozenten.Equals(schulung.Dozenten)) {
+                    schulungAlt.Dozenten = schulung.Dozenten;
+                }
                 if (!schulungAlt.Termine.Equals(schulung.Termine))
                 {
                     schulungAlt.Termine = schulung.Termine;
@@ -243,8 +253,6 @@ namespace Schulungsportal_2.Models.Schulungen
                 schulungAlt.GeprüftReminderSent = schulung.GeprüftReminderSent;
                 schulungAlt.IsAbgesagt = schulung.IsAbgesagt;
                 schulungAlt.IsGeprüft = schulung.IsGeprüft;
-                schulungAlt.NameDozent = schulung.NameDozent;
-                schulungAlt.NummerDozent = schulung.NummerDozent;
                 schulungAlt.OrganisatorInstitution = schulung.OrganisatorInstitution;
                 schulungAlt.Ort = schulung.Ort;
                 schulungAlt.Titel = schulung.Titel;

@@ -41,7 +41,7 @@ namespace Schulungsportal_2.Models
 
                 var selbstmanagementUrl = rootUrl + "/Anmeldung/Selbstmanagement/" + anmeldung.AccessToken;
                     
-                var attachments = GetAppointment(schulung, anmeldung.Email, emailSender.GetAbsendeAdresse(), istAbsage: false);
+                var attachments = GetAppointment(schulung, new []{anmeldung.Email}, emailSender.GetAbsendeAdresse(), istAbsage: false);
 
                 MailViewModel mvm = new MailViewModel
                 {
@@ -94,12 +94,15 @@ namespace Schulungsportal_2.Models
             {
                 MimeMessage message = new MimeMessage();
                 message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
-                message.To.Add(new MailboxAddress(schulung.NameDozent, schulung.EmailDozent));//Empfaenger 
+                foreach(var dozent in schulung.Dozenten) {
+                    message.To.Add(new MailboxAddress(dozent.Name, dozent.EMail)); // Empfaenger
+                }
                 message.Subject = "[INFO/noreply] Schulung angelegt"; //Betreff
 
                 var teilnehmerListeUrl = rootUrl + "/Schulung/Teilnehmer/" + schulung.AccessToken;
 
-                var attachments = GetAppointment(schulung, schulung.EmailDozent, emailSender.GetAbsendeAdresse(), istAbsage: false);
+                var dozentenEmails = schulung.Dozenten.Select(d => d.EMail);
+                var attachments = GetAppointment(schulung, dozentenEmails, emailSender.GetAbsendeAdresse(), istAbsage: false);
 
                 MailViewModel mvm = new MailViewModel
                 {
@@ -171,7 +174,7 @@ namespace Schulungsportal_2.Models
                     Text = await RunCompileAsync("AbsageMail", mvm),
                     ContentTransferEncoding = ContentEncoding.Base64,
                 };
-                var attachments = GetAppointment(schulung, anmeldung.Email, emailSender.GetAbsendeAdresse(), istAbsage: true);
+                var attachments = GetAppointment(schulung, new []{anmeldung.Email}, emailSender.GetAbsendeAdresse(), istAbsage: true);
                     
                 var outmultipart = new Multipart("mixed");
                 outmultipart.Add(body);
@@ -253,7 +256,9 @@ namespace Schulungsportal_2.Models
             var schulung = anmeldung.Schulung;
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
-            message.To.Add(new MailboxAddress(schulung.NameDozent, schulung.EmailDozent)); // Empfaenger
+            foreach(var dozent in schulung.Dozenten) {
+                message.To.Add(new MailboxAddress(dozent.Name, dozent.EMail)); // Empfaenger
+            }
             message.Subject = "Schulung "+anmeldung.Schulung.Titel + ": Abmeldung eines Teilnehmers"; //Betreff
 
             MailViewModel mwm = new MailViewModel {
@@ -344,7 +349,7 @@ namespace Schulungsportal_2.Models
                     Text = await RunCompileAsync("AbmeldungMail", mvm),
                     ContentTransferEncoding = ContentEncoding.Base64,
                 };
-                var attachments = GetAppointment(schulung, anmeldung.Email, emailSender.GetAbsendeAdresse(), istAbsage: true);
+                var attachments = GetAppointment(schulung, new []{anmeldung.Email}, emailSender.GetAbsendeAdresse(), istAbsage: true);
                 
                 var outmultipart = new Multipart("mixed");
                 outmultipart.Add(body);
@@ -383,7 +388,9 @@ namespace Schulungsportal_2.Models
         {
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
-            message.To.Add(new MailboxAddress(schulung.NameDozent, schulung.EmailDozent)); // Empfaenger
+            foreach(var dozent in schulung.Dozenten) {
+                message.To.Add(new MailboxAddress(dozent.Name, dozent.EMail)); // Empfaenger
+            }
             message.Subject = "[INFO/noreply] Reminder Teilnehmerliste " + schulung.Titel; //Betreff
 
             var multipart = new MultipartRelated();
@@ -419,7 +426,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="schulung"> Die Schulung für den Termin</param>
         /// <returns> Termin Anhang </returns>
-        public static List<MimePart> GetAppointment(Schulung schulung, string empfaengerMail, string absender, Boolean istAbsage)
+        public static List<MimePart> GetAppointment(Schulung schulung, IEnumerable<string> empfaengerMails, string absender, Boolean istAbsage)
         {
             // Konstruieren der ics-Datei
             List<MimePart> parts = new List<MimePart>(schulung.Termine.Count);
@@ -463,7 +470,9 @@ namespace Schulungsportal_2.Models
                 // nicht als verpflichtend gekennzeichnet, lässt man es aber weg
                 // ist office365 zu blöd, zu lesen an wen die Mail geht und erwartet das
                 // dies hier steht. Ein sinnvoller Fehler wird auch nicht geworfen
-                writer.WriteLine(string.Format("ATTENDEE:{0}", empfaengerMail));
+                foreach(var empfaengerMail in empfaengerMails) {
+                    writer.WriteLine(string.Format("ATTENDEE:{0}", empfaengerMail));
+                }
 
                 if (!istAbsage)
                 {

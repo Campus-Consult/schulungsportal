@@ -124,7 +124,7 @@
         {
             <h3>Anwesenheitsliste @Html.DisplayFor(model => model.Schulung.Titel)</h3>
         }
-        <p>Gehalten von @Html.DisplayFor(model => model.Schulung.NameDozent) am @date @*@String.Join(", ", Model.Schulung.Termine.Select(x => x.Start.Date.ToString("dd.MM.yyyy")))*@ </p>
+        <p>Gehalten von @String.Join(", ", Model.Schulung.Dozenten.Select(d => d.Name)) am @date @*@String.Join(", ", Model.Schulung.Termine.Select(x => x.Start.Date.ToString("dd.MM.yyyy")))*@ </p>
 
         if (DateTime.Now > Model.Schulung.Termine.Max(x => x.End).AddDays(3) && !Context.User.Identity.IsAuthenticated)
         {

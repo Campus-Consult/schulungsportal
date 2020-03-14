@@ -25,7 +25,9 @@
                 Dozent:
             </th>
             <td>
-                @Html.DisplayFor(m => m.NameDozent)
+                @foreach (var dozent in Model.Dozenten) {
+                    <div><a href="mailto:@dozent.EMail">@Html.DisplayFor(modelItem => dozent.Name)</a></div>
+                }
             </td>
         </tr>
         <tr>

@@ -101,7 +101,11 @@ namespace Schulungsportal.Controllers
                 if (sucheViewModel.NachnameDozent == null) sucheViewModel.NachnameDozent = "";
 
                 List<Schulung> Schulungen = _schulungRepository.GetForArchivSortByDate()
-                    .Where(s => s.NameDozent.ToLower().Contains(sucheViewModel.VornameDozent.ToLower()) && s.NameDozent.ToLower().Contains(sucheViewModel.NachnameDozent.ToLower()))
+                    .Where(s =>
+                        s.Dozenten.Any(d =>
+                            d.Name.ToLower().Contains(sucheViewModel.VornameDozent.ToLower()) && d.Name.ToLower().Contains(sucheViewModel.NachnameDozent.ToLower())
+                        )
+                    )
                     .ToList();
                 SearchResultViewModel srvw = new SearchResultViewModel
                 {

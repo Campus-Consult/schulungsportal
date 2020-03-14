@@ -36,6 +36,14 @@ namespace Schulungsportal_2.Data
                 .WithMany(s => s.Termine)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<Dozent>()
+                .HasKey(d => new { d.SchulungGUID, d.EMail });
+
+            builder.Entity<Dozent>()
+                .HasOne(t => t.Schulung)
+                .WithMany(s => s.Dozenten)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Anmeldung>()
                 .HasOne(a => a.Schulung)
                 .WithMany(s => s.Anmeldungen)

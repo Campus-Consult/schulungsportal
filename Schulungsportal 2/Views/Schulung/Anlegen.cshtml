@@ -46,60 +46,115 @@
             <div class="col-md-7"></div>
         </div>
 
-        @* Label und Eingabefeld für Name des Dozenten*@ 
-        <div class="form-group">
-            @Html.LabelFor(model => model.NameDozent, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-3">
-                @Html.EditorFor(model => model.NameDozent, new { htmlAttributes = new { @class = "form-control orga" } })
-                @Html.ValidationMessageFor(model => model.NameDozent, "", new { @class = "text-danger" })
+        <div>
+            <div id="dozent-template" class="hidden">
+                <div class="dozent form-group">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-3">
+                        <input class="form-control text-box single-line dozent-name" data-val="true" data-val-required="The Name des Dozenten field is required." type="text" value="">
+                        <span class="field-validation-valid text-danger" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <input class="form-control text-box single-line dozent-nummer" data-val="true" data-val-required="The Nummer des Dozenten field is required." type="text" value="">
+                        <span class="field-validation-valid text-danger" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <input class="form-control text-box single-line dozent-email" data-val="true" data-val-required="The EMail des Dozenten field is required." type="text" value="">
+                        <span class="field-validation-valid text-danger" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-danger dozent-remove" title="entfernen" type="button">-</button>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-7"></div>
-        </div>
-
-        @* Label und Eingabefeld für Nummer des Dozenten*@ 
-        <div class="form-group">
-            @Html.LabelFor(model => model.NummerDozent, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-3">
-                @Html.EditorFor(model => model.NummerDozent, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.NummerDozent, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <label class="col-md-2 control-label">Dozenten</label>
+                <label class="col-md-3 control-label">Name des Dozenten</label>
+                <label class="col-md-3 control-label">Handynummer des Dozenten</label>
+                <label class="col-md-3 control-label">EMail des Dozenten</label>
             </div>
-            <div class="col-md-7"></div>
-        </div>
-
-        @* Label und Eingabefeld für E-Mail des Dozenten*@ 
-        <div class="form-group">
-            @Html.LabelFor(model => model.EmailDozent, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-3">
-                @Html.EditorFor(model => model.EmailDozent, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.EmailDozent, "", new { @class = "text-danger" })
+            <div id="dozenten-container">
+                @{int i = 0; }
+                @foreach (var dozent in Model.Dozenten)
+                {
+                    <div class="dozent form-group">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-3">
+                            <input class="form-control text-box single-line dozent-name" data-val="true" data-val-required="The Name des Dozenten field is required." name="Dozenten[@(i)].Name" type="text" value="@dozent.Name">
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Dozenten[@(i)].Name" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <input class="form-control text-box single-line dozent-nummer" data-val="true" data-val-required="The Nummer des Dozenten field is required." name="Dozenten[@(i)].Nummer" type="text" value="@dozent.Nummer">
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Dozenten[@(i)].Nummer" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <input class="form-control text-box single-line dozent-email" data-val="true" data-val-required="The EMail des Dozenten field is required." name="Dozenten[@(i)].EMail" type="text" value="@dozent.EMail">
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Dozenten[@(i)].EMail" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col-md-1">
+                            <button class="btn btn-danger dozent-remove" title="entfernen" type="button">-</button>
+                        </div>
+                    </div>
+                }
+                @{i++;}
             </div>
-            <div class="col-md-7"></div>
+            <div class="form-group">
+                <div class="col-md-11"></div>
+                <div class="col-md-1">
+                    <button id="dozent-add" class="btn btn-success" type="button">+</button>
+                </div>
+            </div>
         </div>
 
         <div>
+            <div id="termin-template" class="hidden">
+                <div class="termin form-group">
+                    <div class="col-md-2" ></div >
+                    <div class="col-md-2">
+                        <input class="form-control text-box single-line start-date" data-val="true" data-val-date="Das Feld &quot;Start-Termin&quot; muss eine Datumsangabe sein." data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." placeholder="dd.mm.yyyy" type="date" value="">
+                        <span class="field-validation-valid text-danger" data-valmsg-for="termin.StartDate" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <input class="form-control text-box single-line start-time" data-val="true" data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." placeholder="HH:mm" type="time" value="">
+                        <span class="field-validation-valid text-danger" data-valmsg-for="termin.StartTime" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-md-1">bis</div>
+                    <div class="col-md-2">
+                        <input class="form-control text-box single-line end-date" data-val="true" data-val-date="Das Feld &quot;End-Termin&quot; muss eine Datumsangabe sein." data-val-required="Das Feld &quot;End-Termin&quot; ist erforderlich." placeholder="dd.mm.yyyy" type="date" value="">
+                        <span class="field-validation-valid text-danger" data-valmsg-for="termin.EndDate" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <input class="form-control text-box single-line end-time" data-val="true" data-val-required="Das Feld &quot;End-Uhrzeit&quot; ist erforderlich." placeholder="HH:mm" type="time" value="">
+                        <span class="field-validation-valid text-danger" data-valmsg-for="termin.EndTime" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-danger termin-remove" title="entfernen" type="button">-</button>
+                    </div>
+                </div>
+            </div>
             <div class="form-group"><label class="col-md-2 control-label">Termine</label></div>
             <div id="termine-container">
-                @{int i = 0; }
+                @{i = 0; }
                 @foreach (var termin in Model.TermineVM)
                 {
                     <div class="termin form-group">
                         <div class="col-md-2"></div>
                         <div class="col-md-2">
                             <input class="form-control text-box single-line start-date" data-val="true" data-val-date="Das Feld &quot;Start-Termin&quot; muss eine Datumsangabe sein." data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." id="TermineVM_@(i)_StartDate" name="TermineVM[@(i)].StartDate" placeholder="dd.mm.yyyy" type="date" value="@termin.StartDate.ToString("yyyy-MM-dd")">
-                            <span class="field-validation-valid text-danger" data-valmsg-for="termin.StartDate" data-valmsg-replace="true"></span>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="TermineVM[@(i)].StartDate" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-md-2">
                             <input class="form-control text-box single-line start-time" data-val="true" data-val-required="Das Feld &quot;Start-Termin&quot; ist erforderlich." id="TermineVM_@(i)_StartTime" name="TermineVM[@(i)].StartTime" placeholder="HH:mm" type="time" value="@termin.StartTime.ToString("hh\\:mm")">
-                            <span class="field-validation-valid text-danger" data-valmsg-for="termin.StartTime" data-valmsg-replace="true"></span>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="TermineVM[@(i)].StartTime" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-md-1">bis</div>
                         <div class="col-md-2">
                             <input class="form-control text-box single-line end-date" data-val="true" data-val-date="Das Feld &quot;End-Termin&quot; muss eine Datumsangabe sein." data-val-required="Das Feld &quot;End-Termin&quot; ist erforderlich." id="TermineVM_@(i)_EndDate" name="TermineVM[@(i)].EndDate" placeholder="dd.mm.yyyy" type="date" value="@termin.EndDate.ToString("yyyy-MM-dd")">
-                            <span class="field-validation-valid text-danger" data-valmsg-for="termin.EndDate" data-valmsg-replace="true"></span>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="TermineVM[@(i)].EndDate" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-md-2">
                             <input class="form-control text-box single-line end-time" data-val="true" data-val-required="Das Feld &quot;End-Uhrzeit&quot; ist erforderlich." id="TermineVM_@(i)_EndTime" name="TermineVM[@(i)].EndTime" placeholder="HH:mm" type="time" value="@termin.EndTime.ToString("hh\\:mm")">
-                            <span class="field-validation-valid text-danger" data-valmsg-for="termin.EndTime" data-valmsg-replace="true"></span>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="TermineVM[@(i)].EndTime" data-valmsg-replace="true"></span>
                         </div>
                         <div class="col-md-1">
                             <button class="btn btn-danger termin-remove" title="entfernen" type="button">-</button>
