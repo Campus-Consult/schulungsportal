@@ -25,6 +25,28 @@ Diese Konfiguration kann man anlegen wenn man unter Schulungsportal 2 Rechtsklic
 
 Leider scheint es damit nicht möglich zu sein, sich selber Termine zu schicken, da office365 sich querstellt
 
+### Beispiel appsettings.Release.json
+```
+{
+  "EMailOptions": {
+    "Mailserver": "smtp.office365.com",
+    "Port": 587,
+    "Absender": "EMailAdresse des Schulungsportals",
+    "Passwort": "Passwort für den EMail Account"
+  },
+  "DefaultAdminUser": {
+    "UserEmail": "EMail des Default Nutzers des Schulungsportals",
+    "UserPassword": "Passwort für den default Nutzer"
+  },
+  "ConnectionStrings": {
+    "type": "mysql",
+    "DefaultConnection": "server=localhost;port=3306;database=databasename;user=databaseuser;password=databasepassword"
+  }
+}
+```
+
+
+
 ## Development
 
 Um dynamische Elemente auf der Clientseite zu ermöglichen, wird das Javascript-Framework Vue verwendet. Um die Dateien zusammenzufassen und so zu "bundlen" wird der Parcel-Bundler mit npm verwendet.
@@ -36,10 +58,3 @@ Die Source Dateien für die JS-Client-Seite befinden sich in `js/src`, Vue mit T
 Um das Javascript zu bauen muss man `npm run build` ausführen, die fertigen Dateien liegen dann in `wwwroot/dist`. Um während des Developments alle Änderungen zu überwachen, muss man `npm run watch` ausführen.
 
 Um das gesammte Programm mit allen Komponenten releasefertig vorzubereiten, übernimmt `npm run release` die Schritte des JavaScript und C# Übersetzens.
-
-## GitLab CI/CD
-
-Das Projekt wird bei jedem push automatisch gebaut und die vorkonfigurierten Tests werden ausgeführt.
-
-Außerdem werden alle pushes auf master automatisch auf den CC-Server hochgeladen und sind damit sofort live. Dafür mussten ein paar Konfigurationsschritte unternommen werden. [Anleitung zur Verwendung von SSH-Keys in GitLab CI](https://docs.gitlab.com/ee/ci/ssh_keys/README.html).
-

@@ -561,22 +561,5 @@ namespace Schulungsportal_2.Controllers
                 return View("Error", e);
             }
         }
-        
-        /// <summary>
-        /// Methode, um das senden des Newsletters als Cronjob zu implementieren
-        /// </summary>
-        /// <param name="key">Der geheime Schlüssel, sonst wird die Mail nicht gesendet</param>
-        /// <returns></returns>
-        public ActionResult SendNewsletter(string key)
-        {
-            if (key != "PbpsNDeKx9cFkoJP5fptQ6jczLqAwXe5")
-            {
-                return new StatusCodeResult(403);
-            }
-            // hole alle nächsten Schulungen aus der Datenbank und sende newsletter
-            // erstmal deaktiviert
-            // MailingHelper.GenerateAndSendSchulungsNewsletter(_schulungRepository.GetForRegSortByDate().ToList(), Util.getVorstand(_context), emailSender);
-            return new StatusCodeResult(200);
-        }
     }
 }
