@@ -38,6 +38,18 @@ namespace Schulungsportal_2.ViewModels
         public List<TerminViewModel> TermineVM { get; set; }
 
         [Required]
+        [Display(Name = "Start Anmeldefrist")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime StartAnmeldefristDate { get; set; }
+
+        [Required]
+        [Display(Name = "Start Anmeldefrist")]
+        [DataType(DataType.Time)]
+        [DisplayFormat(DataFormatString = "{0:hh\\:mm}", ApplyFormatInEditMode = true)]
+        public TimeSpan StartAnmeldefristTime { get; set; }
+
+        [Required]
         [Display(Name = "Anmeldefrist")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
@@ -61,6 +73,8 @@ namespace Schulungsportal_2.ViewModels
         public SchulungCreateViewModel()
         {
             TermineVM = new List<TerminViewModel>();
+            StartAnmeldefristDate = DateTime.Now.Date;
+            StartAnmeldefristTime = DateTime.Now.TimeOfDay;
             TermineVM.Add(new TerminViewModel { EndDate = DateTime.Now.Date, StartDate = DateTime.Now.Date });
             Dozenten = new List<Dozent>();
             Dozenten.Add(new Dozent() {
@@ -80,6 +94,7 @@ namespace Schulungsportal_2.ViewModels
 
             result.Termine = TermineVM.ConvertAll(x => x.ToTermin(SchulungGUID));
             result.Anmeldefrist = AnmeldefristDate.Add(AnmeldefristTime);
+            result.StartAnmeldefrist = StartAnmeldefristDate.Add(StartAnmeldefristTime);
             return result;
         }
     }

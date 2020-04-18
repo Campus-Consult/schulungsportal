@@ -49,8 +49,11 @@ namespace Schulungsportal_2.Controllers
         { 
             try
             {
+                var now = DateTime.Now;
                 // alle Schulungen aus der Datebank abrufen
-                List<Schulung> Schulungen = _schulungRepository.GetForRegSortByDate().ToList();
+                List<Schulung> Schulungen = _schulungRepository.GetForRegSortByDate()
+                    // man kann sich nur für Schulungen anmelden, deren Anmeldung läuft
+                    .Where(s => s.StartAnmeldefrist < now).ToList();
                 
                 // neues Viewmodel erstellen   
                 AnmeldungViewModel anmeldungViewModel = new AnmeldungViewModel(Schulungen);
@@ -106,7 +109,7 @@ namespace Schulungsportal_2.Controllers
                             // Termine aus Datenbank laden
                             if (schulung.Termine.Count == 0) { }
                             // Check ob die Schulung immer noch offen ist, sonst ignorieren
-                            if (!schulung.IsAbgesagt && schulung.Anmeldefrist > now) {
+                            if (!schulung.IsAbgesagt && schulung.Anmeldefrist > now && schulung.StartAnmeldefrist < now) {
                                 if (await _anmeldungRepository.AnmeldungAlreadyExistAsync(anmeldung))
                                 {
                                     schulung.Check = true;

@@ -37,6 +37,11 @@ namespace Schulungsportal_2.Models.Schulungen
 
         [Required]
         public String Ort { get; set; }
+
+        [Display(Name = "Start Anmeldefrist")]
+        [DataType(DataType.DateTime)]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}", ApplyFormatInEditMode = true)]
+        public DateTime StartAnmeldefrist { get; set; }
         
         [Required]
         [Display(Name = "Anmeldefrist")]
@@ -76,6 +81,9 @@ namespace Schulungsportal_2.Models.Schulungen
 
             result.AnmeldefristDate = Anmeldefrist.Date;
             result.AnmeldefristTime = Anmeldefrist.TimeOfDay;
+
+            result.StartAnmeldefristDate = StartAnmeldefrist.Date;
+            result.StartAnmeldefristTime = StartAnmeldefrist.TimeOfDay;
 
             return result;
         }

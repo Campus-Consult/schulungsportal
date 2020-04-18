@@ -242,6 +242,7 @@ namespace Schulungsportal_2.Models.Schulungen
                     .SingleAsync(m => m.SchulungGUID == schulung.SchulungGUID);
                 schulungAlt.Beschreibung = schulung.Beschreibung;
                 schulungAlt.Anmeldefrist = schulung.Anmeldefrist;
+                schulungAlt.StartAnmeldefrist = schulung.StartAnmeldefrist;
                 schulungAlt.Check = schulung.Check;
                 if (!schulungAlt.Dozenten.Equals(schulung.Dozenten)) {
                     schulungAlt.Dozenten = schulung.Dozenten;
