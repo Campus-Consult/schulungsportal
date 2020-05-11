@@ -1,0 +1,58 @@
+@using System.Linq
+<!DOCTYPE html>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <html>
+    <head>
+        <style>
+            * {
+                font-family: 'Franklin Gothic Book', sans-serif;
+            }
+
+            p, li {
+                margin: 0cm;
+                margin-bottom: .0001pt;
+                font-size: 11.0pt;
+            }
+
+            img {
+                border: 0;
+                width: 0.3333in;
+                height:0.3333in;
+            }
+        </style>
+    </head>
+    <body>
+        @RenderBody()
+        <p>_________________________________</p>
+        <p>Campus Consult e. V.</p>
+        <br />
+        <p>Technologiepark 13</p>
+        <p>33100 Paderborn</p>
+        <br />
+        <p>Internet: <a href=" https://campus-consult.org">https://campus-consult.org</a></p>
+        @if (@Model.CCLogoFile != null) {// if one is non null, assume all others are non null as well
+            <p>
+                Lernen Sie uns im Social Media kennen:
+            </p>
+            <p>
+                <a href="https://campus-consult.org/">
+                    <img src="cid:@Model.CCLogoFile" alt="Homepage - Campus Consult e. V.">
+                </a>
+                <a href="http://www.facebook.com/pages/Campus-Consult/312379063432">
+                    <img src="cid:@Model.FacebookLogoFile" alt="Facebook-Seite - Campus Consult e. V.">
+                </a>
+                <a href="https://www.instagram.com/campus_consult_ev/">
+                    <img src="cid:@Model.InstaLogoFile" alt="Instagram-Seite - Campus Consult e. V.">
+                </a>
+            </p>
+        }
+        <p>_________________________________</p>
+        <p>Vertretungsberechtigter Vorstand: @Model.Vorstand</p>
+        <br />
+        <p>Amtsgericht Paderborn; VR 1615</p>
+        <br />
+        <p>Campus Consult e. V. ist seit 1994 Mitglied im</p>
+        <p>Bundesverband Deutscher Studentischer Unternehmensberatungen e. V. (<a href="www.bdsu.de">www.bdsu.de</a>)</p>
+        <p>und in der European Confederation of Junior Enterprises (<a href="www.jadenet.org">www.jadenet.org</a>)</p>
+    </body>
+</html>

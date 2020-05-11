@@ -18,13 +18,11 @@ namespace Schulungsportal_2.Services
             log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private Timer _timer;
-        private ISchulungsportalEmailSender emailSender;
         private readonly IServiceScopeFactory scopeFactory;
 
-        public AnwesenheitslisteReminderService(IServiceScopeFactory scopeFactory, ISchulungsportalEmailSender emailSender)
+        public AnwesenheitslisteReminderService(IServiceScopeFactory scopeFactory)
         {
             this.scopeFactory = scopeFactory;
-            this.emailSender = emailSender;
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
@@ -44,6 +42,7 @@ namespace Schulungsportal_2.Services
             using (var scope = scopeFactory.CreateScope())
             {
                 ApplicationDbContext _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                MailingHelper mailingHelper = scope.ServiceProvider.GetRequiredService<MailingHelper>();
                 SchulungRepository schulungRepository = new SchulungRepository(_context);
                 var ungeprüfteSchulungen = schulungRepository.GetUngeprüfteSchulungen()
                     .Where(s => !s.GeprüftReminderSent);
@@ -54,7 +53,7 @@ namespace Schulungsportal_2.Services
                     foreach (var schulung in ungeprüfteSchulungen) {
                         Task.WaitAll(
                             schulungRepository.SetGeprüftMailSent(schulung.SchulungGUID, true),
-                            MailingHelper.GenerateAndSendGeprueftReminderMail(schulung, vorstand, emailSender)
+                            mailingHelper.GenerateAndSendGeprueftReminderMail(schulung, vorstand)
                         );
                     }
                 }

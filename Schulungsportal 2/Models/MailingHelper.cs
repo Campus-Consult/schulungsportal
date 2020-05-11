@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Internal;
 using MimeKit;
-using RazorLight;
 using Schulungsportal_2.Models.Anmeldungen;
 using Schulungsportal_2.Models.Schulungen;
 using Schulungsportal_2.Services;
@@ -20,17 +19,21 @@ namespace Schulungsportal_2.Models
         // logger
         private static readonly log4net.ILog logger =
             log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+            
+        private IRazorViewToStringRenderer viewRenderer;
+        private ISchulungsportalEmailSender emailSender;
 
-        private static RazorLightEngine engine = new RazorLightEngineBuilder()
-                .UseMemoryCachingProvider()
-                .Build();
+        public MailingHelper(IRazorViewToStringRenderer viewRenderer, ISchulungsportalEmailSender emailSender) {
+            this.viewRenderer = viewRenderer;
+            this.emailSender = emailSender;
+        }
 
         /// <summary>
         /// Diese Methode generiert und schickt eine Bestaetigungsmail an einen Nutzer, der sich zu einer Schulung angemeldet hat.
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung, die beim anmelden erstellt wird.</param>
         /// <param name="schulung">Die Schulung, zu der sich der Nutzer angemeldet hat.</param>
-        public static async Task GenerateAndSendBestätigungsMailAsync(Anmeldung anmeldung, Schulung schulung, string vorstand, string rootUrl, ISchulungsportalEmailSender emailSender)
+        public async Task GenerateAndSendBestätigungsMailAsync(Anmeldung anmeldung, Schulung schulung, string vorstand, string rootUrl)
         {
             try
             {
@@ -88,7 +91,7 @@ namespace Schulungsportal_2.Models
         /// Diese Methode wird aufgerufen, wenn eine Schulung angelegt wurde und generiert und schickt eine Mail an den Dozenten der Schulung.
         /// </summary>
         /// <param name="schulung">Die Schulung, die angelegt wurde</param>
-        public static async Task GenerateAndSendAnlegeMailAsync(Schulung schulung, string rootUrl, string vorstand, ISchulungsportalEmailSender emailSender)
+        public async Task GenerateAndSendAnlegeMailAsync(Schulung schulung, string rootUrl, string vorstand)
         {
             try
             {
@@ -151,7 +154,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung.</param>
         /// <param name="schulung">Die Schulung, zu die abgesagt wird.</param>
-        public static async Task GenerateAndSendAbsageMailAsync(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
+        public async Task GenerateAndSendAbsageMailAsync(Anmeldung anmeldung, Schulung schulung, string vorstand)
         {
             try
             {
@@ -203,7 +206,7 @@ namespace Schulungsportal_2.Models
             }
         }
 
-        public static async Task GenerateAndSendSchulungsNewsletterAsync(List<Schulung> schulungen, string vorstand, ISchulungsportalEmailSender emailSender)
+        public async Task GenerateAndSendSchulungsNewsletterAsync(List<Schulung> schulungen, string vorstand)
         {
             // Kein newsletter ohne Schulungen
             if (schulungen.Count() == 0)
@@ -252,7 +255,7 @@ namespace Schulungsportal_2.Models
             }
         }
 
-        public static async Task GenerateAndSendAbsageAnSchulungsdozentMailAsync(Anmeldung anmeldung, String begruendung, String vorstand, ISchulungsportalEmailSender emailSender) {
+        public async Task GenerateAndSendAbsageAnSchulungsdozentMailAsync(Anmeldung anmeldung, String begruendung, String vorstand) {
             var schulung = anmeldung.Schulung;
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
@@ -289,7 +292,7 @@ namespace Schulungsportal_2.Models
             await emailSender.SendEmailAsync(message);
         }
 
-        public static async Task GenerateAndSendInviteMailAsync(Invite invite, string rootUrl, string vorstand, ISchulungsportalEmailSender emailSender) {
+        public async Task GenerateAndSendInviteMailAsync(Invite invite, string rootUrl, string vorstand) {
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
             message.To.Add(new MailboxAddress(invite.EMailAdress)); // Empfaenger
@@ -326,7 +329,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung.</param>
         /// <param name="schulung">Die Schulung, zu die abgesagt wird.</param>
-        public static async Task GenerateAndSendAbmeldungMailAsync(Anmeldung anmeldung, Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
+        public async Task GenerateAndSendAbmeldungMailAsync(Anmeldung anmeldung, Schulung schulung, string vorstand)
         {
             try
             {
@@ -384,7 +387,7 @@ namespace Schulungsportal_2.Models
         /// </summary>
         /// <param name="anmeldung">Die Anmeldung.</param>
         /// <param name="schulung">Die Schulung, zu die abgesagt wird.</param>
-        public static async Task GenerateAndSendGeprueftReminderMail(Schulung schulung, string vorstand, ISchulungsportalEmailSender emailSender)
+        public async Task GenerateAndSendGeprueftReminderMail(Schulung schulung, string vorstand)
         {
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
@@ -512,18 +515,9 @@ namespace Schulungsportal_2.Models
             return parts;
         }
 
-        private static async Task<string> RunCompileAsync<T>(string filename, T mvm)
+        private async Task<string> RunCompileAsync<T>(string filename, T mvm)
         {
-            var cacheResult = engine.TemplateCache.RetrieveTemplate(filename);
-            if (cacheResult.Success)
-            {
-                return await engine.RenderTemplateAsync(cacheResult.Template.TemplatePageFactory(), mvm);
-            } else
-            {
-                var stream = Assembly.GetAssembly(typeof(MailingHelper)).GetManifestResourceStream("Schulungsportal_2.MailTemplates." + filename + ".cshtml");
-                var template = await new StreamReader(stream).ReadToEndAsync();
-                return await engine.CompileRenderAsync(filename, template, mvm);
-            }
+            return await viewRenderer.RenderViewToStringAsync("/MailTemplates/"+filename+".cshtml",mvm);
         }
 
         private static MimePart LoadInlinePicture(string filename, string contentID)

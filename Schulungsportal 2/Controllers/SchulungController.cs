@@ -23,7 +23,7 @@ namespace Schulungsportal_2.Controllers
         private AnmeldungRepository _anmeldungRepository;
         private ApplicationDbContext _context;
         private IMapper _mapper;
-        private ISchulungsportalEmailSender emailSender;
+        private MailingHelper mailingHelper;
 
         // logger
         private static readonly log4net.ILog logger =
@@ -32,13 +32,13 @@ namespace Schulungsportal_2.Controllers
         /// <summary>
         /// SchulungController Konstruktor legt Repositories für Datenzugriff an.
         /// </summary>
-        public SchulungController(ApplicationDbContext context, ISchulungsportalEmailSender emailSender, IMapper mapper)
+        public SchulungController(ApplicationDbContext context, MailingHelper mailingHelper, IMapper mapper)
         {
             _schulungRepository = new SchulungRepository(context);
             _anmeldungRepository = new AnmeldungRepository(context, mapper);
             _context = context;
             _mapper = mapper;
-            this.emailSender = emailSender;
+            this.mailingHelper = mailingHelper;
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Schulungsportal_2.Controllers
                         && schulung.Termine.All(x => x.Start > schulung.Anmeldefrist && x.End > x.Start)
                         && schulung.StartAnmeldefrist < schulung.Anmeldefrist)
                     {
-                        await MailingHelper.GenerateAndSendAnlegeMailAsync(schulung, Util.getRootUrl(Request), Util.getVorstand(_context), emailSender);
+                        await mailingHelper.GenerateAndSendAnlegeMailAsync(schulung, Util.getRootUrl(Request), Util.getVorstand(_context));
                         return RedirectToAction("Uebersicht");
                     }
                     if (schulung.StartAnmeldefrist < schulung.Anmeldefrist) {
@@ -404,7 +404,7 @@ namespace Schulungsportal_2.Controllers
 
                 foreach(Anmeldung anmeldung in Anmeldungen)
                 {
-                    MailingHelper.GenerateAndSendAbsageMailAsync(anmeldung, schulung, vorstand, emailSender);
+                    mailingHelper.GenerateAndSendAbsageMailAsync(anmeldung, schulung, vorstand);
                 }
 
                 return RedirectToAction("Uebersicht");

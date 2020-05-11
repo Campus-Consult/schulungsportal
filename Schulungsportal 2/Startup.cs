@@ -18,6 +18,7 @@ using AutoMapper;
 using Npgsql.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Schulungsportal_2.Services;
+using Schulungsportal_2.Models;
 using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Schulungsportal_2
@@ -105,6 +106,10 @@ namespace Schulungsportal_2
             services.AddTransient<ISchulungsportalEmailSender, AuthMessageSender>();
             // Background Task for reminders
             services.AddHostedService<AnwesenheitslisteReminderService>();
+
+            services.AddScoped<IRazorViewToStringRenderer, RazorViewToStringRenderer>();
+
+            services.AddScoped<MailingHelper, MailingHelper>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAutoMapper();
