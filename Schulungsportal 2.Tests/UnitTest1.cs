@@ -9,6 +9,7 @@ using Schulungsportal_2.Controllers;
 using AutoMapper;
 using Schulungsportal_2.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Schulungsportal_2.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -27,12 +28,13 @@ namespace Schulungsportal_2_Tests
 
         public UnitTest1()
         {
+            var services = new ServiceCollection().BuildServiceProvider();
             context = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase("test").Options);
             var mapper = new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())).CreateMapper();
             sr = new SchulungRepository(context);
             ar = new AnmeldungRepository(context, mapper);
-            ac = new AnmeldungController(context, emailSender, mapper);
+            ac = new AnmeldungController(context, mapper, new MailingHelper(new FakeRazorToStringRenderer(), emailSender));
             sac = new SchulungApiController(context, emailSender, mapper);
         }
 

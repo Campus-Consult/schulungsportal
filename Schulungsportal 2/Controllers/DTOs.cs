@@ -85,7 +85,7 @@ namespace Schulungsportal_2.Controllers {
                 Start = t.Start,
                 End = t.End,
             });
-            var dozenten = s.Dozenten.Select(d => DozentDTO.toDTO(d));
+            var dozenten = s.Dozenten.Select(d => DozentDTO.toDTO(d)).ToList();
             return new InternalSchulungDTO
                 {
                 Anmeldefrist = s.Anmeldefrist,

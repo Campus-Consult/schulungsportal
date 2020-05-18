@@ -201,7 +201,9 @@ namespace Schulungsportal_2.Models.Anmeldungen
         public IEnumerable<AnmeldungWithMatchCount> SearchAnmeldungenWithMatchCount(string vorname, string nachname, string email, string handynummer)
         {
             return context.Anmeldung
-                .Include(a => a.Schulung).ThenInclude(s => s.Termine).AsEnumerable().Select((anmeldung) => new {
+                .Include(a => a.Schulung).ThenInclude(s => s.Termine)
+                .Include(a => a.Schulung).ThenInclude(s => s.Dozenten)
+                .AsEnumerable().Select((anmeldung) => new {
                 anmeldung = anmeldung,
                 matchC = (String.Equals(anmeldung.Vorname.Trim(), vorname.Trim(), StringComparison.OrdinalIgnoreCase) ? 1 : 0) +
                          (String.Equals(anmeldung.Nachname.Trim(), nachname.Trim(), StringComparison.OrdinalIgnoreCase) ? 1 : 0) +

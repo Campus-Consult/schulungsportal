@@ -32,6 +32,7 @@ namespace Schulungsportal_2_Tests
                 OrganisatorInstitution = "CC",
                 Ort = "Büro",
                 SchulungGUID = "00000000-0000-0000-0000-000000000000",
+                StartAnmeldefrist = now.AddDays(-1),
                 Anmeldefrist = now.AddDays(1),
             });
             context.Add(new Schulung
@@ -45,6 +46,7 @@ namespace Schulungsportal_2_Tests
                 OrganisatorInstitution = "CC",
                 Ort = "Büro",
                 SchulungGUID = "00000000-0000-0000-0000-000000000001",
+                StartAnmeldefrist = now.AddDays(-3),
                 Anmeldefrist = now.AddDays(-1),
             });
             context.Add(new Anmeldung
@@ -168,6 +170,7 @@ namespace Schulungsportal_2_Tests
             {
                 AccessToken = id + "0",
                 Anmeldefrist = anmeldefrist,
+                StartAnmeldefrist = anmeldefrist.AddDays(-1),
                 Beschreibung = name,
                 Dozenten = CreateSingletonDozent("Test Dozent", "12345", "test@test.test"),
                 IsAbgesagt = false,
