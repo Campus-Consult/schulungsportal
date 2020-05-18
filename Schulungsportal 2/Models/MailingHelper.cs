@@ -39,7 +39,7 @@ namespace Schulungsportal_2.Models
             {
                 MimeMessage message = new MimeMessage();
                 message.From.Add(new MailboxAddress(emailSender.GetAbsendeAdresse())); //Absender
-                message.To.Add(new MailboxAddress(anmeldung.Vorname + " " + anmeldung.Nachname, anmeldung.Email)); // Empfaenger
+                message.To.Add(GetSafeMailboxAddress(anmeldung.Vorname + " " + anmeldung.Nachname, anmeldung.Email)); // Empfaenger
                 message.Subject = "[INFO/noreply] Schulungsanmeldung " + schulung.Titel; //Betreff
 
                 var selbstmanagementUrl = rootUrl + "/Anmeldung/Selbstmanagement/" + anmeldung.AccessToken;
@@ -98,7 +98,7 @@ namespace Schulungsportal_2.Models
                 MimeMessage message = new MimeMessage();
                 message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
                 foreach(var dozent in schulung.Dozenten) {
-                    message.To.Add(new MailboxAddress(dozent.Name, dozent.EMail)); // Empfaenger
+                    message.To.Add(GetSafeMailboxAddress(dozent.Name, dozent.EMail)); // Empfaenger
                 }
                 message.Subject = "[INFO/noreply] Schulung angelegt"; //Betreff
 
@@ -160,7 +160,7 @@ namespace Schulungsportal_2.Models
             {
                 MimeMessage message = new MimeMessage();
                 message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
-                message.To.Add(new MailboxAddress(anmeldung.Vorname + " " + anmeldung.Nachname, anmeldung.Email)); // Empfaenger
+                message.To.Add(GetSafeMailboxAddress(anmeldung.Vorname + " " + anmeldung.Nachname, anmeldung.Email)); // Empfaenger
                 message.Subject = "[INFO/noreply] Schulung abgesagt " + schulung.Titel; //Betreff
                 
                 MailViewModel mvm = new MailViewModel
@@ -260,7 +260,7 @@ namespace Schulungsportal_2.Models
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
             foreach(var dozent in schulung.Dozenten) {
-                message.To.Add(new MailboxAddress(dozent.Name, dozent.EMail)); // Empfaenger
+                message.To.Add(GetSafeMailboxAddress(dozent.Name, dozent.EMail)); // Empfaenger
             }
             message.Subject = "Schulung "+anmeldung.Schulung.Titel + ": Abmeldung eines Teilnehmers"; //Betreff
 
@@ -335,7 +335,7 @@ namespace Schulungsportal_2.Models
             {
                 MimeMessage message = new MimeMessage();
                 message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
-                message.To.Add(new MailboxAddress(anmeldung.Vorname + " " + anmeldung.Nachname, anmeldung.Email)); // Empfaenger
+                message.To.Add(GetSafeMailboxAddress(anmeldung.Vorname + " " + anmeldung.Nachname, anmeldung.Email)); // Empfaenger
                 message.Subject = "[INFO/noreply] Abmeldung von der Schulung " + schulung.Titel; //Betreff
                 
                 MailViewModel mvm = new MailViewModel
@@ -392,7 +392,7 @@ namespace Schulungsportal_2.Models
             MimeMessage message = new MimeMessage();
             message.From.Add(new MailboxAddress("Schulungsportal", emailSender.GetAbsendeAdresse())); //Absender
             foreach(var dozent in schulung.Dozenten) {
-                message.To.Add(new MailboxAddress(dozent.Name, dozent.EMail)); // Empfaenger
+                message.To.Add(GetSafeMailboxAddress(dozent.Name, dozent.EMail)); // Empfaenger
             }
             message.Subject = "[INFO/noreply] Reminder Teilnehmerliste " + schulung.Titel; //Betreff
 
@@ -423,6 +423,18 @@ namespace Schulungsportal_2.Models
             await emailSender.SendEmailAsync(message);
         }
 
+        /// <summary>
+        /// Creates a mailbox address using the name and the email address
+        /// if the name is invalid, use just the email address
+        /// </summary>
+        public static MailboxAddress GetSafeMailboxAddress(string name, string email) {
+            try {
+                return new MailboxAddress(name, email);
+            } catch(ParseException e) {
+                logger.Warn("Problem parsing mailbox address :"+name, e);
+                return new MailboxAddress(email);
+            }
+        }
 
         /// <summary>
         /// Generiert den Termin als Anhang (.ics-Datei)
