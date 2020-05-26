@@ -1,1 +1,1 @@
-scp -r "../Schulungsportal 2/bin/Release/netcoreapp2.2/publish/" cc@campus-consult.org:/tmp/schulungsportal2
+cd "../Schulungsportal 2/bin/Release/netcoreapp2.2/"; tar cvzf - "publish" | ssh cc@campus-consult.org "cd /tmp; tar zxvf -"
