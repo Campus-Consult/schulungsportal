@@ -200,6 +200,8 @@ namespace Schulungsportal_2.Models.Anmeldungen
         /// <returns></returns>
         public IEnumerable<AnmeldungWithMatchCount> SearchAnmeldungenWithMatchCount(string vorname, string nachname, string email, string handynummer)
         {
+            // möglich, sich ohne nummer anzumelden
+            bool nummerExists = handynummer.Trim() != "";
             return context.Anmeldung
                 .Include(a => a.Schulung).ThenInclude(s => s.Termine)
                 .Include(a => a.Schulung).ThenInclude(s => s.Dozenten)
@@ -208,7 +210,7 @@ namespace Schulungsportal_2.Models.Anmeldungen
                 matchC = (String.Equals(anmeldung.Vorname.Trim(), vorname.Trim(), StringComparison.OrdinalIgnoreCase) ? 1 : 0) +
                          (String.Equals(anmeldung.Nachname.Trim(), nachname.Trim(), StringComparison.OrdinalIgnoreCase) ? 1 : 0) +
                          (String.Equals(anmeldung.Email.Trim(), email.Trim(), StringComparison.OrdinalIgnoreCase) ? 1 : 0) +
-                         (String.Equals(anmeldung.Nummer.Trim(), handynummer.Trim(), StringComparison.OrdinalIgnoreCase) ? 1 : 0)
+                         (nummerExists && String.Equals(anmeldung.Nummer.Trim(), handynummer.Trim(), StringComparison.OrdinalIgnoreCase) ? 1 : 0)
              }).Where((anm)=>anm.matchC>0).Select((anm)=> {
                 AnmeldungWithMatchCount amwc = mapper.Map<AnmeldungWithMatchCount>(anm.anmeldung);
                 amwc.matchCount = anm.matchC;
