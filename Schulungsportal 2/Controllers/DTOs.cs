@@ -43,6 +43,8 @@ namespace Schulungsportal_2.Controllers {
         public String Beschreibung { get; set; }
 
         public String Ort { get; set; }
+
+        public DateTime StartAnmeldefrist { get; set; }
         
         public DateTime Anmeldefrist { get; set; }
 
@@ -64,6 +66,7 @@ namespace Schulungsportal_2.Controllers {
                 OrganisatorInstitution = s.OrganisatorInstitution,
                 Ort = s.Ort,
                 SchulungGUID = s.SchulungGUID,
+                StartAnmeldefrist = s.StartAnmeldefrist,
                 Termine = termine,
                 Titel = s.Titel,
             };
@@ -82,7 +85,7 @@ namespace Schulungsportal_2.Controllers {
                 Start = t.Start,
                 End = t.End,
             });
-            var dozenten = s.Dozenten.Select(d => DozentDTO.toDTO(d));
+            var dozenten = s.Dozenten.Select(d => DozentDTO.toDTO(d)).ToList();
             return new InternalSchulungDTO
                 {
                 Anmeldefrist = s.Anmeldefrist,

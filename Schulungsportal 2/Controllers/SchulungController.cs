@@ -23,7 +23,7 @@ namespace Schulungsportal_2.Controllers
         private AnmeldungRepository _anmeldungRepository;
         private ApplicationDbContext _context;
         private IMapper _mapper;
-        private ISchulungsportalEmailSender emailSender;
+        private MailingHelper mailingHelper;
 
         // logger
         private static readonly log4net.ILog logger =
@@ -32,13 +32,13 @@ namespace Schulungsportal_2.Controllers
         /// <summary>
         /// SchulungController Konstruktor legt Repositories für Datenzugriff an.
         /// </summary>
-        public SchulungController(ApplicationDbContext context, ISchulungsportalEmailSender emailSender, IMapper mapper)
+        public SchulungController(ApplicationDbContext context, MailingHelper mailingHelper, IMapper mapper)
         {
             _schulungRepository = new SchulungRepository(context);
             _anmeldungRepository = new AnmeldungRepository(context, mapper);
             _context = context;
             _mapper = mapper;
-            this.emailSender = emailSender;
+            this.mailingHelper = mailingHelper;
         }
 
         /// <summary>
@@ -101,12 +101,17 @@ namespace Schulungsportal_2.Controllers
                 {
                     Schulung schulung = await _schulungRepository.AddAsync(newSchulung.ToSchulung());
                     // stellt für alle Termine sicher, dass die Reihenfolge Anmeldefrist<Start<Ende eingehalten ist
-                    if (schulung.Termine.Count > 0 && schulung.Termine.All(x => x.Start > schulung.Anmeldefrist && x.End > x.Start))
+                    // auch Start der Anmeldefrist vor dem Ende der Anmeldefrist
+                    if (schulung.Termine.Count > 0
+                        && schulung.Termine.All(x => x.Start > schulung.Anmeldefrist && x.End > x.Start)
+                        && schulung.StartAnmeldefrist < schulung.Anmeldefrist)
                     {
-                        await MailingHelper.GenerateAndSendAnlegeMailAsync(schulung, Util.getRootUrl(Request), Util.getVorstand(_context), emailSender);
+                        await mailingHelper.GenerateAndSendAnlegeMailAsync(schulung, Util.getRootUrl(Request), Util.getVorstand(_context));
                         return RedirectToAction("Uebersicht");
                     }
-                    if (schulung.Termine.Count > 0)
+                    if (schulung.StartAnmeldefrist < schulung.Anmeldefrist) {
+                        ViewBag.errorMessage = "Start der Anmeldefrist muss vor dem Ende sein!";
+                    } else if (schulung.Termine.Count > 0)
                     {
                         ViewBag.errorMessage = "Anmeldefrist vor Starttermin vor Endtermin bitte!";
                     }
@@ -399,7 +404,7 @@ namespace Schulungsportal_2.Controllers
 
                 foreach(Anmeldung anmeldung in Anmeldungen)
                 {
-                    MailingHelper.GenerateAndSendAbsageMailAsync(anmeldung, schulung, vorstand, emailSender);
+                    mailingHelper.GenerateAndSendAbsageMailAsync(anmeldung, schulung, vorstand);
                 }
 
                 return RedirectToAction("Uebersicht");
@@ -465,12 +470,16 @@ namespace Schulungsportal_2.Controllers
                 {
                     Schulung schulung = schulungVM.ToSchulung();
                     // check ob zeiten passen
-                    if (schulung.Termine.Count > 0 && schulung.Termine.All(x => x.Start > schulung.Anmeldefrist && x.End > x.Start))
+                    if (schulung.Termine.Count > 0
+                        && schulung.Termine.All(x => x.Start > schulung.Anmeldefrist && x.End > x.Start)
+                        && schulung.StartAnmeldefrist < schulung.Anmeldefrist)
                     {
                         await _schulungRepository.UpdateAsync(schulung);
                         return RedirectToAction("Uebersicht"); //Nach Abschluss der Aktion Weiterleitung zur Ubersicht-View
                     }
-                    if (schulung.Termine.Count > 0)
+                    if (schulung.StartAnmeldefrist >= schulung.Anmeldefrist) {
+                        ViewBag.errorMessage = "Start der Anmeldefrist muss vor dem Ende sein!";
+                    } else if (schulung.Termine.Count > 0)
                     {
                         ViewBag.errorMessage = "Anmeldefrist vor Starttermin vor Endtermin bitte!";
                     }

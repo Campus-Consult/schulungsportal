@@ -23,7 +23,7 @@ namespace Schulungsportal_2.Controllers
         private SchulungRepository _schulungRepository;
         private AnmeldungRepository _anmeldungRepository;
 
-        private ISchulungsportalEmailSender emailSender;
+        private MailingHelper mailingHelper;
         
         // logger
         private static readonly log4net.ILog logger =
@@ -32,13 +32,12 @@ namespace Schulungsportal_2.Controllers
         // <summary>
         /// AnmeldungController Konstruktor legt die Repositories an.
         /// </summary>
-        public AnmeldungController(ApplicationDbContext context, ISchulungsportalEmailSender emailSender, IMapper mapper)
+        public AnmeldungController(ApplicationDbContext context, IMapper mapper, MailingHelper mailingHelper)
         {
             _schulungRepository = new SchulungRepository(context);
             _anmeldungRepository = new AnmeldungRepository(context, mapper);
+            this.mailingHelper = mailingHelper;
             _context = context;
-
-            this.emailSender = emailSender;
         }
 
         /// <summary>
@@ -49,8 +48,11 @@ namespace Schulungsportal_2.Controllers
         { 
             try
             {
+                var now = DateTime.Now;
                 // alle Schulungen aus der Datebank abrufen
-                List<Schulung> Schulungen = _schulungRepository.GetForRegSortByDate().ToList();
+                List<Schulung> Schulungen = _schulungRepository.GetForRegSortByDate()
+                    // man kann sich nur für Schulungen anmelden, deren Anmeldung läuft
+                    .Where(s => s.StartAnmeldefrist < now).ToList();
                 
                 // neues Viewmodel erstellen   
                 AnmeldungViewModel anmeldungViewModel = new AnmeldungViewModel(Schulungen);
@@ -106,7 +108,7 @@ namespace Schulungsportal_2.Controllers
                             // Termine aus Datenbank laden
                             if (schulung.Termine.Count == 0) { }
                             // Check ob die Schulung immer noch offen ist, sonst ignorieren
-                            if (!schulung.IsAbgesagt && schulung.Anmeldefrist > now) {
+                            if (!schulung.IsAbgesagt && schulung.Anmeldefrist > now && schulung.StartAnmeldefrist < now) {
                                 if (await _anmeldungRepository.AnmeldungAlreadyExistAsync(anmeldung))
                                 {
                                     schulung.Check = true;
@@ -117,7 +119,7 @@ namespace Schulungsportal_2.Controllers
                                     angemeldeteSchulungen.Add(schulung);
                                     await _anmeldungRepository.AddAsync(anmeldung);
                                     //logger.Info(anmeldung.AccessToken);
-                                    MailingHelper.GenerateAndSendBestätigungsMailAsync(anmeldung, schulung, vorstand, rootUrl, emailSender);
+                                    mailingHelper.GenerateAndSendBestätigungsMailAsync(anmeldung, schulung, vorstand, rootUrl);
                                 }
                             }
                         }
@@ -296,11 +298,11 @@ namespace Schulungsportal_2.Controllers
                 abmeldung.Nachricht = null;
             }
             var vorstand = Util.getVorstand(_context);
-            await MailingHelper.GenerateAndSendAbmeldungMailAsync(anmeldungByToken, anmeldungByToken.Schulung, vorstand, emailSender);
+            await mailingHelper.GenerateAndSendAbmeldungMailAsync(anmeldungByToken, anmeldungByToken.Schulung, vorstand);
 
             // Sende Mail an Dozenten falls Nachricht existiert oder wenn es nach Anmeldefrist ist
             if (abmeldung.Nachricht != null || anmeldungByToken.Schulung.Anmeldefrist < DateTime.Now) {
-                await MailingHelper.GenerateAndSendAbsageAnSchulungsdozentMailAsync(anmeldungByToken, abmeldung.Nachricht, vorstand, emailSender);
+                await mailingHelper.GenerateAndSendAbsageAnSchulungsdozentMailAsync(anmeldungByToken, abmeldung.Nachricht, vorstand);
             }
             return View("AbmeldungErfolgreich");
         }
@@ -343,7 +345,7 @@ namespace Schulungsportal_2.Controllers
             await _anmeldungRepository.UpdateAsync(anmeldungByToken);
             // if the Email changed send the appointment to the new Mail
             if (shouldSendNewMail) {
-                await MailingHelper.GenerateAndSendBestätigungsMailAsync(anmeldungByToken, anmeldungByToken.Schulung, Util.getVorstand(_context), Util.getRootUrl(Request), emailSender);
+                await mailingHelper.GenerateAndSendBestätigungsMailAsync(anmeldungByToken, anmeldungByToken.Schulung, Util.getVorstand(_context), Util.getRootUrl(Request));
             }
             return Redirect("/Anmeldung/Selbstmanagement/"+accessToken);
         }
@@ -378,7 +380,7 @@ namespace Schulungsportal_2.Controllers
                     // in Zukunft kommt
                     if (DateTime.Now < schulung.Termine.Min(x => x.Start))
                     {
-                        await MailingHelper.GenerateAndSendBestätigungsMailAsync(anmeldung, await _schulungRepository.GetByIdAsync(anmeldung.SchulungGuid), Util.getVorstand(_context), Util.getRootUrl(Request), emailSender);
+                        await mailingHelper.GenerateAndSendBestätigungsMailAsync(anmeldung, await _schulungRepository.GetByIdAsync(anmeldung.SchulungGuid), Util.getVorstand(_context), Util.getRootUrl(Request));
                     }
                     return Redirect("/Schulung/Teilnehmerliste/" + anmeldung.SchulungGuid);
                 }

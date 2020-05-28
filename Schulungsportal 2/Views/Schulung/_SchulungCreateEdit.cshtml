@@ -153,6 +153,25 @@
             </div>
         </div>
 
+        @* Label und Eingabefelder für den Start der Anmeldefrist*@
+        <div class="form-group">
+            @Html.LabelFor(model => model.StartAnmeldefristDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @*Check if this is create or not, don't show 01.01.0001*@
+                @if (@Model.StartAnmeldefristDate.ToBinary() == 0) {
+                    <input type="date" asp-for="StartAnmeldefristDate" class="form-control" placeholder="dd.mm.yyyy"/>
+                } else {
+                    <input type="date" asp-for="StartAnmeldefristDate" class="form-control" placeholder="dd.mm.yyyy" value="@Model.StartAnmeldefristDate.ToString("yyyy-MM-dd")"/>
+                }
+                @Html.ValidationMessageFor(model => model.StartAnmeldefristDate, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+                @Html.EditorFor(model => model.StartAnmeldefristTime, new { htmlAttributes = new { @class = "form-control", @placeholder = "HH:mm" } })
+                @Html.ValidationMessageFor(model => model.StartAnmeldefristTime, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-5"></div>
+        </div>
+
         @* Label und Eingabefelder für die Anmeldefrist*@
         <div class="form-group">
             @Html.LabelFor(model => model.AnmeldefristDate, htmlAttributes: new { @class = "control-label col-md-2" })

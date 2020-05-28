@@ -40,6 +40,18 @@
     </tr>
     <tr>
         <th>
+            Start Anmeldefrist:
+        </th>
+        @if(@Model.StartAnmeldefrist.ToBinary() == 0) {
+            <td>-</td>
+        } else {
+            <td>
+                @Html.DisplayFor(m => m.StartAnmeldefrist) Uhr
+            </td>
+        }
+    </tr>
+    <tr>
+        <th>
             Anmeldefrist:
         </th>
         <td>

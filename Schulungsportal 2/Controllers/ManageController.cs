@@ -19,18 +19,18 @@ namespace Schulungsportal_2.Controllers
 
         private UserManager<IdentityUser> userManager;
         private RoleManager<IdentityRole> roleManager;
-        private ISchulungsportalEmailSender mailSender;
+        private MailingHelper mailingHelper;
         private InviteRepository InviteRepository;
         private ApplicationDbContext _context;
 
         public ManageController(UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            ISchulungsportalEmailSender mailSender,
+            MailingHelper mailingHelper,
             ApplicationDbContext _context)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
-            this.mailSender = mailSender;
+            this.mailingHelper = mailingHelper;
             this._context = _context;
             this.InviteRepository = new InviteRepository(_context);
         }
@@ -51,7 +51,7 @@ namespace Schulungsportal_2.Controllers
             // create invite
             Invite invite = await InviteRepository.CreateForMail(manAdd.EMailAdress, DateTime.Now.AddDays(2));
             // send invite
-            await MailingHelper.GenerateAndSendInviteMailAsync(invite, Util.getRootUrl(Request), Util.getVorstand(_context), mailSender);
+            await mailingHelper.GenerateAndSendInviteMailAsync(invite, Util.getRootUrl(Request), Util.getVorstand(_context));
             ViewBag.successMessage = "Successfully sent invite Mail, this is valid for 2 days";
             return View();
         }

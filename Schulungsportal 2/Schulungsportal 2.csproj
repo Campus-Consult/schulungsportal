@@ -26,10 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="MailTemplates\AbsageMail.cshtml" />
-    <Content Remove="MailTemplates\AnlegeMail.cshtml" />
-    <Content Remove="MailTemplates\BestaetigungsMail.cshtml" />
-    <Content Remove="MailTemplates\NewsletterMail.cshtml" />
+    <EmbeddedResource Include="Views\Shared\BaseMail.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -75,7 +72,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
-    <PackageReference Include="RazorLight" Version="2.0.0-beta1" />
   </ItemGroup>
 
 

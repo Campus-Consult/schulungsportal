@@ -44,7 +44,7 @@ namespace Schulungsportal_2_Tests
             Assert.Equal("application/json; charset=utf-8", 
                 response.Content.Headers.ContentType.ToString());
             var gotJson = await response.Content.ReadAsStringAsync();
-            var expectedJson = "[{\"anmeldungsZahl\":0,\"schulungGUID\":\"00000000-0000-0000-0000-000000000001\",\"titel\":\"Schulung 2\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 2\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-18T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"isAbgesagt\":false},{\"anmeldungsZahl\":4,\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Schulung 1\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 1\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-20T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"isAbgesagt\":false}]";
+            var expectedJson = "[{\"anmeldungsZahl\":0,\"schulungGUID\":\"00000000-0000-0000-0000-000000000001\",\"titel\":\"Schulung 2\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 2\",\"ort\":\"Büro\",\"startAnmeldefrist\":\"0001-01-01T00:00:00\",\"anmeldefrist\":\"2019-06-18T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"isAbgesagt\":false},{\"anmeldungsZahl\":4,\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Schulung 1\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 1\",\"ort\":\"Büro\",\"startAnmeldefrist\":\"0001-01-01T00:00:00\",\"anmeldefrist\":\"2019-06-20T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"isAbgesagt\":false}]";
             Assert.Equal(expectedJson, gotJson);
         }
 
@@ -86,7 +86,7 @@ namespace Schulungsportal_2_Tests
             Assert.Equal("application/json; charset=utf-8", 
                 response.Content.Headers.ContentType.ToString());
             var gotJson = await response.Content.ReadAsStringAsync();
-            var expectedJson = "[{\"anmeldungsZahl\":4,\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Schulung 1\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 1\",\"ort\":\"Büro\",\"anmeldefrist\":\"2019-06-20T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"isAbgesagt\":false}]";
+            var expectedJson = "[{\"anmeldungsZahl\":4,\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Schulung 1\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Schulung 1\",\"ort\":\"Büro\",\"startAnmeldefrist\":\"0001-01-01T00:00:00\",\"anmeldefrist\":\"2019-06-20T00:00:00\",\"termine\":[{\"start\":\"2019-06-21T00:00:00\",\"end\":\"2019-06-22T00:00:00\"}],\"isAbgesagt\":false}]";
             Assert.Equal(expectedJson, gotJson);
         }
 
@@ -152,7 +152,7 @@ namespace Schulungsportal_2_Tests
 
             // Assert
             response.EnsureSuccessStatusCode();
-            var expectedJson = "[{\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Test 0\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Test 0\",\"ort\":\"hier\",\"anmeldefrist\":\"2019-03-11T00:00:00\",\"termine\":[{\"start\":\"2019-03-12T00:00:00\",\"end\":\"2019-03-13T00:00:00\"}],\"isAbgesagt\":false}]";
+            var expectedJson = "[{\"schulungGUID\":\"00000000-0000-0000-0000-000000000000\",\"titel\":\"Test 0\",\"organisatorInstitution\":\"CC\",\"beschreibung\":\"Test 0\",\"ort\":\"hier\",\"startAnmeldefrist\":\"2019-03-10T00:00:00\",\"anmeldefrist\":\"2019-03-11T00:00:00\",\"termine\":[{\"start\":\"2019-03-12T00:00:00\",\"end\":\"2019-03-13T00:00:00\"}],\"isAbgesagt\":false}]";
             Assert.Equal(expectedJson, await response.Content.ReadAsStringAsync());
         }
 
@@ -250,7 +250,8 @@ namespace Schulungsportal_2_Tests
             // Assert
             response.EnsureSuccessStatusCode();
             //throw new Exception(await response.Content.ReadAsStringAsync());
-            var obj = JsonConvert.DeserializeObject<List<AnmeldungWithMatchCountDTO>>(await response.Content.ReadAsStringAsync());
+            var resp = await response.Content.ReadAsStringAsync();
+            var obj = JsonConvert.DeserializeObject<List<AnmeldungWithMatchCountDTO>>(resp);
             Assert.Equal(1, obj.Count);
             var cur = obj[0];
             Assert.Equal(5, cur.AnmeldungID);
