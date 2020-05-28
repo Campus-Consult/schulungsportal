@@ -100,10 +100,13 @@ namespace Schulungsportal_2
                 };
             });
 
-            // For the framework, only method to send mails
-            services.AddTransient<IEmailSender, AuthMessageSender>();
-            // For some of our stuff, has some more specific methods to send mails
-            services.AddTransient<ISchulungsportalEmailSender, AuthMessageSender>();
+            // only configure mail if it hasn't been set, workaround for tests
+            if (!services.Any(s => s.ServiceType == typeof(ISchulungsportalEmailSender))) {
+                // For the framework, only method to send mails
+                services.AddTransient<IEmailSender, AuthMessageSender>();
+                // For some of our stuff, has some more specific methods to send mails
+                services.AddTransient<ISchulungsportalEmailSender, AuthMessageSender>();
+            }
             // Background Task for reminders
             services.AddHostedService<AnwesenheitslisteReminderService>();
 
