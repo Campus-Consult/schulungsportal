@@ -19,10 +19,11 @@ namespace Schulungsportal_2.ViewModels
         public static readonly List<string> AllStati = new List<string>
             {
                 "Trainee",
-                "Junior Mitglied",
-                "Mitglied",
-                "Senior Mitglied",
-                "Alumnus/Alumna",
+                "Associate",
+                "Junior Consultant",
+                "Consultant",
+                "Senior Consultant",
+                "Partner",
                 "Sonstiges"
             };
 

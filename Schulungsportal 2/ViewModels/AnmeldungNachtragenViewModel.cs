@@ -19,7 +19,7 @@ namespace Schulungsportal_2.ViewModels
         public AnmeldungNachtragenViewModel()
         {
             // dem Viewmodel die Stati als SelectListItems für das Dropdown-Menü übergeben
-            Stati = GetSelectListItems(GetAllStati()); 
+            Stati = GetSelectListItems(AnmeldungViewModel.AllStati); 
         }
         
 
@@ -68,24 +68,6 @@ namespace Schulungsportal_2.ViewModels
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Diese Methode gibt eine Liste von Strings mit den Bezeichnungen aller CC-Stati zurück
-        /// </summary>
-        /// <returns> Liste von Strings mit den Bezeichnungen aller CC-Stati </returns>
-        private IEnumerable<string> GetAllStati()
-        {
-            return new List<string>
-            {
-                "Mentee",
-                "Trainee",
-                "Junior Mitglied",
-                "Mitglied",
-                "Senior Mitglied",
-                "Alumnus",
-                "Sonstiges"
-            };
         }
 
         /// <summary>
