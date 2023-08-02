@@ -26,10 +26,7 @@ services:
     build:
       dockerfile: ./Dockerfile
     image: schulungsportal
-    depends_on: [mysql]  
-    environment:
-      DATABASE_HOST: database
-      DATABASE_PASSWORD: Password      
+    depends_on: [mysql]       
     ports:
       - 5002:80
     volumes:
