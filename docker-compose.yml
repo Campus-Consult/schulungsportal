@@ -26,13 +26,14 @@ services:
     build:
       dockerfile: ./Dockerfile
     image: schulungsportal
-    depends_on: mysql  
+    depends_on: [mysql]  
     environment:
       DATABASE_HOST: database
       DATABASE_PASSWORD: Password      
     ports:
-      - 5001:5001
-      - 5000:5000
+      - 5002:80
+    volumes:
+      - ./appsettings.docker.json:/app/appsettings.Production.json
 
 
 # Names our volume
