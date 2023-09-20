@@ -77,4 +77,4 @@ jobs:
     - name: Adding Known Hosts
       run: ssh-keyscan -H ${{ secrets.CAMPUS_CONSULT_SERVER_IP }} >> ~/.ssh/known_hosts
     - name: Restart backend
-      run: ssh ${{ secrets.CAMPUS_CONSULT_SERVER_USER }}@${{ secrets.CAMPUS_CONSULT_SERVER_IP }} 'podman pull ghcr.io/campus-consult/schulungsportal:main && systemctl --user restart dotnet-schulungsportal.service'
+      run: ssh ${{ secrets.CAMPUS_CONSULT_SERVER_USER }}@${{ secrets.CAMPUS_CONSULT_SERVER_IP }} 'podman pull ghcr.io/campus-consult/schulungsportal:main && systemctl --user restart container-schulungsportal.service'
