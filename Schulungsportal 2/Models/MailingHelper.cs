@@ -48,12 +48,8 @@ namespace Schulungsportal_2.Models
 
                 MailViewModel mvm = new MailViewModel
                 {
-                    //CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
-                    //FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
-                    //InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
                     SelbstmanagementUrl = selbstmanagementUrl,
                     Schulung = schulung,
-                    Vorstand = vorstand,
                 };
 
                 var body = new TextPart("html") //Inhalt
@@ -64,12 +60,6 @@ namespace Schulungsportal_2.Models
 
                 var outmultipart = new Multipart("mixed");
                 outmultipart.Add(body);
-                //inmultipart.Add(attachments.First());
-                // Bilder für Corporate Design, funktioniert leider nicht
-                //outmultipart.Add(inmultipart);
-                //outmultipart.Add(LoadInlinePicture("CCLogo.png", mvm.CCLogoFile));
-                //outmultipart.Add(LoadInlinePicture("FBLogo.png", mvm.FacebookLogoFile));
-                //outmultipart.Add(LoadInlinePicture("InstaLogo.png", mvm.InstaLogoFile));
                 foreach (var attachment in attachments)
                 {
                     outmultipart.Add(attachment);
@@ -109,11 +99,7 @@ namespace Schulungsportal_2.Models
 
                 MailViewModel mvm = new MailViewModel
                 {
-                    //CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
-                    //FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
-                    //InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
                     Schulung = schulung,
-                    Vorstand = vorstand,
                     TeilnehmerListeUrl = teilnehmerListeUrl,
                 };
 
@@ -125,12 +111,6 @@ namespace Schulungsportal_2.Models
 
                 var outmultipart = new Multipart("mixed");
                 outmultipart.Add(body);
-                //inmultipart.Add(attachments.First());
-                // Bilder für Corporate Design, funktioniert leider nicht
-                //outmultipart.Add(inmultipart);
-                //outmultipart.Add(LoadInlinePicture("CCLogo.png", mvm.CCLogoFile));
-                //outmultipart.Add(LoadInlinePicture("FBLogo.png", mvm.FacebookLogoFile));
-                //outmultipart.Add(LoadInlinePicture("InstaLogo.png", mvm.InstaLogoFile));
                 foreach (var attachment in attachments)
                 {
                     outmultipart.Add(attachment);
@@ -165,11 +145,7 @@ namespace Schulungsportal_2.Models
                 
                 MailViewModel mvm = new MailViewModel
                 {
-                    //CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
-                    //FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
-                    //InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
                     Schulung = schulung,
-                    Vorstand = vorstand,
                 };
                 
                 var body = new TextPart("html") //Inhalt
@@ -181,12 +157,6 @@ namespace Schulungsportal_2.Models
                     
                 var outmultipart = new Multipart("mixed");
                 outmultipart.Add(body);
-                //inmultipart.Add(attachments.First());
-                // Bilder für Corporate Design, funktioniert leider nicht
-                //outmultipart.Add(inmultipart);
-                //outmultipart.Add(LoadInlinePicture("CCLogo.png", mvm.CCLogoFile));
-                //outmultipart.Add(LoadInlinePicture("FBLogo.png", mvm.FacebookLogoFile));
-                //outmultipart.Add(LoadInlinePicture("InstaLogo.png", mvm.InstaLogoFile));
                 foreach (var attachment in attachments)
                 {
                     outmultipart.Add(attachment);
@@ -222,11 +192,7 @@ namespace Schulungsportal_2.Models
 
                 MailViewModel mvm = new MailViewModel
                 {
-                    CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
-                    FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
-                    InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
                     Schulungen = schulungen,
-                    Vorstand = vorstand,
                 };
 
                 var body = new TextPart("html") //Inhalt
@@ -237,10 +203,6 @@ namespace Schulungsportal_2.Models
 
                 var multipart = new MultipartRelated();
                 multipart.Add(body);
-                // Bilder für Corporate Design
-                multipart.Add(LoadInlinePicture("CCLogo.png", mvm.CCLogoFile));
-                multipart.Add(LoadInlinePicture("FBLogo.png", mvm.FacebookLogoFile));
-                multipart.Add(LoadInlinePicture("InstaLogo.png", mvm.InstaLogoFile));
                 
                 message.Body = multipart;
 
@@ -265,13 +227,9 @@ namespace Schulungsportal_2.Models
             message.Subject = "Schulung "+anmeldung.Schulung.Titel + ": Abmeldung eines Teilnehmers"; //Betreff
 
             MailViewModel mwm = new MailViewModel {
-                Vorstand = vorstand,
                 Begruendung = begruendung,
                 Anmeldung = anmeldung,
                 Schulung = schulung,
-                CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
-                FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
-                InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
             };
 
             var body = new TextPart("html") //Inhalt
@@ -282,10 +240,6 @@ namespace Schulungsportal_2.Models
 
             var multipart = new MultipartRelated();
             multipart.Add(body);
-            // Bilder für Corporate Design
-            multipart.Add(LoadInlinePicture("CCLogo.png", mwm.CCLogoFile));
-            multipart.Add(LoadInlinePicture("FBLogo.png", mwm.FacebookLogoFile));
-            multipart.Add(LoadInlinePicture("InstaLogo.png", mwm.InstaLogoFile));
             
             message.Body = multipart;
 
@@ -299,11 +253,7 @@ namespace Schulungsportal_2.Models
             message.Subject = "Invite Schulungsportal"; //Betreff
 
             InviteMailViewModel imwm = new InviteMailViewModel {
-                Vorstand = vorstand,
                 InviteURL = rootUrl + "/Manage/Register/" + invite.InviteGUID,
-                CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
-                FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
-                InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
             };
 
             var body = new TextPart("html") //Inhalt
@@ -314,10 +264,6 @@ namespace Schulungsportal_2.Models
 
             var multipart = new MultipartRelated();
             multipart.Add(body);
-            // Bilder für Corporate Design
-            multipart.Add(LoadInlinePicture("CCLogo.png", imwm.CCLogoFile));
-            multipart.Add(LoadInlinePicture("FBLogo.png", imwm.FacebookLogoFile));
-            multipart.Add(LoadInlinePicture("InstaLogo.png", imwm.InstaLogoFile));
             
             message.Body = multipart;
 
@@ -340,11 +286,7 @@ namespace Schulungsportal_2.Models
                 
                 MailViewModel mvm = new MailViewModel
                 {
-                    //CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
-                    //FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
-                    //InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
                     Schulung = schulung,
-                    Vorstand = vorstand,
                 };
                 
                 var body = new TextPart("html") //Inhalt
@@ -356,12 +298,6 @@ namespace Schulungsportal_2.Models
                 
                 var outmultipart = new Multipart("mixed");
                 outmultipart.Add(body);
-                //inmultipart.Add(attachments.First());
-                // Bilder für Corporate Design, funktioniert leider nicht
-                //outmultipart.Add(inmultipart);
-                //outmultipart.Add(LoadInlinePicture("CCLogo.png", mvm.CCLogoFile));
-                //outmultipart.Add(LoadInlinePicture("FBLogo.png", mvm.FacebookLogoFile));
-                //outmultipart.Add(LoadInlinePicture("InstaLogo.png", mvm.InstaLogoFile));
                 foreach (var attachment in attachments)
                 {
                     outmultipart.Add(attachment);
@@ -400,11 +336,7 @@ namespace Schulungsportal_2.Models
             
             MailViewModel mvm = new MailViewModel
             {
-                CCLogoFile = "cclogo.png@"+Guid.NewGuid().ToString(),
-                FacebookLogoFile = "fblogo.png@" + Guid.NewGuid().ToString(),
-                InstaLogoFile = "instalogo.png@" + Guid.NewGuid().ToString(),
                 Schulung = schulung,
-                Vorstand = vorstand,
             };
             
             var body = new TextPart("html") //Inhalt
@@ -414,10 +346,6 @@ namespace Schulungsportal_2.Models
             };
 
             multipart.Add(body);
-            // Bilder für Corporate Design
-            multipart.Add(LoadInlinePicture("CCLogo.png", mvm.CCLogoFile));
-            multipart.Add(LoadInlinePicture("FBLogo.png", mvm.FacebookLogoFile));
-            multipart.Add(LoadInlinePicture("InstaLogo.png", mvm.InstaLogoFile));
             message.Body = multipart;
 
             await emailSender.SendEmailAsync(message);
@@ -531,39 +459,19 @@ namespace Schulungsportal_2.Models
         {
             return await viewRenderer.RenderViewToStringAsync("/MailTemplates/"+filename+".cshtml",mvm);
         }
-
-        private static MimePart LoadInlinePicture(string filename, string contentID)
-        {
-            return new MimePart("image", "png")
-            {
-                Content = new MimeContent(Assembly.GetAssembly(typeof(MailingHelper)).GetManifestResourceStream("Schulungsportal_2.MailTemplates."+filename)),
-                ContentDisposition = new ContentDisposition(ContentDisposition.Inline),
-                ContentId = contentID,
-                ContentTransferEncoding = ContentEncoding.Base64,
-                FileName = filename
-            };
-        }
     }
 
     public class MailViewModel
     {
         public string TeilnehmerListeUrl { get; set; }
         public string SelbstmanagementUrl { get; set; }
-        public string Vorstand { get; set; }
         public string Begruendung { get; set; }
         public Anmeldung Anmeldung { get; set; }
         public Schulung Schulung { get; set; }
         public List<Schulung> Schulungen { get; set; }
-        public string CCLogoFile { get; set; }
-        public string FacebookLogoFile { get; set; }
-        public string InstaLogoFile { get; set; }
     }
 
     public class InviteMailViewModel {
         public string InviteURL { get; set; }
-        public string Vorstand { get; set; }
-        public string CCLogoFile { get; set; }
-        public string FacebookLogoFile { get; set; }
-        public string InstaLogoFile { get; set; }
     }
 }
