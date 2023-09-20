@@ -5,6 +5,7 @@ using Schulungsportal_2.Data;
 using Schulungsportal_2.Models;
 using Schulungsportal_2.Services;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,6 +42,7 @@ namespace Schulungsportal_2.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles="Verwaltung")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddManager(ManagerAddModel manAdd) {
             // TODO: test
@@ -54,6 +56,30 @@ namespace Schulungsportal_2.Controllers
             await mailingHelper.GenerateAndSendInviteMailAsync(invite, Util.getRootUrl(Request), Util.getVorstand(_context));
             ViewBag.successMessage = "Successfully sent invite Mail, this is valid for 2 days";
             return View();
+        }
+
+        [Authorize(Roles="Verwaltung")]
+        public async Task<IActionResult> Managers() {
+            var users = await userManager.GetUsersInRoleAsync("Verwaltung");
+            var userEmails = users.Select(u => u.Email).ToList();
+            return View("Managers", users);
+        }
+
+        [Authorize(Roles="Verwaltung")]
+        [Route("Manage/Remove/{userId}")]
+        public async Task<IActionResult> Remove(string userId) {
+            var user = await userManager.FindByIdAsync(userId);
+            return View("Remove", user);
+        }
+
+        [HttpPost]
+        [Authorize(Roles="Verwaltung")]
+        [Route("Manage/Remove/{userId}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemovePost(string userId) {
+            var user = await userManager.FindByIdAsync(userId);
+            await userManager.DeleteAsync(user);
+            return Redirect("/Manage/Managers");
         }
 
         [Route("Manage/Register/{inviteID}")]

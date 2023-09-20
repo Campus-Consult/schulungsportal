@@ -1,0 +1,20 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityUser
+
+@{
+    ViewData["Title"] = "Löschen";
+}
+<h3>Sind Sie sicher, das @Model.Email von den verwaltenden Personen entfernt werden soll?</h3>
+<div>
+    <p> Diese Aktion kann nicht Rückgängig gemacht werden!</p>
+
+    @using (Html.BeginForm())
+    {
+        <div class="form-group">
+            @Html.AntiForgeryToken()
+        </div>
+        <div class="form-actions no-color">
+            <input type="submit" value="Löschen" class="btn btn-danger" />
+        </div>
+    }
+</div>
+

@@ -1,0 +1,19 @@
+@model System.Collections.Generic.IList<Microsoft.AspNetCore.Identity.IdentityUser>;
+
+@{
+    ViewData["Title"] = "Verwaltungsberechtigte";
+}
+
+<h2>Verwaltungsberechtige</h2>
+
+<a href="/Manage/AddManager">Verwaltungsberechtige Person hinzufügen</a>
+
+<table class="table table-striped well">
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Email</td>
+            <td><a href="/Manage/Remove/@user.Id">Löschen</a></td>
+        </tr>    
+    }
+</table>
