@@ -26,4 +26,5 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-alpine AS runtime
 WORKDIR /app
 COPY --from=build ["/app/Schulungsportal 2/out", "./"]
+ENV TZ=Europe/Berlin
 ENTRYPOINT ["dotnet", "Schulungsportal 2.dll"]
